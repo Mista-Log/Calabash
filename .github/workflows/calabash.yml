@@ -1,0 +1,43 @@
+name: Calabash Pipeline
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  backend:
+    name: Django CI (uv)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install uv
+        run: |
+          pip install uv
+
+      - name: Sync dependencies
+        working-directory: backend
+        run: |
+          uv sync --frozen
+
+      - name: Run migrations check
+        working-directory: backend
+        run: |
+          uv run python manage.py makemigrations --check --dry-run
+
+      - name: Run Django tests
+        working-directory: backend
+        env:
+          DJANGO_SETTINGS_MODULE: config.settings.test
+          SECRET_KEY: dummy-secret-key
+        run: |
+          uv run python manage.py test
