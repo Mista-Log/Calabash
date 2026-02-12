@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 from pathlib import Path
 from dotenv import load_dotenv
 import os
+from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -42,6 +43,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'account',
+    "drf_spectacular",
+    "rest_framework",
+    "rest_framework_simplejwt",
 ]
 
 MIDDLEWARE = [
@@ -122,3 +126,23 @@ USE_TZ = True
 STATIC_URL = 'static/'
 
 AUTH_USER_MODEL = 'account.User'
+
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ),
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+}
+
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Calabash API",
+    "DESCRIPTION": "API documentation for calabash digital platform",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+}
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
+}

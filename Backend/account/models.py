@@ -73,9 +73,9 @@ class Student(models.Model):
         on_delete=models.CASCADE,
         related_name="student_profile"
     )
-    matric_number = models.CharField(max_length=50, unique=True)
-    department = models.CharField(max_length=100)
-    level = models.CharField(max_length=50)
+    matric_number = models.CharField(max_length=50, unique=True, null=True, blank=True)
+    department = models.CharField(max_length=100, null=True, blank=True)
+    level = models.CharField(max_length=50, null=True, blank=True)
 
     def __str__(self):
         return f"Student: {self.user.full_name}"
@@ -87,9 +87,9 @@ class Lecturer(models.Model):
         on_delete=models.CASCADE,
         related_name="lecturer_profile"
     )
-    staff_id = models.CharField(max_length=50, unique=True)
-    department = models.CharField(max_length=100)
-    office = models.CharField(max_length=100)
+    staff_id = models.CharField(max_length=50, unique=True, null=True, blank=True)
+    department = models.CharField(max_length=100, null=True, blank=True)
+    office = models.CharField(max_length=100, null=True, blank=True)
 
     def __str__(self):
         return f"Lecturer: {self.user.full_name}"
@@ -100,7 +100,7 @@ class Admin(models.Model):
         on_delete=models.CASCADE,
         related_name="admin_profile"
     )
-    position = models.CharField(max_length=100)
+    position = models.CharField(max_length=100, null=True, blank=True)
 
     def __str__(self):
         return f"Admin: {self.user.full_name}"
