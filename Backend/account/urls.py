@@ -1,9 +1,9 @@
 from django.urls import path
 from django.http import HttpResponse
-
-def dummy_view(request):
-    return HttpResponse("Account app is active!")
+from django.urls import path
+from .views import SignupView, LoginView
 
 urlpatterns = [
-    path('test/', dummy_view),
+    path("signup/", SignupView.as_view(), name="signup"),
+    path("login/", LoginView.as_view(), name="login"),
 ]
