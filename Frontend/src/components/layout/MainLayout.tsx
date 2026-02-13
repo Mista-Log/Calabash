@@ -38,11 +38,15 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/core";
-import { LucideIcon } from "lucide-react";
+// import { LucideIcon } from "lucide-react";
+// import { HugeiconsIcon } from "hugeicons-react";
+
+
+type HugeIconType = React.ComponentProps<typeof HugeiconsIcon>["icon"];
 interface NavItem {
   title: string;
   href: string;
-  icon: LucideIcon;
+  icon: HugeIconType;
 }
 
 const mainNav: NavItem[] = [
