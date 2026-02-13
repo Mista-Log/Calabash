@@ -1,2 +1,65 @@
-.env
+# ==============================
+# Python
+# ==============================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Virtual environments
 .venv/
+venv/
+env/
+ENV/
+
+# ==============================
+# UV
+# ==============================
+# Keep these:
+# pyproject.toml
+# uv.lock
+
+# ==============================
+# Django
+# ==============================
+*.log
+db.sqlite3
+media/
+staticfiles/
+
+# If using local settings file
+local_settings.py
+
+# ==============================
+# Environment Variables
+# ==============================
+.env
+.env.*
+*.env
+
+# ==============================
+# IDEs
+# ==============================
+.vscode/
+.idea/
+
+# ==============================
+# OS Files
+# ==============================
+.DS_Store
+Thumbs.db
+
+# ==============================
+# Testing & Coverage
+# ==============================
+.coverage
+htmlcov/
+.pytest_cache/
+
+# ==============================
+# Node (if using React/Next frontend)
+# ==============================
+node_modules/
+.next/
+dist/
+build/
