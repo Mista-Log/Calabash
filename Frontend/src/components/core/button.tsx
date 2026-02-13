@@ -39,6 +39,7 @@ const buttonVariants = cva(
   },
 );
 
+
 export interface ButtonProps
   extends
     React.ButtonHTMLAttributes<HTMLButtonElement>,
@@ -47,7 +48,7 @@ export interface ButtonProps
   isLoading?: boolean;
   loadingText?: string;
   success?: boolean;
-  icon?: any;
+  icon?: React.ReactElement | string;
   iconPlacement?: "left" | "right";
 }
 
@@ -71,8 +72,9 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ) => {
     const Comp = asChild ? Slot.Slot : "button";
 
-    const renderIcon = (iconData: any) => {
+    const renderIcon = (iconData: React.ReactElement | string) => {
       if (React.isValidElement(iconData)) return iconData;
+
       return (
         <HugeiconsIcon
           icon={iconData}

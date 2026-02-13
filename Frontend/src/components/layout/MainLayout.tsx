@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import {
   LibraryIcon,
   BookOpen01Icon,
-  Upload01Icon,
+  // Upload01Icon,
   Settings02Icon,
   Logout02Icon,
   Menu01Icon,
@@ -15,12 +15,12 @@ import {
   DashboardSquare01Icon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion}  from "framer-motion";
 
 import { cn } from "@/lib/utils";
 import { useSettingsStore } from "@/store/useSettingsStore";
 import { staggerContainer, listEntry } from "@/lib/motion-variants";
-import { Button, ScrollArea, Separator } from "@/components/core";
+import { Button, ScrollArea } from "@/components/core";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -38,11 +38,11 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/core";
-
+import { LucideIcon } from "lucide-react";
 interface NavItem {
   title: string;
   href: string;
-  icon: any;
+  icon: LucideIcon;
 }
 
 const mainNav: NavItem[] = [

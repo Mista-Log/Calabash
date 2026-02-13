@@ -8,8 +8,8 @@ import {
   LibraryIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { motion, AnimatePresence } from "framer-motion";
-import { cn } from "@/lib/utils";
+// import { motion, AnimatePresence } from "framer-motion";
+// import { cn } from "@/lib/utils";
 import { Button } from "@/components/core";
 
 interface Testimonial {

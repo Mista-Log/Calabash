@@ -29,7 +29,7 @@ export function SignupForm({
   className,
   title = "Create Account.",
   description = "Join Calabash and start your academic journey.",
-  ...props
+  // ...props
 }: SignupFormProps) {
   const router = useRouter();
   const [isLoading, setIsLoading] = React.useState(false);

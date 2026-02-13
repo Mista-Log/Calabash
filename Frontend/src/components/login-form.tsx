@@ -3,7 +3,7 @@
 import * as React from "react";
 import { useRouter } from "next/navigation";
 import {
-  LibraryIcon,
+  // LibraryIcon,
   Mail01Icon,
   LockPasswordIcon,
   ViewIcon,
@@ -22,13 +22,13 @@ import {
 
 export function LoginForm({
   className,
-  ...props
+  // ...props
 }: React.ComponentProps<"form">) {
   const router = useRouter();
   const [isLoading, setIsLoading] = React.useState(false);
   const [email, setEmail] = React.useState("");
   const [emailError, setEmailError] = React.useState("");
-  const [password, setPassword] = React.useState("");
+  // const [password, setPassword] = React.useState("");
   const [showPassword, setShowPassword] = React.useState(false);
 
   const validateEmail = (val: string) => {
