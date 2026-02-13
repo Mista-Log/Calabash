@@ -38,7 +38,7 @@ jobs:
         working-directory: Backend
         env:
           DJANGO_SETTINGS_MODULE: config.settings
-          SECRET_KEY: dummy-secret-key
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
         run: |
           uv run python manage.py test
 
