@@ -47,10 +47,12 @@ INSTALLED_APPS = [
     "drf_spectacular",
     "rest_framework",
     "rest_framework_simplejwt",
+    "corsheaders",
+
 ]
 
 MIDDLEWARE = [
-
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
 
@@ -153,3 +155,10 @@ SIMPLE_JWT = {
 
 STATIC_URL = "static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "https://frontend-ten-psi-43.vercel.app",
+]
+
+CORS_ALLOW_CREDENTIALS = True
