@@ -5,7 +5,24 @@ from rest_framework import status
 from .serializers import SignupSerializer, LoginSerializer
 from drf_spectacular.utils import extend_schema
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.generics import RetrieveAPIView
+from rest_framework.permissions import IsAuthenticated
+from .serializers import UserMeSerializer
 
+
+
+
+@extend_schema(
+    summary="Get current authenticated user",
+    description="Returns the authenticated user's information and role-based profile.",
+    responses=UserMeSerializer,
+)
+class MeView(RetrieveAPIView):
+    serializer_class = UserMeSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self):
+        return self.request.user
 
 
 
