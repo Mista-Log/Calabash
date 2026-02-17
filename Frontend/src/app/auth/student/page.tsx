@@ -1,10 +1,10 @@
 import { AuthLayout } from "@/components/layout/AuthLayout";
-import { SignupForm } from "@/components/signup-form";
+import { SignupForm } from "@/components/auth/SignupForm";
 
 export default function StudentSignupPage() {
   return (
     <AuthLayout
-      image="https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=2070&auto=format&fit=crop"
+      video="https://ouq07ad0ckrnn7nu.public.blob.vercel-storage.com/student%20cover.mp4"
       testimonial={{
         quote:
           "I'm the type of student who used to struggle with finding organized materials. Calabash is truly like a miracle for my grades.",
@@ -16,6 +16,7 @@ export default function StudentSignupPage() {
       <SignupForm
         title="Join Calabash."
         description="Access your course materials and collaborate with peers today."
+        defaultRole="student"
       />
     </AuthLayout>
   );

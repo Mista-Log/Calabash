@@ -1,35 +1,33 @@
+import { Loading01Icon, Tick01Icon } from "@hugeicons/core-free-icons";
 import * as React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 import * as Slot from "@radix-ui/react-slot";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Loading01Icon, Tick01Icon } from "@hugeicons/core-free-icons";
 
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-semibold transition-all duration-200 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 shadow-sm",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-bold transition-colors duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2 active:scale-[0.98]",
   {
     variants: {
       variant: {
-        default:
-          "bg-primary text-primary-foreground hover:bg-primary/90 hover:shadow-md hover:shadow-primary/20",
-        destructive:
-          "bg-destructive text-white hover:bg-destructive/90 hover:shadow-md hover:shadow-destructive/20",
+        default: "bg-primary text-primary-foreground hover:bg-primary/90",
+        destructive: "bg-destructive text-white hover:bg-destructive/90",
         outline:
-          "border border-border bg-background hover:bg-accent hover:text-accent-foreground",
+          "border border-border/60 bg-background hover:bg-primary/5 hover:border-primary/20 hover:text-primary shadow-none",
         secondary:
           "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-        ghost: "hover:bg-accent/50 hover:text-accent-foreground",
+        ghost: "hover:bg-primary/5 hover:text-primary shadow-none",
         subtle:
-          "bg-accent/10 text-accent-foreground hover:bg-accent/20 shadow-none",
-        link: "text-primary underline-offset-4 hover:underline shadow-none",
+          "bg-primary/5 text-primary hover:bg-primary/10 shadow-none border border-primary/10",
+        link: "text-primary underline-offset-4 hover:underline shadow-none p-0 h-auto",
       },
       size: {
         default: "h-10 px-6 py-2",
-        xs: "h-7 gap-1 rounded-md px-2 text-xs [&_svg:not([class*='size-'])]:size-3",
-        sm: "h-8 rounded-md gap-1.5 px-3",
-        lg: "h-12 rounded-lg px-8 text-base",
-        icon: "size-10 p-0",
+        xs: "h-8 gap-1 rounded-sm px-2 text-xs [&_svg:not([class*='size-'])]:size-3",
+        sm: "h-9 rounded-md gap-1.5 px-3",
+        lg: "h-11 rounded-md px-8 text-base",
+        icon: "size-10 p-0 rounded-md",
       },
     },
     defaultVariants: {

@@ -1,11 +1,20 @@
 import type { Metadata } from "next";
+import { Outfit } from "next/font/google";
 import "./globals.css";
 import { PageAnimatePresence } from "@/components/layout/PageAnimatePresence";
+import { ThemeWrapper } from "@/components/layout/ThemeWrapper"; // Import ThemeWrapper
+
+const outfit = Outfit({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-outfit",
+});
 
 export const metadata: Metadata = {
   title: "Calabash - Academic Material Discovery",
   description:
     "Explore and share academic resources curated for your department.",
+  manifest: "/manifest.json", // Add manifest link
 };
 
 export default function RootLayout({
@@ -15,21 +24,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link
-          rel="preconnect"
-          href="https://fonts.gstatic.com"
-          crossOrigin="anonymous"
-        />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap"
-          rel="stylesheet"
-        />
-      </head>
-      <body className="antialiased overflow-x-hidden">
-        <PageAnimatePresence>{children}</PageAnimatePresence>
-      </body>
+      <ThemeWrapper>
+        <body
+          className={`${outfit.variable} antialiased overflow-x-hidden font-sans`}
+        >
+          <PageAnimatePresence>{children}</PageAnimatePresence>
+        </body>
+      </ThemeWrapper>
     </html>
   );
 }

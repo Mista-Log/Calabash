@@ -1,39 +1,83 @@
 "use client";
 
 import * as React from "react";
-import {
-  Search01Icon,
-  FilterIcon,
-  ArrowUpRight01Icon,
-  Clock02Icon,
-  PlusSignIcon,
-  Mortarboard01Icon,
-  BookOpen01Icon,
-} from "@hugeicons/core-free-icons";
+import dynamic from "next/dynamic";
+import { motion } from "framer-motion";
 import { HugeiconsIcon } from "@hugeicons/react";
+import { PlusSignIcon, BookOpen01Icon } from "@hugeicons/core-free-icons";
 
 import { CalabashApiService, DashboardData } from "@/services/api";
 import { MainLayout } from "@/components/layout/MainLayout";
-import { MaterialShelf } from "@/components/scenes/MaterialShelf";
-import { MaterialCard } from "@/components/library/MaterialCard";
-import { UploadModal } from "@/components/modals/UploadModal";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-  Button,
-  Separator,
-  Input,
-} from "@/components/core";
-import { motion } from "framer-motion";
+import { UploadModal } from "@/components/features/library/UploadModal";
+import { Button } from "@/components/core";
+import { StatPill } from "@/components/core/stat-pill";
 import { useSettingsStore } from "@/store/useSettingsStore";
 import { fadeIn } from "@/lib/motion-variants";
+import { useUserStore } from "@/store/useUserStore";
+import { useCourseStore } from "@/store/useCourseStore";
+import { useLibraryStore } from "@/store/useLibraryStore";
+
+const StudentDashboard = dynamic(
+  () =>
+    import("@/components/features/dashboard/StudentDashboard").then(
+      (mod) => mod.StudentDashboard,
+    ),
+  {
+    loading: () => <DashboardSkeleton />,
+  },
+);
+
+const LecturerDashboard = dynamic(
+  () =>
+    import("@/components/features/dashboard/LecturerDashboard").then(
+      (mod) => mod.LecturerDashboard,
+    ),
+  {
+    loading: () => <DashboardSkeleton />,
+  },
+);
+
+function DashboardSkeleton() {
+  return (
+    <div className="space-y-12 animate-pulse">
+      {/* Header Skeleton */}
+      <div className="flex flex-col gap-8">
+        <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+          <div className="space-y-2">
+            <div className="h-10 w-64 bg-muted/20 rounded-lg" />
+            <div className="h-6 w-96 bg-muted/20 rounded-lg" />
+          </div>
+          <div className="h-14 w-48 bg-muted/20 rounded-2xl" />
+        </div>
+        <div className="flex flex-wrap items-center gap-4 p-2 rounded-3xl bg-muted/10 w-fit">
+          <div className="h-20 w-32 bg-muted/20 rounded-2xl" />
+          <div className="h-20 w-32 bg-muted/20 rounded-2xl" />
+          <div className="h-20 w-32 bg-muted/20 rounded-2xl" />
+        </div>
+      </div>
+
+      {/* Main Content Skeleton */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <div className="lg:col-span-7 h-[300px] bg-muted/20 rounded-2xl" />
+        <div className="lg:col-span-5 h-[300px] bg-muted/20 rounded-2xl" />
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {[...Array(3)].map((_, i) => (
+          <div key={i} className="h-60 bg-muted/20 rounded-2xl" />
+        ))}
+      </div>
+    </div>
+  );
+}
 
 export default function DashboardPage() {
-  const [data, setData] = React.useState<DashboardData | null>(null);
+  const { user, login, updateUser } = useUserStore();
+  const { courses, setCourses } = useCourseStore();
+  const { materials, setMaterials } = useLibraryStore();
+
+  const [showWelcome, setShowWelcome] = React.useState(false);
+
   const [loading, setLoading] = React.useState(true);
   const [isUploadOpen, setIsUploadOpen] = React.useState(false);
   const { reducedMotion } = useSettingsStore();
@@ -41,13 +85,84 @@ export default function DashboardPage() {
   const motionProps = reducedMotion ? { initial: false, animate: false } : {};
 
   React.useEffect(() => {
-    CalabashApiService.getDashboardData().then((res) => {
-      setData(res);
-      setLoading(false);
-    });
-  }, []);
+    if (user?.isNewUser) {
+      setShowWelcome(true);
+      updateUser({ isNewUser: false });
+    }
+  }, [user, updateUser]);
 
-  if (loading || !data) {
+  React.useEffect(() => {
+    async function loadData() {
+      // If we have user, courses, and materials, we might not need to fetch.
+      if (user && courses.length > 0 && materials.length > 0) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const res = await CalabashApiService.getDashboardData();
+
+        // Only set if not already set to preserve local changes
+        if (!user) {
+          // In a real app, we'd redirect to /auth if no user is found
+          // For now, we'll just not call login with a mock token
+        }
+        if (courses.length === 0) setCourses(res.courses);
+        if (materials.length === 0) setMaterials(res.recentMaterials);
+      } catch (error) {
+        console.error("Failed to load dashboard data", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadData();
+  }, [user, courses.length, materials.length, login, setCourses, setMaterials]);
+
+  // Construct the data object expected by children components
+  const dashboardData: DashboardData | null = user
+    ? {
+        user: user,
+        courses: courses,
+        recentMaterials: materials,
+        // Mock stats based on role
+        lecturerStats:
+          user.role === "lecturer"
+            ? {
+                totalStudents: 1240,
+                totalUploads: materials.length,
+                totalViews: 8200,
+                activeCourses: courses.length,
+                trendingMaterial: {
+                  title: materials[0]?.title || "N/A",
+                  views: 125,
+                  downloads: 45,
+                  trend: 12,
+                },
+              }
+            : undefined,
+        studentStats:
+          user.role === "student"
+            ? {
+                gpa: "3.92",
+                attendance: "94%",
+                upcomingDeadlines: [
+                  {
+                    title: "Database Systems Project",
+                    due: "Tomorrow",
+                    color: "orange",
+                  },
+                  {
+                    title: "Algorithm Analysis Quiz",
+                    due: "2 days",
+                    color: "sage",
+                  },
+                ],
+              }
+            : undefined,
+      }
+    : null;
+
+  if (loading || !dashboardData) {
     return (
       <MainLayout>
         <div className="flex h-[60vh] items-center justify-center">
@@ -62,6 +177,8 @@ export default function DashboardPage() {
     );
   }
 
+  const isLecturer = dashboardData.user.role === "lecturer";
+
   return (
     <MainLayout>
       <motion.div
@@ -71,153 +188,85 @@ export default function DashboardPage() {
         variants={fadeIn}
         {...motionProps}
       >
-        {/* Welcome Section */}
-        <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight text-foreground">
-              Welcome back, {data.user.name}
-            </h1>
-            <p className="text-muted-foreground">
-              Continue your academic journey in {data.user.department}.
-            </p>
+        {/* Header Section */}
+        <div className="flex flex-col gap-10">
+          <div className="flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
+            <div className="space-y-2">
+              <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-foreground text-balance">
+                {isLecturer
+                  ? `Faculty Dashboard`
+                  : `${showWelcome ? "Welcome" : "Academic Overview"}, ${(() => {
+                      const nameParts =
+                        dashboardData.user.name?.split(" ") || [];
+                      return nameParts.length > 1
+                        ? nameParts[1]
+                        : nameParts[0] || "User";
+                    })()}`}
+              </h1>
+              <p className="text-muted-foreground font-bold text-lg max-w-2xl leading-relaxed">
+                {isLecturer
+                  ? `Oversee your courses and academic materials for ${dashboardData.user.department}.`
+                  : `Resume your educational journey and track your progress in ${dashboardData.user.department}.`}
+              </p>
+            </div>
+            {isLecturer && (
+              <Button
+                className="w-full md:w-fit h-14 px-8 gap-3 shadow-2xl shadow-primary/30 rounded-2xl text-base font-black transition-all hover:scale-[1.02] active:scale-[0.98]"
+                onClick={() => setIsUploadOpen(true)}
+                icon={PlusSignIcon}
+              >
+                Upload New Material
+              </Button>
+            )}
           </div>
-          <Button
-            className="w-fit gap-2 shadow-lg shadow-primary/20"
-            onClick={() => setIsUploadOpen(true)}
-            icon={PlusSignIcon}
-          >
-            Upload Material
-          </Button>
-        </div>
 
-        {/* 3D Material Shelf Integration */}
-        <MaterialShelf materials={data.recentMaterials} />
-
-        {/* Stats / Quick Actions Area */}
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-          {/* Course Cards */}
-          {data.courses.map((course) => (
-            <div key={course.id}>
-              <Card className="group relative overflow-hidden h-full">
-                <div className="p-6 transition-transform group-hover:-translate-y-1">
-                  <CardHeader className="p-0 pb-2">
-                    <CardDescription className="text-primary/70 font-semibold">
-                      {course.code}
-                    </CardDescription>
-                    <CardTitle className="text-lg leading-tight lg:text-xl">
-                      {course.title}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="p-0">
-                    <div className="flex items-center gap-1.5 text-xs text-muted-foreground font-medium">
-                      <HugeiconsIcon icon={Clock02Icon} size={12} /> Updated 2
-                      days ago
-                    </div>
-                  </CardContent>
-                </div>
-                <div className="absolute top-4 right-4 opacity-0 transition-opacity group-hover:opacity-100">
-                  <HugeiconsIcon
-                    icon={ArrowUpRight01Icon}
-                    size={16}
-                    className="text-primary"
-                  />
-                </div>
-              </Card>
-            </div>
-          ))}
-        </div>
-
-        {/* Main Interface Split */}
-        <div className="grid gap-8 lg:grid-cols-3">
-          {/* Recent Materials (Large) */}
-          <div className="lg:col-span-2 space-y-4">
-            <div className="flex items-center justify-between">
-              <h2 className="text-xl font-semibold tracking-tight">
-                Recent Materials
-              </h2>
-              <div className="flex items-center gap-2">
-                <div className="relative">
-                  <HugeiconsIcon
-                    icon={Search01Icon}
-                    size={16}
-                    className="absolute left-3 top-2.5 text-muted-foreground"
-                  />
-                  <Input
-                    placeholder="Search materials..."
-                    className="w-[200px] pl-10 h-10 bg-card md:w-[300px]"
-                  />
-                </div>
-                <Button variant="outline" size="icon">
-                  <HugeiconsIcon icon={FilterIcon} size={18} />
-                </Button>
-              </div>
-            </div>
-
-            <div className="grid gap-6 sm:grid-cols-2">
-              {data.recentMaterials.map((material) => (
-                <MaterialCard
-                  key={material.id}
-                  material={material}
-                  onView={(m) => console.warn("Viewing:", m.title)}
+          {/* Stat Pills Header */}
+          <div className="flex flex-wrap items-center gap-4 bg-muted/5 p-2 rounded-3xl border border-border/40 w-fit">
+            {isLecturer ? (
+              <>
+                <StatPill
+                  label="Enrolled Students"
+                  value={dashboardData.lecturerStats?.totalStudents || 0}
+                  variant="primary"
                 />
-              ))}
-            </div>
-          </div>
-
-          {/* Activity / Sidebar Info */}
-          <div className="space-y-4">
-            <h2 className="text-xl font-semibold tracking-tight">
-              Department News
-            </h2>
-            <Card className="border-accent/30 bg-accent/5 backdrop-blur-sm shadow-none hover:shadow-none translate-y-0">
-              <CardContent className="pt-6 space-y-4">
-                <div className="flex gap-4">
-                  <div className="h-10 w-10 shrink-0 rounded-full bg-accent/20 flex items-center justify-center text-accent-foreground">
-                    <HugeiconsIcon icon={Mortarboard01Icon} size={20} />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium leading-none">
-                      Semester Registration
-                    </p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Deadline for course registration is next Friday.
-                    </p>
-                    <span className="text-[10px] text-accent font-bold mt-2 block uppercase tracking-wider">
-                      Important
-                    </span>
-                  </div>
-                </div>
-                <Separator />
-                <div className="flex gap-4">
-                  <div className="h-10 w-10 shrink-0 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                    <HugeiconsIcon icon={BookOpen01Icon} size={20} />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium leading-none">
-                      New Library Addition
-                    </p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      "Advanced Database Systems" slides added by Dr. Okoro.
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-              <CardFooter>
-                <Button
-                  variant="ghost"
-                  className="w-full text-xs text-muted-foreground underline"
-                >
-                  View all notifications
-                </Button>
-              </CardFooter>
-            </Card>
+                <StatPill
+                  label="Digital Assets"
+                  value={dashboardData.lecturerStats?.totalUploads || 0}
+                  variant="accent"
+                />
+                <StatPill
+                  label="Global Reach"
+                  value={dashboardData.lecturerStats?.totalViews || 0}
+                  variant="default"
+                />
+              </>
+            ) : (
+              <>
+                <StatPill
+                  label="Active Courses"
+                  value={dashboardData.courses.length}
+                  variant="primary"
+                />
+                <StatPill label="Resources Used" value="12" variant="accent" />
+                <StatPill label="Bookmarks" value="5" variant="default" />
+              </>
+            )}
           </div>
         </div>
+
+        {/* Role-Based Dashboard Content */}
+        {isLecturer ? (
+          <LecturerDashboard data={dashboardData} />
+        ) : (
+          <StudentDashboard data={dashboardData} />
+        )}
       </motion.div>
-      <UploadModal
-        isOpen={isUploadOpen}
-        onClose={() => setIsUploadOpen(false)}
-      />
+      {isLecturer && (
+        <UploadModal
+          isOpen={isUploadOpen}
+          onClose={() => setIsUploadOpen(false)}
+        />
+      )}
     </MainLayout>
   );
 }
