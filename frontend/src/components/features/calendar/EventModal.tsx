@@ -1,0 +1,251 @@
+﻿"use client";
+
+import * as React from "react";
+import {
+  Cancel01Icon,
+  CheckmarkCircle02Icon,
+  Calendar03Icon,
+} from "@/lib/icons/material-icons";
+import { MaterialSymbol } from "@/components/core/MaterialSymbol";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  M3Button,
+  Input,
+} from "@/components/core";
+import { useCalendarStore, EventCategory } from "@/store/useCalendarStore";
+import { format } from "date-fns";
+
+interface EventModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+const CATEGORIES: EventCategory[] = [
+  "Lecture",
+  "Exam",
+  "Deadline",
+  "Holiday",
+  "Other",
+];
+
+export function EventModal({ isOpen, onClose }: EventModalProps) {
+  const {
+    selectedDate,
+    editingEventId,
+    events,
+    addEvent,
+    updateEvent,
+    removeEvent,
+    setIsEventModalOpen,
+  } = useCalendarStore();
+  const [title, setTitle] = React.useState("");
+  const [category, setCategory] = React.useState<EventCategory>("Lecture");
+  const [startTime, setStartTime] = React.useState("09:00");
+  const [endTime, setEndTime] = React.useState("10:00");
+
+  const handleClose = React.useCallback(() => {
+    setIsEventModalOpen(false);
+    setTitle("");
+    onClose();
+  }, [onClose, setIsEventModalOpen]);
+
+  const editingEvent = React.useMemo(
+    () => (editingEventId ? events.find((e) => e.id === editingEventId) : null),
+    [editingEventId, events],
+  );
+
+  React.useEffect(() => {
+    if (editingEvent) {
+      setTitle(editingEvent.title);
+      setCategory(editingEvent.category);
+      setStartTime(editingEvent.startTime);
+      setEndTime(editingEvent.endTime);
+    } else {
+      setTitle("");
+      setCategory("Lecture");
+      setStartTime("09:00");
+      setEndTime("10:00");
+    }
+  }, [editingEvent, isOpen]);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if ((!selectedDate && !editingEvent) || !title) return;
+    const eventDate = selectedDate ?? editingEvent?.date;
+    if (!eventDate) return;
+
+    if (editingEvent) {
+      updateEvent(editingEvent.id, {
+        title,
+        category,
+        startTime,
+        endTime,
+      });
+    } else {
+      addEvent({
+        title,
+        category,
+        date: eventDate,
+        startTime,
+        endTime,
+      });
+    }
+
+    handleClose();
+  };
+
+  const handleDelete = () => {
+    if (editingEvent) {
+      removeEvent(editingEvent.id);
+      handleClose();
+    }
+  };
+
+  const dateLabel = selectedDate
+    ? format(new Date(selectedDate), "MMMM do, yyyy")
+    : editingEvent
+      ? format(new Date(editingEvent.date), "MMMM do, yyyy")
+      : null;
+
+  const handleDialogOpenChange = React.useCallback(
+    (nextOpen: boolean) => {
+      if (!nextOpen) {
+        handleClose();
+        return;
+      }
+      setIsEventModalOpen(true);
+    },
+    [handleClose, setIsEventModalOpen],
+  );
+
+  const formContent = (
+    <>
+      <div className="space-y-4">
+        <div className="space-y-2">
+          <label className="text-[13px] font-black uppercase tracking-widest text-muted-foreground ml-1">
+            Event Title
+          </label>
+          <Input
+            placeholder="e.g. Midterm Assessment"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            className="h-12 w-full"
+            required
+          />
+        </div>
+
+        <div className="space-y-2">
+          <label className="text-[13px] font-black uppercase tracking-widest text-muted-foreground ml-1">
+            Category
+          </label>
+          <div className="flex flex-wrap gap-2">
+            {CATEGORIES.map((cat) => (
+              <button
+                key={cat}
+                type="button"
+                onClick={() => setCategory(cat)}
+                className={`px-3 py-1.5 rounded-xl text-[13px] font-black uppercase transition-all ${
+                  category === cat
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-muted/50 text-muted-foreground hover:bg-muted"
+                }`}
+              >
+                {cat === "Exam" ? "Assessment" : cat}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <div className="space-y-2">
+            <label className="text-[13px] font-black uppercase tracking-widest text-muted-foreground ml-1">
+              Start Time
+            </label>
+            <Input
+              type="time"
+              value={startTime}
+              onChange={(e) => setStartTime(e.target.value)}
+              className="h-12 w-full"
+              leadingIcon="schedule"
+            />
+          </div>
+          <div className="space-y-2">
+            <label className="text-[13px] font-black uppercase tracking-widest text-muted-foreground ml-1">
+              End Time
+            </label>
+            <Input
+              type="time"
+              value={endTime}
+              onChange={(e) => setEndTime(e.target.value)}
+              className="h-12 w-full"
+              leadingIcon="schedule"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 gap-3 pt-2">
+        {editingEvent ? (
+          <>
+            <M3Button
+              variant="outlined"
+              type="button"
+              onClick={handleDelete}
+              className="h-11 rounded-2xl border-[color:var(--md-sys-color-error)]/30 text-[color:var(--md-sys-color-error)] font-bold hover:bg-[color:var(--md-sys-color-error-container)]"
+            >
+              Delete
+            </M3Button>
+            <M3Button type="submit" className="h-11 rounded-2xl font-bold">
+              Update
+            </M3Button>
+          </>
+        ) : (
+          <>
+            <M3Button
+              variant="outlined"
+              type="button"
+              onClick={handleClose}
+              className="h-11 rounded-2xl font-bold border-primary/20"
+            >
+              Cancel
+            </M3Button>
+            <M3Button type="submit" className="h-11 rounded-2xl font-bold gap-2">
+              <MaterialSymbol icon={CheckmarkCircle02Icon} size={18} />
+              Create Event
+            </M3Button>
+          </>
+        )}
+      </div>
+    </>
+  );
+
+  return (
+    <Dialog open={isOpen} onOpenChange={handleDialogOpenChange}>
+      <DialogContent className="calendar-event-dialog w-[min(96vw,480px)] max-h-[calc(100dvh-2rem)] rounded-3xl p-0 overflow-hidden border-none">
+        <DialogHeader className="p-6 bg-primary/5 border-b border-primary/10">
+          <div className="flex items-center justify-between">
+            <DialogTitle className="text-xl font-black">
+              {editingEvent ? "Edit Event" : "Add New Event"}
+            </DialogTitle>
+            <M3Button size="sm" onClick={handleClose} className="rounded-xl size-8">
+              <MaterialSymbol icon={Cancel01Icon} size={18} />
+            </M3Button>
+          </div>
+          {dateLabel && (
+            <p className="text-[13px] font-bold text-primary flex items-center gap-1.5 mt-1">
+              <MaterialSymbol icon={Calendar03Icon} size={14} />
+              {dateLabel}
+            </p>
+          )}
+        </DialogHeader>
+
+        <form onSubmit={handleSubmit} className="p-6 space-y-6">
+          {formContent}
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}
