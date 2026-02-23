@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: config
+    env: python
+    buildCommand: uv sync
+    startCommand: uv run gunicorn config.wsgi:application
+    envVars:
+      - key: DJANGO_SETTINGS_MODULE
+        value: config.settings

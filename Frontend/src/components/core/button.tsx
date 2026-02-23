@@ -36,6 +36,8 @@ const buttonVariants = cva(
     },
   },
 );
+type HugeIconType = React.ComponentProps<typeof HugeiconsIcon>["icon"];
+
 
 export interface ButtonProps
   extends
@@ -45,7 +47,7 @@ export interface ButtonProps
   isLoading?: boolean;
   loadingText?: string;
   success?: boolean;
-  icon?: any;
+  icon?: React.ReactElement | HugeIconType;
   iconPlacement?: "left" | "right";
 }
 
@@ -69,8 +71,9 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ) => {
     const Comp = asChild ? Slot.Slot : "button";
 
-    const renderIcon = (iconData: any) => {
+    const renderIcon = (iconData: React.ReactElement | HugeIconType) => {
       if (React.isValidElement(iconData)) return iconData;
+
       return (
         <HugeiconsIcon
           icon={iconData}
@@ -78,6 +81,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         />
       );
     };
+
 
     return (
       <Comp
