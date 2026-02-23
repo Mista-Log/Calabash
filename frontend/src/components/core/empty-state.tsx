@@ -5,8 +5,7 @@ import { Folder01Icon } from "@/lib/icons/material-icons";
 import { M3Button } from "@/components/core";
 
 interface EmptyStateProps extends React.HTMLAttributes<HTMLDivElement> {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  icon?: any;
+  icon?: React.ComponentType<{ size?: number; className?: string; strokeWidth?: number }> | string;
   title: string;
   description?: string;
   action?: React.ReactNode;
@@ -34,7 +33,7 @@ export function EmptyState({
     >
       <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full border border-[color:var(--md-sys-color-outline-variant)] bg-[color:var(--md-sys-color-surface-container-low)] text-[color:var(--md-sys-color-on-surface-variant)]">
         <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[color:var(--md-sys-color-secondary-container)] text-[color:var(--md-sys-color-on-secondary-container)]">
-          <MaterialSymbol icon={Icon} size={24} strokeWidth={1.5} />
+          <MaterialSymbol icon={Icon as string} size={24} strokeWidth={1.5} />
         </div>
       </div>
 

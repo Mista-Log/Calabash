@@ -116,7 +116,7 @@ export function FilterModal({
           </div>
         </DialogHeader>
 
-        <div className="max-h-[calc(100dvh-18rem)] space-y-6 overflow-y-auto py-4 pr-1">
+        <div className="max-h-[calc(100dvh-18rem)] space-y-6 overflow-y-auto px-1 py-1">
           {sections.map((section) => (
             <div key={section.id} className="space-y-3">
               <h4 className="text-[14px] font-semibold text-[color:var(--md-sys-color-on-surface)]">

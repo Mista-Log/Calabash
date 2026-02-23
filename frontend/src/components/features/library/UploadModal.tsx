@@ -25,17 +25,18 @@ interface UploadModalProps {
   isOpen: boolean;
   onClose: () => void;
   onUploaded?: (material: Material) => void;
+  preselectedCourseCode?: string;
 }
 
 type UploadStep = "upload" | "details" | "uploading" | "success";
 
-export function UploadModal({ isOpen, onClose, onUploaded }: UploadModalProps) {
+export function UploadModal({ isOpen, onClose, onUploaded, preselectedCourseCode }: UploadModalProps) {
   const { createMaterial } = useLibraryStore();
 
   const [step, setStep] = React.useState<UploadStep>("upload");
   const [file, setFile] = React.useState<File | null>(null);
   const [title, setTitle] = React.useState("");
-  const [courseCode, setCourseCode] = React.useState("");
+  const [courseCode, setCourseCode] = React.useState(preselectedCourseCode || "");
   const [type, setType] = React.useState<Material["type"]>("pdf");
   const [uploadProgress, setUploadProgress] = React.useState(0);
   const [error, setError] = React.useState<string | null>(null);
@@ -44,17 +45,24 @@ export function UploadModal({ isOpen, onClose, onUploaded }: UploadModalProps) {
     setStep("upload");
     setFile(null);
     setTitle("");
-    setCourseCode("");
+    setCourseCode(preselectedCourseCode || "");
     setType("pdf");
     setUploadProgress(0);
     setError(null);
-  }, []);
+  }, [preselectedCourseCode]);
 
   React.useEffect(() => {
     if (!isOpen) {
       resetState();
     }
   }, [isOpen, resetState]);
+
+  // Update course code when preselectedCourseCode changes
+  React.useEffect(() => {
+    if (preselectedCourseCode && step === "upload") {
+      setCourseCode(preselectedCourseCode);
+    }
+  }, [preselectedCourseCode, step]);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const nextFile = event.target.files?.[0];
@@ -113,10 +121,10 @@ export function UploadModal({ isOpen, onClose, onUploaded }: UploadModalProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="w-[min(96vw,500px)] max-h-[calc(100dvh-2rem)] overflow-hidden p-0">
+      <DialogContent className="w-[min(96vw,500px)] max-h-[calc(100dvh-2rem)] overflow-hidden">
         <div className="max-h-[calc(100dvh-2rem)] overflow-y-auto">
           <div className="h-1.5 bg-[color:var(--md-sys-color-primary)]" />
-          <div className="p-6">
+          <div className="px-1 py-1">
             <DialogHeader>
               <DialogTitle className="text-[24px] font-bold">
                 Upload Knowledge

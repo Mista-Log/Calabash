@@ -1,9 +1,12 @@
-﻿import type { Metadata } from "next";
+﻿import type { Metadata, Viewport } from "next";
 import { Google_Sans, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { PageAnimatePresence } from "@/components/layout/PageAnimatePresence";
-import { ThemeWrapper } from "@/components/layout/ThemeWrapper"; // Import ThemeWrapper
+import { ThemeWrapper } from "@/components/layout/ThemeWrapper";
 import { MaterialWebInit } from "@/components/layout/MaterialWebInit";
+import { GlobalErrorBoundary } from "@/components/core/GlobalErrorBoundary";
+import { ToastProvider } from "@/components/core/toast";
+import { GlobalShortcutsProvider } from "@/components/core/GlobalShortcutsProvider";
 
 const googleSans = Google_Sans({
   subsets: ["latin"],
@@ -31,11 +34,13 @@ export const metadata: Metadata = {
   title: "Calabash - Academic Material Discovery",
   description:
     "Explore and share academic resources curated for your department.",
-  manifest: "/manifest.json", // Add manifest link
+  manifest: "/manifest.json",
 };
 
-import { GlobalErrorBoundary } from "@/components/core/GlobalErrorBoundary";
-import { ToastProvider } from "@/components/core/toast";
+export const viewport: Viewport = {
+  colorScheme: "light dark",
+  themeColor: "#ffffff",
+};
 
 export default function RootLayout({
   children,
@@ -58,9 +63,11 @@ export default function RootLayout({
         <ThemeWrapper>
           <MaterialWebInit />
           <ToastProvider>
-            <GlobalErrorBoundary>
-              <PageAnimatePresence>{children}</PageAnimatePresence>
-            </GlobalErrorBoundary>
+            <GlobalShortcutsProvider>
+              <GlobalErrorBoundary>
+                <PageAnimatePresence>{children}</PageAnimatePresence>
+              </GlobalErrorBoundary>
+            </GlobalShortcutsProvider>
           </ToastProvider>
         </ThemeWrapper>
       </body>

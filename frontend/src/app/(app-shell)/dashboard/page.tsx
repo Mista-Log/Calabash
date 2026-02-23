@@ -7,12 +7,20 @@ import { useDashboardStore } from "@/store/useDashboardStore";
 import { useLibraryStore } from "@/store/useLibraryStore";
 import { M3Button } from "@/components/core";
 import { MaterialSymbol } from "@/components/core/MaterialSymbol";
+import { LastUpdated } from "@/components/core/last-updated";
 import { AlertCircleIcon } from "@/lib/icons/material-icons";
 import {
   DashboardHeaderSkeleton,
   LecturerDashboardSkeleton,
   StudentDashboardSkeleton,
 } from "@/components/features/dashboard/DashboardSkeletons";
+import {
+  APP_PAGE_CONTAINER,
+  APP_PAGE_SHELL,
+  APP_SECTION_STACK,
+  APP_SURFACE_CARD,
+} from "@/lib/ui-sync";
+import { cn } from "@/lib/utils";
 
 const StudentDashboard = dynamic(
   () =>
@@ -61,8 +69,8 @@ function RoleDashboardSkeleton() {
 
 function DashboardLoadingState({ role }: { role?: "student" | "lecturer" | null }) {
   return (
-    <div className="w-full px-3 py-5 sm:px-5 sm:py-7 lg:px-7 lg:py-9">
-      <div className="mx-auto max-w-[1360px] space-y-6 sm:space-y-8">
+    <div className={APP_PAGE_SHELL}>
+      <div className={cn(APP_PAGE_CONTAINER, APP_SECTION_STACK)}>
         <DashboardHeaderSkeleton />
         {role === "lecturer" ? (
           <LecturerDashboardSkeleton />
@@ -80,6 +88,7 @@ export default function DashboardPage() {
   const {
     status,
     error,
+    lastUpdated,
     studentView,
     lecturerView,
     fetchDashboard,
@@ -103,18 +112,16 @@ export default function DashboardPage() {
 
   if (!user) {
     return (
-      
-        <div className="mx-auto flex min-h-[60vh] w-full max-w-[960px] items-center justify-center px-4">
-          <div className="rounded-3xl border border-[color:var(--md-sys-color-outline-variant)] bg-[color:var(--md-sys-color-surface-container-low)] p-8 text-center">
-            <h1 className="text-[24px] font-semibold text-[color:var(--md-sys-color-on-surface)]">
-              {COPY.unauthTitle}
-            </h1>
-            <p className="mt-2 text-[14px] text-[color:var(--md-sys-color-on-surface-variant)]">
-              {COPY.unauthDescription}
-            </p>
-          </div>
+      <div className="mx-auto flex min-h-[60vh] w-full max-w-[960px] items-center justify-center px-4">
+        <div className={cn(APP_SURFACE_CARD, "p-8 text-center")}>
+          <h1 className="text-[24px] font-semibold text-[color:var(--md-sys-color-on-surface)]">
+            {COPY.unauthTitle}
+          </h1>
+          <p className="mt-2 text-[14px] text-[color:var(--md-sys-color-on-surface-variant)]">
+            {COPY.unauthDescription}
+          </p>
         </div>
-      
+      </div>
     );
   }
 
@@ -127,11 +134,11 @@ export default function DashboardPage() {
   }
 
   return (
-    
-      <div className="w-full px-3 py-5 sm:px-5 sm:py-7 lg:px-7 lg:py-9">
-        <div className="mx-auto max-w-[1360px] space-y-6 sm:space-y-8">
+    <>
+      <div className={APP_PAGE_SHELL}>
+        <div className={cn(APP_PAGE_CONTAINER, APP_SECTION_STACK)}>
           {/* Page Header */}
-          <div className="space-y-2 sm:space-y-3">
+          <div className="space-y-2.5 sm:space-y-3">
             <h1 className="text-[30px] font-semibold leading-tight tracking-tight text-[color:var(--md-sys-color-on-surface)] sm:text-[36px] md:text-[42px]">
               {isLecturer ? COPY.lecturerHeading : COPY.studentHeading(firstName)}
             </h1>
@@ -140,11 +147,12 @@ export default function DashboardPage() {
                 ? COPY.lecturerSubheading(user.department)
                 : COPY.studentSubheading(user.semester)}
             </p>
+            {lastUpdated ? <LastUpdated timestamp={lastUpdated} /> : null}
           </div>
 
           {status === "error" && (
             <div className="flex min-h-[44vh] items-center justify-center">
-              <div className="w-full max-w-[920px] rounded-3xl border border-[color:var(--md-sys-color-outline-variant)] bg-[color:var(--md-sys-color-surface-container-low)] p-6 sm:p-8">
+              <div className={cn(APP_SURFACE_CARD, "w-full max-w-[920px] p-6 sm:p-8")}>
                 <div className="flex items-start gap-3">
                   <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[color:var(--md-sys-color-error-container)] text-[color:var(--md-sys-color-on-error-container)]">
                     <MaterialSymbol icon={AlertCircleIcon} size={18} />
@@ -188,7 +196,6 @@ export default function DashboardPage() {
           )}
         </div>
       </div>
-    
+    </>
   );
 }
-

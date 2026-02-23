@@ -63,6 +63,25 @@ interface VideoComment {
 
 const VIDEO_COMMENT_STORAGE_KEY = "calabash-video-comments-v1";
 
+// Queue for serializing localStorage writes to prevent race conditions
+let videoCommentWriteQueue: Array<() => void> = [];
+let isWritingVideoComments = false;
+
+function processVideoCommentWriteQueue(): void {
+  if (isWritingVideoComments || videoCommentWriteQueue.length === 0) {
+    return;
+  }
+
+  isWritingVideoComments = true;
+  const write = videoCommentWriteQueue.shift();
+  if (write) {
+    write();
+    isWritingVideoComments = false;
+    // Process next item in queue on next tick
+    setTimeout(processVideoCommentWriteQueue, 0);
+  }
+}
+
 function readPersistedVideoComments(): VideoComment[] {
   if (typeof window === "undefined") return [];
 
@@ -174,12 +193,18 @@ export function MaterialDetail({ material }: MaterialDetailProps) {
     (nextCommentsForMaterial: VideoComment[]) => {
       if (typeof window === "undefined") return;
 
-      const allComments = readPersistedVideoComments();
-      const commentsForOtherMaterials = allComments.filter(
-        (comment) => comment.materialId !== material.id,
-      );
-      const merged = [...nextCommentsForMaterial, ...commentsForOtherMaterials];
-      window.localStorage.setItem(VIDEO_COMMENT_STORAGE_KEY, JSON.stringify(merged));
+      // Queue the write operation to prevent race conditions
+      const writeOperation = () => {
+        const allComments = readPersistedVideoComments();
+        const commentsForOtherMaterials = allComments.filter(
+          (comment) => comment.materialId !== material.id,
+        );
+        const merged = [...nextCommentsForMaterial, ...commentsForOtherMaterials];
+        window.localStorage.setItem(VIDEO_COMMENT_STORAGE_KEY, JSON.stringify(merged));
+      };
+
+      videoCommentWriteQueue.push(writeOperation);
+      processVideoCommentWriteQueue();
     },
     [material.id],
   );

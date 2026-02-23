@@ -28,6 +28,16 @@ export function ProfileSection() {
   const [avatarUrl, setAvatarUrl] = React.useState(user?.avatarUrl || "");
   const [isSaving, setIsSaving] = React.useState(false);
 
+  // Sync state with user store when user data changes
+  React.useEffect(() => {
+    if (user) {
+      setName(user.name || "");
+      setEmail(user.email || "");
+      setBio(user.bio || "");
+      setAvatarUrl(user.avatarUrl || "");
+    }
+  }, [user]);
+
   const handleSave = async () => {
     setIsSaving(true);
     try {

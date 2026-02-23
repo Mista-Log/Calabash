@@ -1,37 +1,9 @@
-import axios from 'axios';
-import { useUserStore } from '@/store/useUserStore';
-import { API_BASE_URL } from './config';
+import api from '@/lib/axios';
+import { API_ENDPOINTS } from './config';
 
 /**
  * API Service Interfaces for Calabash
  */
-
-// Create axios instance
-const api = axios.create({
-    baseURL: API_BASE_URL,
-    withCredentials: true,
-    headers: {
-        'Content-Type': 'application/json',
-    },
-});
-
-// Request interceptor for auth token
-api.interceptors.request.use(
-    (config) => {
-        const token = useUserStore.getState().token;
-        if (token) {
-            config.headers.Authorization = `Bearer ${token}`;
-        }
-        return config;
-    },
-    (error) => Promise.reject(error)
-);
-
-// Response interceptor for error handling (Toasts can be added here if we had access to useToast, 
-// but since this is a service, we'll handle toasts in the components or use a global event bus)
-// For now, let's keep it simple and handle in components, or we can use window.dispatchEvent
-
-export default api;
 
 export interface Material {
     id: string;
@@ -210,12 +182,14 @@ export class CalabashApiService {
      * Fallback policy is handled by the dashboard repository layer.
      */
     static async getDashboardData(): Promise<DashboardData> {
-        const response = await api.get('/dashboard');
+        if (!API_ENDPOINTS.DASHBOARD) {
+            throw new Error('Dashboard endpoint is not configured.');
+        }
+        const response = await api.get(API_ENDPOINTS.DASHBOARD);
         return response.data;
     }
 
     static async uploadMaterial(file: File, metadata: Partial<Material>): Promise<Material> {
-        console.warn('Uploading...', file.name, metadata);
         await new Promise((resolve) => setTimeout(resolve, 2000));
         return {
             id: Math.random().toString(36).substr(2, 9),
@@ -276,13 +250,11 @@ export class CalabashApiService {
         };
     }
 
-    static async bulkActionMaterials(materialIds: string[], action: 'delete' | 'move' | 'hide'): Promise<void> {
-        console.warn(`Bulk Action: ${action} on`, materialIds);
+    static async bulkActionMaterials(_materialIds: string[], _action: 'delete' | 'move' | 'hide'): Promise<void> {
         await new Promise((resolve) => setTimeout(resolve, 1500));
     }
 
-    static async toggleMaterialVisibility(materialId: string, visible: boolean): Promise<void> {
-        console.warn(`Toggle Visibility: ${materialId} to ${visible}`);
+    static async toggleMaterialVisibility(_materialId: string, _visible: boolean): Promise<void> {
         await new Promise((resolve) => setTimeout(resolve, 500));
     }
 }

@@ -1,14 +1,46 @@
-import axios from "axios";
 import type { UserProfile } from "./api";
-import { API_BASE_URL, API_ENDPOINTS } from "./config";
+import axios from "axios";
+import api from "@/lib/axios";
+import { API_ENDPOINTS } from "./config";
 
 export type BackendRole = "student" | "lecturer" | "admin";
 
 export interface LoginResponse {
   email?: string;
+  user?: {
+    id?: number | string;
+    email?: string;
+    role?: BackendRole | string;
+  };
   access?: string;
   refresh?: string;
   token?: string;
+}
+
+export interface RefreshTokenRequest {
+  refresh: string;
+}
+
+export interface RefreshTokenResponse {
+  access: string;
+  refresh?: string;
+}
+
+export interface PasswordResetRequest {
+  email: string;
+}
+
+export interface PasswordResetResponse {
+  message: string;
+}
+
+export interface PasswordResetConfirmRequest {
+  token: string;
+  new_password: string;
+}
+
+export interface PasswordResetConfirmResponse {
+  message: string;
 }
 
 export interface SignupRequest {
@@ -19,9 +51,17 @@ export interface SignupRequest {
 }
 
 export interface SignupResponse {
-  email: string;
-  full_name: string;
-  role: BackendRole;
+  email?: string;
+  full_name?: string;
+  role?: BackendRole | string;
+  user?: {
+    id?: number | string;
+    email?: string;
+    role?: BackendRole | string;
+  };
+  access?: string;
+  refresh?: string;
+  token?: string;
 }
 
 export interface LoginCredentials {
@@ -46,14 +86,6 @@ export interface ResolvedAuthSession {
   refreshToken: string | null;
   me: UserMeResponse;
 }
-
-const authApi = axios.create({
-  baseURL: API_BASE_URL,
-  withCredentials: true,
-  headers: {
-    "Content-Type": "application/json",
-  },
-});
 
 const AUTH_ERROR_KEYS = [
   "detail",
@@ -86,14 +118,41 @@ function parseBackendRole(value: unknown): BackendRole | null {
   return null;
 }
 
-function mapToUserProfile(me: UserMeResponse, role: "student" | "lecturer"): UserProfile {
+function normalizeEmail(email: string): string {
+  return email.trim().toLowerCase();
+}
+
+function trimmedEmail(email: string): string {
+  return email.trim();
+}
+
+function isInvalidCredentialsError(error: unknown): boolean {
+  if (!axios.isAxiosError(error) || !error.response) {
+    return false;
+  }
+
+  if (error.response.status !== 400 && error.response.status !== 401) {
+    return false;
+  }
+
+  const payload = error.response.data as Record<string, unknown> | undefined;
+  const nonFieldError = firstString(payload?.non_field_errors);
+  const detail = firstString(payload?.detail);
+  const message = (nonFieldError ?? detail ?? "").toLowerCase();
+
+  return message.includes("invalid credential");
+}
+
+function mapToUserProfile(me: UserMeResponse, role: "student" | "lecturer" | "admin"): UserProfile {
+  // Admin users default to lecturer role for UI purposes
+  const uiRole = role === "admin" ? "lecturer" : role;
   return {
     id: String(me.id),
     name: me.full_name || me.email,
     email: me.email,
-    role,
+    role: uiRole,
     department: "Academic Department",
-    semester: role === "student" ? 1 : undefined,
+    semester: uiRole === "student" ? 1 : undefined,
     isNewUser: false,
   };
 }
@@ -141,16 +200,35 @@ export function extractAuthErrorMessage(
 
 export const authService = {
   async login(credentials: LoginCredentials): Promise<LoginResponse> {
-    const response = await authApi.post<LoginResponse>(API_ENDPOINTS.AUTH.LOGIN, {
-      email: credentials.email,
-      password: credentials.password,
-    });
-    return response.data;
+    const normalized = normalizeEmail(credentials.email);
+    const raw = trimmedEmail(credentials.email);
+
+    try {
+      const response = await api.post<LoginResponse>(API_ENDPOINTS.AUTH.LOGIN, {
+        email: normalized,
+        password: credentials.password,
+      });
+      return response.data;
+    } catch (error) {
+      // Backward compatibility for legacy mixed-case emails created before normalization.
+      if (
+        raw &&
+        raw !== normalized &&
+        isInvalidCredentialsError(error)
+      ) {
+        const retryResponse = await api.post<LoginResponse>(API_ENDPOINTS.AUTH.LOGIN, {
+          email: raw,
+          password: credentials.password,
+        });
+        return retryResponse.data;
+      }
+      throw error;
+    }
   },
 
   async signup(details: SignupRequest): Promise<SignupResponse> {
-    const response = await authApi.post<SignupResponse>(API_ENDPOINTS.AUTH.SIGNUP, {
-      email: details.email,
+    const response = await api.post<SignupResponse>(API_ENDPOINTS.AUTH.SIGNUP, {
+      email: normalizeEmail(details.email),
       full_name: details.full_name,
       password: details.password,
       role: details.role,
@@ -159,7 +237,7 @@ export const authService = {
   },
 
   async getCurrentUser(accessToken?: string): Promise<UserMeResponse> {
-    const response = await authApi.get<UserMeResponse>(API_ENDPOINTS.AUTH.ME, {
+    const response = await api.get<UserMeResponse>(API_ENDPOINTS.AUTH.ME, {
       headers: accessToken
         ? {
             Authorization: `Bearer ${accessToken}`,
@@ -169,12 +247,45 @@ export const authService = {
     return response.data;
   },
 
+  async refreshToken(refreshToken: string): Promise<RefreshTokenResponse> {
+    const response = await api.post<RefreshTokenResponse>(
+      API_ENDPOINTS.AUTH.REFRESH,
+      { refresh: refreshToken }
+    );
+    return response.data;
+  },
+
+  async requestPasswordReset(email: string): Promise<PasswordResetResponse> {
+    const response = await api.post<PasswordResetResponse>(
+      API_ENDPOINTS.AUTH.PASSWORD_RESET,
+      { email: normalizeEmail(email) }
+    );
+    return response.data;
+  },
+
+  async confirmPasswordReset(
+    token: string,
+    newPassword: string
+  ): Promise<PasswordResetConfirmResponse> {
+    const response = await api.post<PasswordResetConfirmResponse>(
+      API_ENDPOINTS.AUTH.PASSWORD_RESET_CONFIRM,
+      { token, new_password: newPassword }
+    );
+    return response.data;
+  },
+
   async loginAndResolveUser(
     credentials: LoginCredentials,
+    expectedRole?: "student" | "lecturer",
   ): Promise<ResolvedAuthSession> {
     const loginResponse = await this.login(credentials);
     const accessToken = loginResponse.access ?? loginResponse.token ?? "";
     const refreshToken = loginResponse.refresh ?? null;
+
+    if (!accessToken) {
+      throw new Error("Unable to complete sign-in. Access token is missing.");
+    }
+
     const me = await this.getCurrentUser(accessToken || undefined);
     const backendRole = parseBackendRole(me.role);
 
@@ -182,10 +293,14 @@ export const authService = {
       throw new Error("Unable to determine account role from profile.");
     }
 
-    const user =
-      backendRole === "admin"
-        ? null
-        : mapToUserProfile(me, backendRole);
+    // Check role mismatch only for non-admin users
+    if (expectedRole && backendRole !== "admin" && backendRole !== expectedRole) {
+      throw new Error(
+        "This account is not permitted on the selected sign-in portal.",
+      );
+    }
+
+    const user = mapToUserProfile(me, backendRole);
 
     return {
       user,

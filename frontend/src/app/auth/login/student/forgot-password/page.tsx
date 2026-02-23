@@ -9,6 +9,7 @@ import { MdFilledButton } from "@/components/core/md-button";
 import { MdIcon } from "@/components/core/md-icon";
 import { MdEmptyState } from "@/components/core/md-empty-state";
 import { useToast } from "@/components/core/toast";
+import { authService } from "@/services/auth.service";
 
 export default function ForgotPasswordPage() {
   const router = useRouter();
@@ -16,17 +17,24 @@ export default function ForgotPasswordPage() {
   const [email, setEmail] = React.useState("");
   const [isLoading, setIsLoading] = React.useState(false);
   const [isSubmitted, setIsSubmitted] = React.useState(false);
+  const [error, setError] = React.useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setError("");
 
-    // TODO: Replace with real API call
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-
-    setIsLoading(false);
-    setIsSubmitted(true);
-    addToast("Reset link sent! Check your email.");
+    try {
+      await authService.requestPasswordReset(email);
+      setIsSubmitted(true);
+      addToast("Reset link sent! Check your email.");
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Failed to send reset link. Please try again.";
+      setError(message);
+      addToast(message, "error");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -59,12 +67,22 @@ export default function ForgotPasswordPage() {
                     type="email"
                     autoComplete="email"
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                      setError("");
+                    }}
                     placeholder="student@university.edu"
                     leadingIcon="mail"
                     className="w-full"
                     required
                   />
+
+                  {error && (
+                    <p className="text-[13px] font-semibold text-[color:var(--md-sys-color-error)] flex items-center gap-2">
+                      <MdIcon>error</MdIcon>
+                      {error}
+                    </p>
+                  )}
 
                   <MdFilledButton
                     type="submit"

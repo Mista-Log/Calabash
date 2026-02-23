@@ -136,14 +136,72 @@ function isValidDashboardData(value: unknown): value is DashboardData {
   }
 
   const data = value as Partial<DashboardData>;
-  return Boolean(
-    data.user &&
-      typeof data.user === "object" &&
-      typeof data.user.id === "string" &&
-      (data.user.role === "student" || data.user.role === "lecturer") &&
-      Array.isArray(data.courses) &&
-      Array.isArray(data.recentMaterials),
-  );
+  
+  // Validate user
+  if (!data.user || typeof data.user !== "object") {
+    return false;
+  }
+  const user = data.user as unknown as Record<string, unknown>;
+  if (typeof user.id !== "string" || !user.id) {
+    return false;
+  }
+  if (user.role !== "student" && user.role !== "lecturer") {
+    return false;
+  }
+  if (typeof user.email !== "string" || !user.email) {
+    return false;
+  }
+  if (typeof user.name !== "string" || !user.name) {
+    return false;
+  }
+
+  // Validate courses array
+  if (!Array.isArray(data.courses)) {
+    return false;
+  }
+  for (const course of data.courses) {
+    if (!course || typeof course !== "object") {
+      return false;
+    }
+    const c = course as unknown as Record<string, unknown>;
+    if (typeof c.id !== "string" || !c.id) {
+      return false;
+    }
+    if (typeof c.code !== "string" || !c.code) {
+      return false;
+    }
+    if (typeof c.title !== "string" || !c.title) {
+      return false;
+    }
+    if (typeof c.semester !== "number") {
+      return false;
+    }
+  }
+
+  // Validate recentMaterials array
+  if (!Array.isArray(data.recentMaterials)) {
+    return false;
+  }
+  for (const material of data.recentMaterials) {
+    if (!material || typeof material !== "object") {
+      return false;
+    }
+    const m = material as unknown as Record<string, unknown>;
+    if (typeof m.id !== "string" || !m.id) {
+      return false;
+    }
+    if (typeof m.title !== "string" || !m.title) {
+      return false;
+    }
+    if (typeof m.courseCode !== "string" || !m.courseCode) {
+      return false;
+    }
+    if (!["pdf", "past-question", "video", "zip", "image"].includes(String(m.type))) {
+      return false;
+    }
+  }
+
+  return true;
 }
 
 const emptyNotesSnapshot: NotesDashboardSnapshot = {

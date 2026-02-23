@@ -3,6 +3,8 @@
 import React from "react";
 import { useSettingsStore } from "@/store/useSettingsStore";
 
+type ResolvedTheme = "light" | "dark";
+
 export function ThemeWrapper({
   children,
 }: Readonly<{
@@ -14,7 +16,37 @@ export function ThemeWrapper({
     const root = document.documentElement;
     const media = window.matchMedia("(prefers-color-scheme: dark)");
 
-    const applyTheme = (nextTheme: "light" | "dark") => {
+    const syncThemeColorMeta = (nextTheme: ResolvedTheme) => {
+      const computed = getComputedStyle(root);
+      const themeColor =
+        computed
+          .getPropertyValue("--md-sys-color-surface-container-lowest")
+          .trim() ||
+        computed.getPropertyValue("--md-sys-color-surface").trim() ||
+        computed.getPropertyValue("--background").trim() ||
+        computed.backgroundColor ||
+        (nextTheme === "dark" ? "#14110f" : "#ffffff");
+
+      let themeMeta = document.querySelector<HTMLMetaElement>(
+        'meta[name="theme-color"]:not([media])'
+      );
+
+      if (!themeMeta) {
+        themeMeta = document.querySelector<HTMLMetaElement>(
+          'meta[name="theme-color"]'
+        );
+      }
+
+      if (!themeMeta) {
+        themeMeta = document.createElement("meta");
+        themeMeta.name = "theme-color";
+        document.head.appendChild(themeMeta);
+      }
+
+      themeMeta.content = themeColor;
+    };
+
+    const applyTheme = (nextTheme: ResolvedTheme) => {
       // Use Google's M3 system theme naming: sys-light / sys-dark
       // Also keep legacy `light`/`dark` classes for Tailwind compatibility.
       root.classList.remove("sys-light", "sys-dark", "light", "dark");
@@ -24,9 +56,13 @@ export function ThemeWrapper({
       root.style.colorScheme = nextTheme;
       root.setAttribute("data-theme", themeClass);
       root.setAttribute("data-md-theme", nextTheme);
+
+      syncThemeColorMeta(nextTheme);
+      requestAnimationFrame(() => syncThemeColorMeta(nextTheme));
     };
 
-    const resolveTheme = () => (media.matches ? "dark" : "light");
+    const resolveTheme = (): ResolvedTheme =>
+      media.matches ? "dark" : "light";
 
     if (theme === "system") {
       applyTheme(resolveTheme());

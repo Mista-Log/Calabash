@@ -8,6 +8,9 @@ import { MaterialUIProvider } from "@/contexts/MaterialUIContext";
 import { MaterialSymbol } from "@/components/core/MaterialSymbol";
 import { useMaterialUI } from "@/contexts/MaterialUIContext";
 import { cn } from "@/lib/utils";
+import { useCommandPaletteShortcut } from "@/hooks/use-keyboard-shortcut";
+import { CommandPalette } from "@/components/core/command-palette";
+import { useUserStore } from "@/store/useUserStore";
 
 export interface MainLayoutProps {
   children: React.ReactNode;
@@ -66,6 +69,12 @@ function MainLayoutFrame({
   searchPlaceholder,
   onSearch,
 }: MainLayoutProps) {
+  const [isCommandPaletteOpen, setIsCommandPaletteOpen] = React.useState(false);
+  const { user } = useUserStore();
+  
+  // Cmd+K opens command palette from anywhere in the layout
+  useCommandPaletteShortcut(() => setIsCommandPaletteOpen(true));
+
   return (
     <div className="min-h-screen bg-[color:var(--background)]">
       {showNavigation && (
@@ -81,6 +90,7 @@ function MainLayoutFrame({
           searchPlaceholder={searchPlaceholder}
           onSearch={onSearch}
           showNavigation={showNavigation}
+          onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
         />
       )}
 
@@ -89,6 +99,13 @@ function MainLayoutFrame({
       </MainContent>
 
       {showFooter && <Footer />}
+
+      {/* Command Palette for search - Role-aware */}
+      <CommandPalette
+        open={isCommandPaletteOpen}
+        onOpenChange={setIsCommandPaletteOpen}
+        role={user?.role}
+      />
     </div>
   );
 }

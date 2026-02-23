@@ -22,11 +22,12 @@ import {
 import { M3Button } from "@/components/core";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/core";
 import { EmptyState } from "@/components/core/empty-state";
-import {
-  AchievementBadge,
-  XPProgress,
-} from "@/components/features/gamification";
+import { AchievementBadge } from "@/components/features/gamification";
 import { AchievementsModal } from "@/components/features/dashboard/AchievementsModal";
+import { GamificationCard } from "@/components/features/gamification/gamification-card";
+import { DeadlineList } from "@/components/core/deadline-list";
+import { MetricStat } from "@/components/core/metric-stat";
+import { APP_SURFACE_CARD } from "@/lib/ui-sync";
 import type {
   StudentActivityCardVM,
   StudentDashboardView,
@@ -57,8 +58,7 @@ const materialTypeLabel: Record<Material["type"], string> = {
   image: "Image",
 };
 
-const dashboardSurfaceCard =
-  "m3-surface m3-surface--elevated rounded-[28px] border-[color:var(--md-sys-color-outline-variant)]";
+const dashboardSurfaceCard = APP_SURFACE_CARD;
 
 const COPY = {
   focusKicker: "Current Course Focus",
@@ -161,6 +161,15 @@ export function StudentDashboard({ view, onRefresh }: StudentDashboardProps) {
     "all" | "unlocked" | "in-progress"
   >("all");
   const [isAchievementsModalOpen, setIsAchievementsModalOpen] = React.useState(false);
+  const activeTabIndex = activeTab === "activities" ? 0 : 1;
+
+  const handleTabChange = React.useCallback((event: React.FormEvent<HTMLElement>) => {
+    const target = event.currentTarget as HTMLElement & {
+      activeTabIndex?: number;
+    };
+    const nextIndex = target.activeTabIndex ?? 0;
+    setActiveTab(nextIndex === 0 ? "activities" : "paths");
+  }, []);
 
   const { data } = view;
   const courseProgress =
@@ -238,10 +247,10 @@ export function StudentDashboard({ view, onRefresh }: StudentDashboardProps) {
   };
 
   const quickStats = [
-    { label: "Average Progress", value: `${averageProgress}%` },
-    { label: "GPA", value: data.studentStats?.gpa || "N/A" },
-    { label: "Attendance", value: data.studentStats?.attendance || "N/A" },
-    { label: "Resources", value: recentMaterials.length.toString() },
+    { label: "Avg Progress", value: `${averageProgress}%`, trend: { value: 12, isPositive: true } },
+    { label: "GPA", value: data.studentStats?.gpa || "N/A", trend: { value: 3, isPositive: true } },
+    { label: "Attendance", value: data.studentStats?.attendance || "N/A", trend: { value: -2, isPositive: false } },
+    { label: "Resources", value: recentMaterials.length.toString(), trend: { value: 8, isPositive: true } },
   ];
 
   const handleClaimAchievement = async (achievementId: string) => {
@@ -311,18 +320,13 @@ export function StudentDashboard({ view, onRefresh }: StudentDashboardProps) {
                   </div>
 
                   <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-                    {quickStats.map((stat) => (
-                      <div
-                        key={stat.label}
-                        className="rounded-2xl border border-[color:var(--md-sys-color-outline-variant)] bg-[color:var(--md-sys-color-surface-container-low)] p-3"
-                      >
-                        <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[color:var(--md-sys-color-on-surface-variant)]">
-                          {stat.label}
-                        </p>
-                        <p className="mt-1 text-[20px] font-semibold text-[color:var(--md-sys-color-on-surface)]">
-                          {stat.value}
-                        </p>
-                      </div>
+                    {quickStats.map((stat, index) => (
+                      <MetricStat
+                        key={index}
+                        label={stat.label}
+                        value={stat.value}
+                        trend={stat.trend}
+                      />
                     ))}
                   </div>
 
@@ -377,33 +381,16 @@ export function StudentDashboard({ view, onRefresh }: StudentDashboardProps) {
             transition={{ duration: 0.35, delay: 0.1 }}
             className={cn(dashboardSurfaceCard, "p-5 sm:p-6")}
           >
-            <div className="border-b border-[color:var(--md-sys-color-outline-variant)]">
-              <div className="flex gap-2">
-                <button
-                  type="button"
-                  onClick={() => setActiveTab("activities")}
-                  className={cn(
-                    "rounded-t-2xl px-4 py-2.5 text-[15px] font-semibold whitespace-nowrap transition-colors",
-                    activeTab === "activities"
-                      ? "bg-[color:var(--md-sys-color-surface-container-high)] text-[color:var(--md-sys-color-primary)]"
-                      : "text-[color:var(--md-sys-color-on-surface-variant)] hover:text-[color:var(--md-sys-color-on-surface)]",
-                  )}
-                >
-                  {COPY.tabs.activity}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setActiveTab("paths")}
-                  className={cn(
-                    "rounded-t-2xl px-4 py-2.5 text-[15px] font-semibold whitespace-nowrap transition-colors",
-                    activeTab === "paths"
-                      ? "bg-[color:var(--md-sys-color-surface-container-high)] text-[color:var(--md-sys-color-primary)]"
-                      : "text-[color:var(--md-sys-color-on-surface-variant)] hover:text-[color:var(--md-sys-color-on-surface)]",
-                  )}
-                >
-                  {COPY.tabs.pathways}
-                </button>
-              </div>
+            <div className="overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              <md-tabs
+                active-tab-index={activeTabIndex}
+                onChange={handleTabChange}
+                className="course-tabs"
+                aria-label="Student dashboard sections"
+              >
+                <md-tab>{COPY.tabs.activity}</md-tab>
+                <md-tab>{COPY.tabs.pathways}</md-tab>
+              </md-tabs>
             </div>
 
             <div className="mt-5 space-y-4">
@@ -537,25 +524,15 @@ export function StudentDashboard({ view, onRefresh }: StudentDashboardProps) {
               transition={{ duration: 0.3, delay: 0.14 }}
               className={cn(dashboardSurfaceCard, "p-5 sm:p-6")}
             >
-                <div className="mb-3 flex items-center gap-2">
-                  <MaterialSymbol icon={Clock02Icon} size={16} />
-                <h3 className="text-[16px] font-semibold">{COPY.deadlinesTitle}</h3>
-                </div>
-              <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
-                {deadlines.slice(0, 3).map((item, idx) => (
-                  <div
-                    key={`${item.title}-${idx}`}
-                    className="rounded-2xl border border-[color:var(--md-sys-color-outline-variant)] bg-[color:var(--md-sys-color-surface-container-low)] p-3"
-                  >
-                    <p className="text-[13px] font-semibold text-[color:var(--md-sys-color-on-surface)]">
-                      {item.title}
-                    </p>
-                    <p className="mt-1 text-[12px] text-[color:var(--md-sys-color-on-surface-variant)]">
-                      Due {item.due}
-                    </p>
-                  </div>
-                ))}
-              </div>
+              <DeadlineList
+                deadlines={deadlines.map((d) => ({
+                  title: d.title,
+                  due: d.due,
+                  dueDate: new Date(),
+                  color: d.color as "orange" | "sage" | "green" | "red" | undefined,
+                }))}
+                limit={6}
+              />
             </motion.div>
           )}
         </section>
@@ -567,16 +544,9 @@ export function StudentDashboard({ view, onRefresh }: StudentDashboardProps) {
             transition={{ duration: 0.35, delay: 0.08 }}
           >
             {gamification ? (
-              <XPProgress
-                level={gamification.level}
-                currentXP={gamification.currentXP}
-                xpToNextLevel={gamification.xpToNextLevel}
-                totalXP={gamification.totalXP}
-                title={gamification.title}
-                streak={{
-                  current: gamification.streak.current,
-                  best: gamification.streak.best,
-                }}
+              <GamificationCard
+                gamification={gamification}
+                onExpand={() => setIsAchievementsModalOpen(true)}
               />
             ) : (
               <Card className={dashboardSurfaceCard}>

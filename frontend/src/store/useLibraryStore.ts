@@ -12,6 +12,29 @@ interface SetMaterialsOptions {
   source?: "dashboard" | "catalog" | "manual";
 }
 
+// Queue for serializing async mutations to prevent race conditions
+let libraryMutationQueue: Array<() => Promise<unknown>> = [];
+let isProcessingLibraryMutation = false;
+
+async function processLibraryMutationQueue(): Promise<void> {
+  if (isProcessingLibraryMutation || libraryMutationQueue.length === 0) {
+    return;
+  }
+
+  isProcessingLibraryMutation = true;
+  while (libraryMutationQueue.length > 0) {
+    const mutation = libraryMutationQueue.shift();
+    if (mutation) {
+      try {
+        await mutation();
+      } catch {
+        // Error handled by individual mutation
+      }
+    }
+  }
+  isProcessingLibraryMutation = false;
+}
+
 interface LibraryState {
   materials: Material[];
   filteredMaterials: Material[];
@@ -167,24 +190,34 @@ export const useLibraryStore = create<LibraryState>()(
           };
         });
 
-        try {
-          if (options?.simulateFailure) {
-            throw new Error("Simulated create material failure");
-          }
-          await Promise.resolve();
-          set({ status: "success", error: null });
-          return createdMaterial;
-        } catch (error) {
-          set({
-            ...updateFiltered(previous.materials, previous.searchQuery),
-            status: "error",
-            error:
-              error instanceof Error
-                ? error.message
-                : "Failed to create material",
-          });
-          throw error;
-        }
+        const mutationPromise = new Promise<Material>((resolve, reject) => {
+          const doMutation = async () => {
+            try {
+              if (options?.simulateFailure) {
+                throw new Error("Simulated create material failure");
+              }
+              await Promise.resolve();
+              set({ status: "success", error: null });
+              resolve(createdMaterial);
+            } catch (error) {
+              set({
+                ...updateFiltered(previous.materials, previous.searchQuery),
+                status: "error",
+                error:
+                  error instanceof Error
+                    ? error.message
+                    : "Failed to create material",
+              });
+              reject(error);
+            }
+          };
+          doMutation();
+        });
+
+        libraryMutationQueue.push(() => mutationPromise);
+        processLibraryMutationQueue();
+
+        return mutationPromise;
       },
 
       addMaterial: async (material, options) => {
@@ -206,23 +239,34 @@ export const useLibraryStore = create<LibraryState>()(
           };
         });
 
-        try {
-          if (options?.simulateFailure) {
-            throw new Error("Simulated update material failure");
-          }
-          await Promise.resolve();
-          set({ status: "success", error: null });
-        } catch (error) {
-          set({
-            ...updateFiltered(previous.materials, previous.searchQuery),
-            status: "error",
-            error:
-              error instanceof Error
-                ? error.message
-                : "Failed to update material",
-          });
-          throw error;
-        }
+        const mutationPromise = new Promise<void>((resolve, reject) => {
+          const doMutation = async () => {
+            try {
+              if (options?.simulateFailure) {
+                throw new Error("Simulated update material failure");
+              }
+              await Promise.resolve();
+              set({ status: "success", error: null });
+              resolve();
+            } catch (error) {
+              set({
+                ...updateFiltered(previous.materials, previous.searchQuery),
+                status: "error",
+                error:
+                  error instanceof Error
+                    ? error.message
+                    : "Failed to update material",
+              });
+              reject(error);
+            }
+          };
+          doMutation();
+        });
+
+        libraryMutationQueue.push(() => mutationPromise);
+        processLibraryMutationQueue();
+
+        return mutationPromise;
       },
 
       setVisibility: async (id, visibility, options) => {

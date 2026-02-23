@@ -16,11 +16,14 @@ import {
   Input,
   M3Button,
 } from "@/components/core";
+import { UploadModal } from "@/components/features/library/UploadModal";
 import { cn } from "@/lib/utils";
 import { Material } from "@/services/api";
 import { useLibraryStore } from "@/store/useLibraryStore";
 import { useMockDataStore } from "@/store/useMockDataStore";
 import { useCourseStore } from "@/store/useCourseStore";
+import { useUserStore } from "@/store/useUserStore";
+import { APP_PAGE_CONTAINER, APP_PAGE_SHELL } from "@/lib/ui-sync";
 
 type CatalogKind = "course" | "lab";
 type CatalogLevel = "beginner" | "intermediate" | "advanced";
@@ -36,6 +39,23 @@ interface CatalogMaterial extends Material {
 }
 
 const PAGE_SIZE = 8;
+
+const ROLE_COPY = {
+  student: {
+    title: "Explore the Academic Resource Library",
+    description:
+      "Access curated course materials, guided learning modules, and instructional resources aligned with your academic programme.",
+    searchPlaceholder: "Search resources",
+    countLabel: "resources",
+  },
+  lecturer: {
+    title: "Review and Manage Course Resources",
+    description:
+      "Inspect published materials, validate metadata, and open resources exactly as students experience them.",
+    searchPlaceholder: "Search your course resources",
+    countLabel: "course resources",
+  },
+} as const;
 
 function isLegacySyntheticMaterial(material: Material): boolean {
   return material.id.startsWith("catalog-");
@@ -85,6 +105,7 @@ function formatDuration(minutes: number): string {
 }
 
 export default function StudentCatalogPage() {
+  const { user } = useUserStore();
   const { materials: storeMaterials, setMaterials } = useLibraryStore();
   const fallbackMaterials = useMockDataStore((state) => state.materials);
   const courses = useCourseStore((state) => state.courses);
@@ -221,6 +242,8 @@ export default function StudentCatalogPage() {
   ]);
 
   const total = filteredMaterials.length;
+  const role = user?.role === "lecturer" ? "lecturer" : "student";
+  const copy = ROLE_COPY[role];
   const pageCount = Math.max(1, Math.ceil(total / PAGE_SIZE));
   const safePage = Math.min(page, pageCount);
   const startIndex = (safePage - 1) * PAGE_SIZE;
@@ -228,31 +251,30 @@ export default function StudentCatalogPage() {
   const currentItems = filteredMaterials.slice(startIndex, endIndex);
 
   return (
-    <div className="w-full px-3 py-5 sm:px-5 sm:py-7 lg:px-7 lg:py-9">
-      <div className="mx-auto w-full max-w-[1360px] space-y-6 sm:space-y-8">
+    <div className={APP_PAGE_SHELL}>
+      <div className={cn(APP_PAGE_CONTAINER, "space-y-6 sm:space-y-8")}>
         {/* Hero + Search */}
         <section className="mx-auto max-w-[1120px] rounded-[28px] border border-[color:var(--md-sys-color-outline-variant)] bg-[color:var(--md-sys-color-surface-container-low)] p-5 sm:p-7">
           <div className="mx-auto max-w-[800px] space-y-4 text-center">
             <h1 className="m3-headline-large text-[color:var(--md-sys-color-on-surface)]">
-              Explore the Academic Resource Library
+              {copy.title}
             </h1>
             <p className="m3-body-large text-[color:var(--md-sys-color-on-surface-variant)]">
-              Access curated course materials, guided learning modules, and
-              instructional resources aligned with your academic programme.
+              {copy.description}
             </p>
           </div>
 
-          <div className="mx-auto mt-6 max-w-[680px]">
+          <div className="mx-auto mt-6 flex max-w-[680px] gap-3">
             <Input
               type="search"
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              placeholder="Search resources"
+              placeholder={copy.searchPlaceholder}
               leadingIcon="search"
               trailingIcon={query ? "close" : undefined}
               trailingIconAriaLabel="Clear search"
               onTrailingIconClick={() => setQuery("")}
-              className={cn("h-14 w-full m3-body-medium")}
+              className={cn("h-14 flex-1 m3-body-medium")}
               style={
                 {
                   "--md-filled-text-field-container-color":
@@ -266,6 +288,15 @@ export default function StudentCatalogPage() {
                 } as React.CSSProperties
               }
             />
+            {role === "lecturer" && (
+              <M3Button 
+                className="h-14 gap-2 px-6 font-semibold whitespace-nowrap"
+                onClick={() => setIsUploadOpen(true)}
+              >
+                <MaterialSymbol icon="upload_file" size={18} />
+                Upload
+              </M3Button>
+            )}
           </div>
         </section>
 
@@ -334,7 +365,7 @@ export default function StudentCatalogPage() {
 
         {/* Results Count */}
         <div className="m3-body-medium text-[color:var(--md-sys-color-on-surface-variant)]">
-          {total.toLocaleString()} resources
+          {total.toLocaleString()} {copy.countLabel}
         </div>
 
         {/* Content Grid */}

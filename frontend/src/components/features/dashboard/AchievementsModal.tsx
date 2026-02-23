@@ -81,8 +81,8 @@ export function AchievementsModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-[min(96vw,64rem)] max-h-[calc(100dvh-2rem)] overflow-hidden rounded-3xl border border-[color:var(--md-sys-color-outline-variant)] bg-[color:var(--md-sys-color-surface-container-low)] p-0">
-        <DialogHeader className="border-b border-[color:var(--md-sys-color-outline-variant)] p-6 sm:p-8">
+      <DialogContent className="w-[min(96vw,64rem)] max-h-[calc(100dvh-2rem)] overflow-hidden rounded-3xl border border-[color:var(--md-sys-color-outline-variant)] bg-[color:var(--md-sys-color-surface-container-low)]">
+        <DialogHeader>
           <div className="flex items-start justify-between gap-4">
             <div className="space-y-2">
               <DialogTitle className="text-[30px] font-semibold leading-tight">
@@ -131,7 +131,7 @@ export function AchievementsModal({
           </div>
         </DialogHeader>
 
-        <div className="max-h-[calc(100dvh-16rem)] overflow-y-auto p-6 sm:p-8">
+        <div className="max-h-[calc(100dvh-16rem)] overflow-y-auto px-1 py-1">
           {visible.length > 0 ? (
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {visible.map((achievement) => {

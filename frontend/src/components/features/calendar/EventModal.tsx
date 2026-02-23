@@ -224,8 +224,8 @@ export function EventModal({ isOpen, onClose }: EventModalProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={handleDialogOpenChange}>
-      <DialogContent className="calendar-event-dialog w-[min(96vw,480px)] max-h-[calc(100dvh-2rem)] rounded-3xl p-0 overflow-hidden border-none">
-        <DialogHeader className="p-6 bg-primary/5 border-b border-primary/10">
+      <DialogContent className="calendar-event-dialog w-[min(96vw,480px)] max-h-[calc(100dvh-2rem)] rounded-3xl overflow-hidden border-none">
+        <DialogHeader className="bg-primary/5 border-b border-primary/10">
           <div className="flex items-center justify-between">
             <DialogTitle className="text-xl font-black">
               {editingEvent ? "Edit Event" : "Add New Event"}
@@ -242,7 +242,7 @@ export function EventModal({ isOpen, onClose }: EventModalProps) {
           )}
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-6 px-1 py-1">
           {formContent}
         </form>
       </DialogContent>

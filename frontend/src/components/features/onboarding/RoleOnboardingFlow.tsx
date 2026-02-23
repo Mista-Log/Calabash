@@ -453,14 +453,11 @@ export function RoleOnboardingFlow({ role }: { role: OnboardingRole }) {
   const selectedLabels = resolveAnswerLabels(role, answers);
 
   const updateAnswer = (questionId: string, value: string | string[]) => {
-    setAnswers((prev) => {
-      const next = {
-        ...prev,
-        [questionId]: value,
-      };
-      upsertRoleAnswers(role, { [questionId]: value });
-      return next;
-    });
+    setAnswers((prev) => ({
+      ...prev,
+      [questionId]: value,
+    }));
+    upsertRoleAnswers(role, { [questionId]: value });
   };
 
   const onMultiToggle = (value: string) => {

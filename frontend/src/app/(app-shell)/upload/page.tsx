@@ -17,6 +17,8 @@ import { Card, CardContent, M3Button, Input, Label } from "@/components/core";
 import { useUploadStore } from "@/store/useUploadStore";
 import { useUserStore } from "@/store/useUserStore";
 import { useToast } from "@/components/core/toast";
+import { APP_PAGE_CONTAINER, APP_PAGE_SHELL, APP_SURFACE_CARD } from "@/lib/ui-sync";
+import { cn } from "@/lib/utils";
 
 type StepId = "details" | "file" | "review";
 
@@ -82,7 +84,7 @@ export default function UploadPage() {
   if (!user) {
     return (
       <div className="mx-auto flex min-h-[60vh] max-w-[860px] items-center justify-center">
-        <Card className="w-full border-[color:var(--md-sys-color-outline-variant)] bg-[color:var(--md-sys-color-surface-container-low)]">
+        <Card className={cn(APP_SURFACE_CARD, "w-full")}>
           <CardContent className="p-8 text-center">
             <h1 className="text-[24px] font-semibold text-[color:var(--md-sys-color-on-surface)]">
               Sign in to upload materials
@@ -102,7 +104,7 @@ export default function UploadPage() {
   if (user && user.role !== "lecturer") {
     return (
       <div className="mx-auto flex min-h-[60vh] max-w-[860px] items-center justify-center">
-        <Card className="w-full border-[color:var(--md-sys-color-outline-variant)] bg-[color:var(--md-sys-color-surface-container-low)]">
+        <Card className={cn(APP_SURFACE_CARD, "w-full")}>
           <CardContent className="p-8 text-center">
             <h1 className="text-[24px] font-semibold text-[color:var(--md-sys-color-on-surface)]">
               Upload is lecturer-only
@@ -174,7 +176,7 @@ export default function UploadPage() {
   if (status === "success" && lastSuccess) {
     return (
       <div className="mx-auto flex min-h-[68vh] max-w-[740px] items-center justify-center">
-        <Card className="w-full border-[color:var(--md-sys-color-outline-variant)] bg-[color:var(--md-sys-color-surface-container-low)]">
+        <Card className={cn(APP_SURFACE_CARD, "w-full")}>
           <CardContent className="space-y-6 p-8 text-center">
             <div className="mx-auto flex size-16 items-center justify-center rounded-full bg-[color:var(--md-sys-color-primary-container)] text-[color:var(--md-sys-color-on-primary-container)]">
               <MaterialSymbol icon={CheckmarkCircle01Icon} size={34} />
@@ -212,8 +214,8 @@ export default function UploadPage() {
   }
 
   return (
-    <div className="w-full px-3 py-5 sm:px-5 sm:py-7 lg:px-7 lg:py-9">
-      <div className="mx-auto w-full max-w-[1360px] space-y-6">
+    <div className={APP_PAGE_SHELL}>
+      <div className={cn(APP_PAGE_CONTAINER, "space-y-6")}>
       <div className="space-y-2">
         <h1 className="text-[34px] font-semibold tracking-tight text-[color:var(--md-sys-color-on-surface)]">
           Upload Resource

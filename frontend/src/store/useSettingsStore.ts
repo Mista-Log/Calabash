@@ -5,6 +5,7 @@ interface SettingsState {
   // Display preferences
   reducedMotion: boolean;
   theme: 'light' | 'dark' | 'system';
+  themePreferenceSet: boolean;
 
   // Notification preferences
   emailNotifications: boolean;
@@ -27,7 +28,8 @@ export const useSettingsStore = create<SettingsState>()(
     (set) => ({
       // Default values
       reducedMotion: false,
-      theme: 'system',
+      theme: 'light',
+      themePreferenceSet: false,
       emailNotifications: true,
       pushNotifications: false,
       profileVisibility: 'public',
@@ -36,13 +38,32 @@ export const useSettingsStore = create<SettingsState>()(
       setReducedMotion: (value) => set({ reducedMotion: value }),
       toggleReducedMotion: () =>
         set((state) => ({ reducedMotion: !state.reducedMotion })),
-      setTheme: (theme) => set({ theme }),
+      setTheme: (theme) => set({ theme, themePreferenceSet: true }),
       setEmailNotifications: (enabled) => set({ emailNotifications: enabled }),
       setPushNotifications: (enabled) => set({ pushNotifications: enabled }),
       setProfileVisibility: (visibility) => set({ profileVisibility: visibility }),
     }),
     {
       name: "calabash-settings",
+      version: 2,
+      migrate: (persistedState) => {
+        const state = (persistedState ?? {}) as Partial<SettingsState>;
+        const hadExplicitPreference = state.themePreferenceSet ?? false;
+        const persistedTheme = state.theme;
+
+        const normalizedTheme =
+          persistedTheme === "system" && !hadExplicitPreference
+            ? "light"
+            : persistedTheme ?? "light";
+
+        return {
+          ...state,
+          theme: normalizedTheme,
+          themePreferenceSet:
+            state.themePreferenceSet ??
+            (normalizedTheme === "dark" || normalizedTheme === "system"),
+        } as SettingsState;
+      },
     }
   )
 );

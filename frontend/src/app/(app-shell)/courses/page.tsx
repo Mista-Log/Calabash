@@ -17,6 +17,7 @@ import { FilterModal } from "@/components/features/shared/FilterModal";
 import { cn } from "@/lib/utils";
 import { courseRepository } from "@/services/course.repository";
 import type { CourseSidebarFeed } from "@/types/courses";
+import { APP_PAGE_CONTAINER, APP_PAGE_SHELL } from "@/lib/ui-sync";
 
 const emptySidebarFeed: CourseSidebarFeed = {
   deadlines: [],
@@ -194,8 +195,8 @@ export default function CoursesPage() {
 
   return (
     <>
-      <div className="w-full px-3 py-5 sm:px-5 sm:py-7 lg:px-7 lg:py-9">
-        <div className="mx-auto grid max-w-[1360px] grid-cols-1 gap-10 lg:grid-cols-12">
+      <div className={APP_PAGE_SHELL}>
+        <div className={cn(APP_PAGE_CONTAINER, "grid grid-cols-1 gap-10 lg:grid-cols-12")}>
           <div className="space-y-8 lg:col-span-8">
           <div className="space-y-6">
             <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">

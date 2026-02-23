@@ -34,14 +34,18 @@ export const useDashboardStore = create<DashboardStoreState>((set, get) => ({
     set({ status: "loading", error: null });
     try {
       const viewModel = await dashboardRepository.getDashboard(role, userId);
+      
+      // Safely access course store
+      const courseState = useCourseStore.getState();
       const progressMap =
         role === "student" ? viewModel.studentView?.courseProgress ?? {} : {};
-      useCourseStore
-        .getState()
-        .hydrateForContext({ userId, role }, viewModel.raw.courses, progressMap);
-      useLibraryStore.getState().mergeMaterials(viewModel.raw.recentMaterials);
+      courseState.hydrateForContext({ userId, role }, viewModel.raw.courses, progressMap);
+      
+      // Safely access library store
+      const libraryState = useLibraryStore.getState();
+      libraryState.mergeMaterials(viewModel.raw.recentMaterials);
 
-      const mergedMaterials = useLibraryStore.getState().materials;
+      const mergedMaterials = libraryState.materials;
       const remapped = dashboardRepository.mapApiToViewModel(
         viewModel.raw,
         mergedMaterials,
@@ -63,6 +67,7 @@ export const useDashboardStore = create<DashboardStoreState>((set, get) => ({
           error instanceof Error
             ? error.message
             : "Failed to load dashboard",
+        lastUpdated: null,
       });
     }
   },

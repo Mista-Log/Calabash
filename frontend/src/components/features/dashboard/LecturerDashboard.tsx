@@ -26,10 +26,12 @@ import { EditMaterialModal } from "@/components/features/library/EditMaterialMod
 import { Chart } from "@/components/core/chart";
 import { EmptyState } from "@/components/core/empty-state";
 import { SectionHeader } from "@/components/core/section-header";
+import { MetricStat } from "@/components/core/metric-stat";
 import {
   DashboardMasonrySection,
   DashboardTile,
 } from "@/components/features/dashboard/DashboardMasonryLayout";
+import { APP_SURFACE_CARD } from "@/lib/ui-sync";
 import type { LecturerDashboardView } from "@/types/dashboard";
 import type { Material } from "@/services/api";
 
@@ -52,8 +54,7 @@ const materialIcons = {
   image: Pdf01Icon,
 };
 
-const dashboardSurfaceCard =
-  "m3-surface m3-surface--elevated rounded-[28px] border-[color:var(--md-sys-color-outline-variant)]";
+const dashboardSurfaceCard = APP_SURFACE_CARD;
 
 const COPY = {
   heroKicker: "Instructional Overview",
@@ -277,10 +278,29 @@ export function LecturerDashboard({ view, onRefresh }: LecturerDashboardProps) {
               </div>
 
               <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-                <MetricStat label="Students" value={lecturerStats.totalStudents} />
-                <MetricStat label="Uploads" value={lecturerStats.totalUploads} />
-                <MetricStat label="Total Views" value={lecturerStats.totalViews} />
-                <MetricStat label="Active Courses" value={lecturerStats.activeCourses} />
+                <MetricStat
+                  label="Students"
+                  value={lecturerStats.totalStudents}
+                  icon="school"
+                  trend={{ value: 15, isPositive: true }}
+                />
+                <MetricStat
+                  label="Uploads"
+                  value={lecturerStats.totalUploads}
+                  icon="upload_file"
+                  trend={{ value: monthDeltaPct, isPositive: monthDelta >= 0 }}
+                />
+                <MetricStat
+                  label="Total Views"
+                  value={lecturerStats.totalViews}
+                  icon="visibility"
+                  trend={{ value: 23, isPositive: true }}
+                />
+                <MetricStat
+                  label="Active Courses"
+                  value={lecturerStats.activeCourses}
+                  icon="menu_book"
+                />
               </div>
 
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -777,27 +797,6 @@ export function LecturerDashboard({ view, onRefresh }: LecturerDashboardProps) {
         material={editingMaterial}
         onSave={handleSaveMaterial}
       />
-    </div>
-  );
-}
-
-function MetricStat({
-  label,
-  value,
-  compact = false,
-}: {
-  label: string;
-  value: string | number;
-  compact?: boolean;
-}) {
-  return (
-    <div className="rounded-2xl border border-[color:var(--md-sys-color-outline-variant)] bg-[color:var(--md-sys-color-surface-container-low)] p-3">
-      <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[color:var(--md-sys-color-on-surface-variant)]">
-        {label}
-      </p>
-      <p className={cn("mt-1 font-semibold", compact ? "text-[18px]" : "text-[21px]")}>
-        {value}
-      </p>
     </div>
   );
 }

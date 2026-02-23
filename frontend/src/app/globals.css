@@ -95,7 +95,7 @@
   --radius-4xl: calc(var(--radius) + 16px);
 }
 
-:root {
+  :root {
   /* Material 3 typography tokens */
   --md-ref-typeface-brand:
     var(--font-sans), ui-sans-serif, system-ui, sans-serif;
@@ -146,6 +146,13 @@
 
   --md-sys-motion-duration-short: var(--md-sys-motion-duration-short4);
   --md-sys-motion-duration-medium: var(--md-sys-motion-duration-medium2);
+
+  /* Shared placeholder treatment: visibly lighter than entered text. */
+  --app-placeholder-color: color-mix(
+    in oklab,
+    var(--md-sys-color-on-surface-variant) 62%,
+    transparent
+  );
 }
 @layer base {
   * {
@@ -167,13 +174,13 @@
 
   input::placeholder,
   textarea::placeholder {
-    color: var(--md-sys-color-on-surface-variant);
-    opacity: 1;
+    color: var(--app-placeholder-color);
+    opacity: 0.88;
   }
 
   input::-ms-input-placeholder,
   textarea::-ms-input-placeholder {
-    color: var(--md-sys-color-on-surface-variant);
+    color: var(--app-placeholder-color);
   }
 
   /* Material 3-inspired type scale */
@@ -347,8 +354,12 @@ md-icon {
     --md-text-field-hover-container-color: var(--md-sys-color-surface-container);
     --md-text-field-leading-icon-color: var(--md-sys-color-on-surface-variant);
     --md-text-field-trailing-icon-color: var(--md-sys-color-on-surface-variant);
-    --md-text-field-input-text-placeholder-color: var(
-      --md-sys-color-on-surface-variant
+    --md-text-field-input-text-placeholder-color: var(--app-placeholder-color);
+    --md-filled-text-field-input-text-placeholder-color: var(
+      --app-placeholder-color
+    );
+    --md-outlined-text-field-input-text-placeholder-color: var(
+      --app-placeholder-color
     );
     --md-filled-text-field-container-shape: var(--md-sys-shape-corner-large);
     --md-outlined-text-field-container-shape: var(--md-sys-shape-corner-large);
@@ -467,8 +478,8 @@ md-icon {
   }
 
   md-dialog.app-dialog {
-    max-inline-size: min(96vw, 64rem);
-    max-block-size: calc(100dvh - 1.5rem);
+    max-inline-size: min(96vw, 72rem);
+    max-block-size: calc(100dvh - 2rem);
     margin: auto;
   }
 
@@ -476,6 +487,18 @@ md-icon {
     max-block-size: min(78dvh, 62rem);
     overflow-y: auto;
     overscroll-behavior: contain;
+    padding: clamp(14px, 2.2vw, 24px);
+    scrollbar-gutter: stable both-edges;
+  }
+
+  .app-modal-header {
+    padding: clamp(14px, 2.2vw, 24px);
+    border-bottom: 1px solid var(--md-sys-color-outline-variant);
+  }
+
+  .app-modal-footer {
+    padding: clamp(12px, 2vw, 20px);
+    border-top: 1px solid var(--md-sys-color-outline-variant);
   }
 
   /* Hide visible scrollbars for all modal surfaces while preserving scroll. */

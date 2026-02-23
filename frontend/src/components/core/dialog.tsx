@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { cn } from "@/lib/utils";
 
 export interface DialogProps {
   open?: boolean;
@@ -194,7 +195,7 @@ const DialogContent = React.forwardRef<
       ...props,
       id: dialogId,
       open: open || undefined,
-      className: ["app-dialog", className].filter(Boolean).join(" "),
+      className: cn("app-dialog app-modal", className),
     },
     ...slotted,
     content.length > 0
@@ -206,14 +207,21 @@ DialogContent.displayName = "DialogContent";
 
 const DialogHeader = ({
   children,
-}: React.HTMLAttributes<HTMLDivElement>) => <>{children}</>;
+  className,
+  ...props
+}: React.HTMLAttributes<HTMLDivElement>) => (
+  <div className={cn("app-modal-header", className)} {...props}>
+    {children}
+  </div>
+);
 DialogHeader.displayName = "DialogHeader";
 
 const DialogFooter = ({
   children,
+  className,
   ...props
 }: React.HTMLAttributes<HTMLDivElement>) => (
-  <div slot="actions" {...props}>
+  <div slot="actions" className={cn("app-modal-footer", className)} {...props}>
     {children}
   </div>
 );

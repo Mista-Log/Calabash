@@ -4,12 +4,12 @@ import * as React from "react";
 import { useMaterialUI } from "@/contexts/MaterialUIContext";
 import { MdIcon } from "@/components/core/md-icon";
 import { MdIconButton } from "@/components/core/md-button";
-import { Input } from "@/components/core";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { useUserStore } from "@/store/useUserStore";
 import { useSettingsStore } from "@/store/useSettingsStore";
 import { useRouter } from "next/navigation";
+import { MaterialSymbol } from "@/components/core/MaterialSymbol";
 
 export interface ToolbarProps {
   title?: string;
@@ -18,6 +18,7 @@ export interface ToolbarProps {
   onSearch?: (query: string) => void;
   showNavigation?: boolean;
   actions?: React.ReactNode;
+  onOpenCommandPalette?: () => void;
 }
 
 export function Toolbar({
@@ -27,16 +28,12 @@ export function Toolbar({
   onSearch,
   showNavigation = true,
   actions,
+  onOpenCommandPalette,
 }: ToolbarProps) {
   const router = useRouter();
   const { user, logout } = useUserStore();
   const { theme, setTheme } = useSettingsStore();
   const {
-    isSearchOpen,
-    openSearch,
-    closeSearch,
-    searchQuery,
-    setSearchQuery,
     experiencePoints,
     streakCount,
     isDrawerCollapsed,
@@ -50,19 +47,10 @@ export function Toolbar({
   );
   const userMenuRef = React.useRef<HTMLDivElement>(null);
 
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setSearchQuery(value);
-    onSearch?.(value);
-  };
-
   const handleLogout = () => {
-    const role = user?.role;
     logout();
     setShowUserMenu(false);
-    router.push(
-      role === "lecturer" ? "/auth/login/lecturer" : "/auth/login/student",
-    );
+    router.push("/auth");
   };
 
   React.useEffect(() => {
@@ -148,105 +136,55 @@ export function Toolbar({
         </Link>
       </div>
 
-      {/* Center Section - Search */}
+      {/* Center Section - Command Palette Search */}
       <div className="flex-1 min-w-0 max-w-xl mx-auto">
         {showSearch && (
-          <div className="relative">
-            {isSearchOpen ? (
-              <div
-                className={cn(
-                  "flex items-center gap-3",
-                  "px-1",
-                )}
-              >
-                <Input
-                  type="search"
-                  value={searchQuery}
-                  onChange={handleSearchChange}
-                  placeholder={searchPlaceholder}
-                  leadingIcon="search"
-                  trailingIcon={searchQuery ? "close" : undefined}
-                  trailingIconAriaLabel="Clear search"
-                  onTrailingIconClick={() => {
-                    setSearchQuery("");
-                    onSearch?.("");
-                  }}
-                  autoFocus
-                  className={cn(
-                    "flex-1",
-                    "m3-body-medium",
-                    "text-[color:var(--md-sys-color-on-surface)]"
-                  )}
-                />
-                <MdIconButton
-                  icon="arrow_downward"
-                  onClick={closeSearch}
-                  className="lg:hidden"
-                  aria-label="Close search"
-                />
-              </div>
-            ) : (
-              <button
-                onClick={openSearch}
-                className={cn(
-                  "hidden lg:flex items-center gap-3",
-                  "w-full h-12 px-4",
-                  "rounded-[var(--md-sys-shape-corner-large)]",
-                  "bg-[color:var(--md-sys-color-surface-container-high)]",
-                  "hover:bg-[color:var(--md-sys-color-surface-container-highest)]",
-                  "transition-colors m3-motion-short"
-                )}
-              >
-                <MdIcon
-                  className="text-[24px]"
-                  style={{ color: "var(--md-sys-color-on-surface-variant)" }}
-                >
-                  search
-                </MdIcon>
-                <span
-                  className="m3-body-medium"
-                  style={{ color: "var(--md-sys-color-on-surface-variant)" }}
-                >
-                  {searchPlaceholder}
-                </span>
-                <kbd
-                  className={cn(
-                    "hidden xl:inline-flex items-center gap-1 ml-auto",
-                    "px-2 py-1 text-xs font-medium rounded-lg",
-                    "bg-[color:var(--md-sys-color-surface-container)]",
-                    "text-[color:var(--md-sys-color-on-surface-variant)]"
-                  )}
-                >
-                  ⌘K
-                </kbd>
-              </button>
+          <button
+            onClick={onOpenCommandPalette}
+            className={cn(
+              "flex items-center gap-3",
+              "w-full h-12 px-4",
+              "rounded-[var(--md-sys-shape-corner-large)]",
+              "bg-[color:var(--md-sys-color-surface-container-high)]",
+              "hover:bg-[color:var(--md-sys-color-surface-container-highest)]",
+              "transition-colors m3-motion-short"
             )}
-
-            {!isSearchOpen && (
-              <MdIconButton
-                icon="search"
-                onClick={openSearch}
-                className="lg:hidden"
-                aria-label="Search"
-              />
-            )}
-          </div>
+          >
+            <MaterialSymbol
+              icon="search"
+              size={24}
+              className="text-[color:var(--md-sys-color-on-surface-variant)]"
+            />
+            <span
+              className="m3-body-medium"
+              style={{ color: "var(--md-sys-color-on-surface-variant)" }}
+            >
+              {searchPlaceholder}
+            </span>
+            <kbd
+              className={cn(
+                "hidden xl:inline-flex items-center gap-1 ml-auto",
+                "px-2 py-1 text-xs font-medium rounded-lg",
+                "bg-[color:var(--md-sys-color-surface-container)]",
+                "text-[color:var(--md-sys-color-on-surface-variant)]"
+              )}
+            >
+              ⌘K
+            </kbd>
+          </button>
         )}
       </div>
 
       {/* Right Section - Actions */}
-      <div
-        className={cn(
-          "flex items-center gap-1",
-          isSearchOpen && "hidden sm:flex"
-        )}
-      >
+      <div className="flex items-center gap-1">
         {showGamification && (
           <>
             <div
               className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full"
               style={{ backgroundColor: "var(--md-sys-color-primary-container)" }}
               title="Experience Points"
+              role="status"
+              aria-label={`${experiencePoints.toLocaleString()} experience points`}
             >
               <MdIcon
                 className="text-[20px]"
@@ -266,6 +204,8 @@ export function Toolbar({
               className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full"
               style={{ backgroundColor: "var(--md-sys-color-tertiary-container)" }}
               title="Learning Streak"
+              role="status"
+              aria-label={`${streakCount} day learning streak`}
             >
               <MdIcon
                 className="text-[20px]"
@@ -393,15 +333,6 @@ export function Toolbar({
                 >
                   <MdIcon>settings</MdIcon>
                   Settings
-                </Link>
-                <Link
-                  href="/settings"
-                  className="flex items-center gap-3 px-4 py-3 m3-body-medium"
-                  style={{ color: "var(--md-sys-color-on-surface-variant)" }}
-                  onClick={() => setShowUserMenu(false)}
-                >
-                  <MdIcon>person_outline</MdIcon>
-                  Profile Settings
                 </Link>
                 <div
                   className="my-2"

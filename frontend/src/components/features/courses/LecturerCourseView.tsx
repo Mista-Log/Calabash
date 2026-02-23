@@ -21,6 +21,8 @@ import { CourseAnalytics } from "@/components/features/courses/CourseAnalytics";
 import { StudentRoster } from "./StudentRoster";
 import { ModuleEditor } from "./ModuleEditor";
 import { downloadCsv } from "@/lib/csv";
+import { APP_SURFACE_CARD } from "@/lib/ui-sync";
+import { cn } from "@/lib/utils";
 
 interface LecturerCourseViewProps {
   course: CourseDetails;
@@ -84,7 +86,7 @@ export function LecturerCourseView({ course }: LecturerCourseViewProps) {
   return (
     <div className="space-y-8">
       {/* Header Info */}
-      <div className="rounded-[28px] border border-[color:var(--md-sys-color-outline-variant)] bg-[color:var(--md-sys-color-surface-container-low)] p-5 sm:p-7">
+      <div className={cn(APP_SURFACE_CARD, "p-5 sm:p-7")}>
         <div className="flex flex-col justify-between gap-6 lg:flex-row lg:items-center">
           <div className="space-y-3">
             <div className="flex items-center gap-3">
@@ -121,7 +123,7 @@ export function LecturerCourseView({ course }: LecturerCourseViewProps) {
 
       {/* Quick Stats Grid */}
       <div className="grid gap-6 md:grid-cols-3">
-        <Card className="border-[color:var(--md-sys-color-outline-variant)] bg-[color:var(--md-sys-color-surface-container-lowest)]">
+        <Card className={APP_SURFACE_CARD}>
           <CardContent className="p-6 flex items-center gap-4">
             <div className="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
               <MaterialSymbol icon={UserGroupIcon} size={24} />
@@ -136,7 +138,7 @@ export function LecturerCourseView({ course }: LecturerCourseViewProps) {
             </div>
           </CardContent>
         </Card>
-        <Card className="border-[color:var(--md-sys-color-outline-variant)] bg-[color:var(--md-sys-color-surface-container-lowest)]">
+        <Card className={APP_SURFACE_CARD}>
           <CardContent className="p-6 flex items-center gap-4">
             <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[color:var(--md-sys-color-tertiary-container)] text-[color:var(--md-sys-color-on-tertiary-container)]">
               <MaterialSymbol icon={BookOpen01Icon} size={24} />
@@ -149,7 +151,7 @@ export function LecturerCourseView({ course }: LecturerCourseViewProps) {
             </div>
           </CardContent>
         </Card>
-        <Card className="border-[color:var(--md-sys-color-outline-variant)] bg-[color:var(--md-sys-color-surface-container-lowest)]">
+        <Card className={APP_SURFACE_CARD}>
           <CardContent className="p-6 flex items-center gap-4">
             <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[color:var(--md-sys-color-secondary-container)] text-[color:var(--md-sys-color-on-secondary-container)]">
               <MaterialSymbol icon={Analytics01Icon} size={24} />

@@ -35,8 +35,8 @@ export const studentNavGroups: NavGroup[] = [
         icon: "local_library",
         filledIcon: "local_library",
       },
-      { title: "Courses", href: "/courses", icon: "book", filledIcon: "book" },
-      { title: "Notes", href: "/notes", icon: "note", filledIcon: "note" },
+      { title: "My Courses", href: "/courses", icon: "book", filledIcon: "book" },
+      { title: "My Notes", href: "/notes", icon: "note", filledIcon: "note" },
       {
         title: "Calendar",
         href: "/calendar",
@@ -75,7 +75,7 @@ export const lecturerNavGroups: NavGroup[] = [
         icon: "dashboard",
         filledIcon: "dashboard",
       },
-      { title: "Courses", href: "/courses", icon: "book", filledIcon: "book" },
+      { title: "My Courses", href: "/courses", icon: "book", filledIcon: "book" },
       { title: "Upload", href: "/upload", icon: "upload", filledIcon: "upload" },
       {
         title: "Calendar",
@@ -182,9 +182,9 @@ export function NavigationRail({
 }: NavigationRailProps) {
   const pathname = usePathname();
   const router = useRouter();
-  const warningLoggedRef = React.useRef(false);
   const { user, hasHydrated } = useUserStore();
   const [isNavReady, setIsNavReady] = React.useState(false);
+  const mobileOpenRef = React.useRef(mobileOpen);
   const isLecturer = user?.role === "lecturer";
   const navGroups = isLecturer ? lecturerNavGroups : studentNavGroups;
   const flatNavItems = React.useMemo(
@@ -214,14 +214,8 @@ export function NavigationRail({
             setIsNavReady(true);
           }
           return;
-        } catch (error) {
-          if (attempt === 1 && !warningLoggedRef.current) {
-            warningLoggedRef.current = true;
-            console.warn(
-              "Material nav registration failed.",
-              error
-            );
-          }
+        } catch {
+          // Registration failed, will retry on next attempt or fail silently
         }
       }
     };
@@ -234,12 +228,14 @@ export function NavigationRail({
   }, []);
 
   React.useEffect(() => {
-    if (mobileOpen) {
+    mobileOpenRef.current = mobileOpen;
+  }, [mobileOpen]);
+
+  React.useEffect(() => {
+    if (mobileOpenRef.current) {
       onMobileClose();
     }
-    // Close only when route changes.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pathname]);
+  }, [pathname, onMobileClose]);
 
   React.useEffect(() => {
     if (!mobileOpen) return;
@@ -342,7 +338,9 @@ export function NavigationRail({
       ? React.createElement(
           "div",
           {
-            className: "app-overlay-root lg:hidden",
+            className: "fixed inset-0 z-50 lg:hidden",
+            role: "dialog",
+            "aria-modal": "true",
             "aria-label": "Mobile navigation drawer",
           },
           React.createElement("button", {
@@ -353,60 +351,56 @@ export function NavigationRail({
           }),
           React.createElement(
             "div",
-            { className: "app-overlay-center" },
+            {
+              className:
+                "relative z-10 h-full w-[min(86vw,340px)] border-r border-[color:var(--md-sys-color-outline-variant)] bg-[color:var(--md-sys-color-surface)]",
+            },
             React.createElement(
-              "div",
+              "md-nav-rail",
               {
+                id: "mobile-navigation-rail",
                 className:
-                  "app-overlay-panel h-[min(92dvh,760px)] w-[min(92vw,var(--app-nav-rail-expanded-width))]",
+                  "navigation-rail navigation-rail--mobile block h-full bg-[color:var(--md-sys-color-surface)]",
+                "aria-label": "Mobile navigation",
+                expanded: true,
+                "active-index": activeIndex,
               },
               React.createElement(
-                "md-nav-rail",
+                "md-icon-button",
                 {
-                  id: "mobile-navigation-rail",
-                  className:
-                    "navigation-rail navigation-rail--mobile block h-full bg-[color:var(--md-sys-color-surface)]",
-                  "aria-label": "Mobile navigation",
-                  expanded: true,
-                  "active-index": activeIndex,
+                  slot: "menu",
+                  onClick: onMobileToggle,
+                  "aria-label": "Close navigation drawer",
+                  title: "Close navigation drawer",
+                  className: "navigation-rail__menu-toggle",
                 },
-                React.createElement(
-                  "md-icon-button",
-                  {
-                    slot: "menu",
-                    onClick: onMobileToggle,
-                    "aria-label": "Close navigation drawer",
-                    title: "Close navigation drawer",
-                    className: "navigation-rail__menu-toggle",
-                  },
-                  React.createElement("span", {
-                    className: "material-icons-outlined",
-                    suppressHydrationWarning: true,
-                  }, "menu_open"),
-                ),
-                React.createElement(
-                  "md-fab",
-                  {
-                    id: "mobile-nav-fab",
-                    slot: "fab",
-                    variant: "primary",
-                    lowered: true,
-                    expanded: true,
-                    label: quickAction.label,
-                    "aria-label": quickAction.label,
-                    onClick: () => {
-                      router.push(quickAction.href);
-                      onMobileClose();
-                    },
-                  },
-                  React.createElement("span", {
-                    slot: "icon",
-                    className: "material-icons-filled",
-                    suppressHydrationWarning: true,
-                  }, "add"),
-                ),
-                navItemsMobileEl,
+                React.createElement("span", {
+                  className: "material-icons-outlined",
+                  suppressHydrationWarning: true,
+                }, "menu_open"),
               ),
+              React.createElement(
+                "md-fab",
+                {
+                  id: "mobile-nav-fab",
+                  slot: "fab",
+                  variant: "primary",
+                  lowered: true,
+                  expanded: true,
+                  label: quickAction.label,
+                  "aria-label": quickAction.label,
+                  onClick: () => {
+                    router.push(quickAction.href);
+                    onMobileClose();
+                  },
+                },
+                React.createElement("span", {
+                  slot: "icon",
+                  className: "material-icons-filled",
+                  suppressHydrationWarning: true,
+                }, "add"),
+              ),
+              navItemsMobileEl,
             ),
           ),
         )

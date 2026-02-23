@@ -35,6 +35,8 @@ import {
 } from "recharts";
 import { useDashboardStore } from "@/store/useDashboardStore";
 import { useUserStore } from "@/store/useUserStore";
+import { APP_PAGE_CONTAINER, APP_PAGE_SHELL, APP_SURFACE_CARD } from "@/lib/ui-sync";
+import { cn } from "@/lib/utils";
 
 const primaryColor = "var(--md-sys-color-primary)";
 const tertiaryColor = "var(--md-sys-color-tertiary)";
@@ -68,7 +70,7 @@ export default function AnalyticsPage() {
   if (!user) {
     return (
       <div className="mx-auto flex min-h-[60vh] w-full max-w-[920px] items-center justify-center px-4">
-        <Card className="w-full border-[color:var(--md-sys-color-outline-variant)] bg-[color:var(--md-sys-color-surface-container-low)]">
+        <Card className={cn(APP_SURFACE_CARD, "w-full")}>
           <CardContent className="p-8 text-center">
             <h1 className="text-[24px] font-semibold text-[color:var(--md-sys-color-on-surface)]">
               Sign in to view analytics
@@ -90,7 +92,7 @@ export default function AnalyticsPage() {
   if (user.role !== "lecturer") {
     return (
       <div className="mx-auto flex min-h-[60vh] w-full max-w-[920px] items-center justify-center px-4">
-        <Card className="w-full border-[color:var(--md-sys-color-outline-variant)] bg-[color:var(--md-sys-color-surface-container-low)]">
+        <Card className={cn(APP_SURFACE_CARD, "w-full")}>
           <CardContent className="p-8">
             <EmptyState
               icon={AnalyticsUpIcon}
@@ -120,7 +122,7 @@ export default function AnalyticsPage() {
   if (status === "error") {
     return (
       <div className="mx-auto flex min-h-[60vh] w-full max-w-[920px] items-center justify-center px-4">
-        <Card className="w-full border-[color:var(--md-sys-color-outline-variant)] bg-[color:var(--md-sys-color-surface-container-low)]">
+        <Card className={cn(APP_SURFACE_CARD, "w-full")}>
           <CardContent className="p-8">
             <p className="text-[22px] font-semibold text-[color:var(--md-sys-color-on-surface)]">
               Unable to load analytics
@@ -146,7 +148,7 @@ export default function AnalyticsPage() {
   if (!lecturerView) {
     return (
       <div className="mx-auto flex min-h-[60vh] w-full max-w-[920px] items-center justify-center px-4">
-        <Card className="w-full border-[color:var(--md-sys-color-outline-variant)] bg-[color:var(--md-sys-color-surface-container-low)]">
+        <Card className={cn(APP_SURFACE_CARD, "w-full")}>
           <CardContent className="p-8">
             <EmptyState
               icon={AnalyticsUpIcon}
@@ -210,8 +212,8 @@ export default function AnalyticsPage() {
   ];
 
   return (
-    <div className="w-full px-3 py-5 sm:px-5 sm:py-7 lg:px-7 lg:py-9">
-      <div className="mx-auto w-full max-w-[1360px] space-y-8">
+    <div className={APP_PAGE_SHELL}>
+      <div className={cn(APP_PAGE_CONTAINER, "space-y-8")}>
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
           <h1 className="text-3xl font-semibold tracking-tight text-[color:var(--md-sys-color-on-surface)]">

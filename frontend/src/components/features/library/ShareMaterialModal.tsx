@@ -145,8 +145,8 @@ export function ShareMaterialModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-[min(96vw,36rem)] max-h-[calc(100dvh-2rem)] overflow-hidden rounded-3xl border border-[color:var(--md-sys-color-outline-variant)] p-0">
-        <DialogHeader className="border-b border-[color:var(--md-sys-color-outline-variant)] bg-[color:var(--md-sys-color-surface-container-low)] p-6 sm:p-7">
+      <DialogContent className="w-[min(96vw,42rem)] max-h-[calc(100dvh-2rem)] overflow-hidden rounded-3xl border border-[color:var(--md-sys-color-outline-variant)]">
+        <DialogHeader className="bg-[color:var(--md-sys-color-surface-container-low)]">
           <div className="flex items-start gap-3">
             <div className="flex size-10 items-center justify-center rounded-xl bg-[color:var(--md-sys-color-primary-container)] text-[color:var(--md-sys-color-on-primary-container)]">
               <MaterialSymbol icon={Share01Icon} size={20} />
@@ -162,7 +162,7 @@ export function ShareMaterialModal({
           </div>
         </DialogHeader>
 
-        <div className="max-h-[calc(100dvh-10rem)] overflow-y-auto space-y-5 p-6 sm:p-7">
+        <div className="max-h-[calc(100dvh-10rem)] overflow-y-auto space-y-5">
           <div className="rounded-2xl border border-[color:var(--md-sys-color-outline-variant)] bg-[color:var(--md-sys-color-surface-container-low)] p-4">
             <p className="text-[12px] font-semibold uppercase tracking-[0.12em] text-[color:var(--md-sys-color-on-surface-variant)]">
               Resource Preview
@@ -254,4 +254,3 @@ export function ShareMaterialModal({
     </Dialog>
   );
 }
-

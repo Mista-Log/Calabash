@@ -4,13 +4,7 @@ import * as React from "react";
 import Image from "next/image";
 import {
   CodeFolderIcon,
-  Download01Icon,
   NoteEditIcon,
-  PlusSignIcon,
-  RecordIcon,
-  Settings02Icon,
-  Sorting05Icon,
-  Upload01Icon,
   ViewOffIcon,
 } from "@/lib/icons/material-icons";
 import { MaterialSymbol } from "@/components/core/MaterialSymbol";
@@ -176,71 +170,35 @@ export function DigitalLibrary({ courseDetails }: DigitalLibraryProps) {
   };
 
   const suggestedMaterials = filteredMaterials.slice(0, 4);
+  const selectedMaterial =
+    selectedMaterials.length === 1
+      ? courseMaterials.find((material) => material.id === selectedMaterials[0]) ?? null
+      : null;
 
   return (
     <div className="mx-auto max-w-7xl space-y-10 pb-20">
-      <div className="flex items-center justify-between gap-4">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <SearchInput
           placeholder="Search files and folders..."
-          className="h-11 max-w-xl rounded-xl"
+          className="h-11 w-full max-w-xl rounded-xl"
           value={searchQuery}
           onChange={(event) => setSearchQuery(event.target.value)}
         />
 
         <div className="flex items-center gap-2">
-          <M3Button className="h-11 w-11 rounded-xl" size="sm">
-            <MaterialSymbol icon={Upload01Icon} size={20} />
-          </M3Button>
-          <M3Button className="h-11 w-11 rounded-xl" size="sm">
-            <MaterialSymbol icon={Sorting05Icon} size={20} />
-          </M3Button>
-          <div className="flex h-11 w-11 items-center justify-center overflow-hidden rounded-full border border-[color:var(--md-sys-color-outline-variant)] bg-[color:var(--md-sys-color-surface-container-high)]">
-            <Image
-              src={
-                courseDetails.modules[0]?.materials[0]?.ownerAvatar ??
-                "/placeholder-avatar.png"
-              }
-              alt="Course owner"
-              width={44}
-              height={44}
-              className="h-full w-full object-cover"
-            />
-          </div>
+          {selectedMaterial ? (
+            <M3Button
+              variant="outlined"
+              className="h-10 px-4 text-[13px] font-semibold"
+              onClick={() => setEditingMaterial(selectedMaterial)}
+            >
+              Edit Selected
+            </M3Button>
+          ) : null}
+          <span className="text-[12px] font-semibold uppercase tracking-[0.12em] text-[color:var(--md-sys-color-on-surface-variant)]">
+            {filteredMaterials.length} result{filteredMaterials.length === 1 ? "" : "s"}
+          </span>
         </div>
-      </div>
-
-      <div className="grid grid-cols-2 gap-4 md:grid-cols-5">
-        {[
-          { label: "Create", icon: PlusSignIcon },
-          { label: "Upload", icon: Upload01Icon },
-          { label: "New Folder", icon: CodeFolderIcon },
-          { label: "Record", icon: RecordIcon },
-          { label: "Edit", icon: NoteEditIcon },
-        ].map((action) => (
-          <Card
-            key={action.label}
-            className="cursor-pointer border border-[color:var(--md-sys-color-outline-variant)] bg-[color:var(--md-sys-color-surface-container-low)] transition-colors hover:bg-[color:var(--md-sys-color-surface-container)]"
-            onClick={() => {
-              if (action.label === "Edit" && selectedMaterials.length === 1) {
-                const selected = courseMaterials.find(
-                  (material) => material.id === selectedMaterials[0],
-                );
-                if (selected) {
-                  setEditingMaterial(selected);
-                }
-              }
-            }}
-          >
-            <CardContent className="flex flex-col items-start gap-4 p-6">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[color:var(--md-sys-color-primary-container)] text-[color:var(--md-sys-color-on-primary-container)]">
-                <MaterialSymbol icon={action.icon} size={24} />
-              </div>
-              <span className="text-[14px] font-semibold text-[color:var(--md-sys-color-on-surface)]">
-                {action.label}
-              </span>
-            </CardContent>
-          </Card>
-        ))}
       </div>
 
       <div className="space-y-4">
@@ -315,7 +273,7 @@ export function DigitalLibrary({ courseDetails }: DigitalLibraryProps) {
               className="h-8 w-8 rounded-full p-0"
               disabled={isBatchUpdating}
             >
-              <MaterialSymbol icon={Sorting05Icon} size={14} className="rotate-45" />
+              <MaterialSymbol icon="close" size={16} />
             </M3Button>
           </div>
         </div>
@@ -327,32 +285,9 @@ export function DigitalLibrary({ courseDetails }: DigitalLibraryProps) {
             <h2 className="text-[30px] font-semibold tracking-tight text-[color:var(--md-sys-color-on-surface)]">
               All Files
             </h2>
-            <M3Button
-              size="sm"
-              className="h-8 w-8 rounded-lg text-[color:var(--md-sys-color-on-surface-variant)]"
-            >
-              <MaterialSymbol icon={Settings02Icon} size={18} />
-            </M3Button>
           </div>
           <div className="text-[13px] font-semibold uppercase tracking-widest text-[color:var(--md-sys-color-on-surface-variant)]">
             {filteredMaterials.length} file{filteredMaterials.length === 1 ? "" : "s"}
-          </div>
-        </div>
-
-        <div className="flex items-center justify-between border-b border-[color:var(--md-sys-color-outline-variant)] pb-4">
-          <div className="flex items-center gap-8">
-            {["Recents", "Starred", "Important"].map((tab, index) => (
-              <button
-                key={tab}
-                type="button"
-                className={`relative text-[14px] font-semibold transition-colors ${index === 0 ? "text-[color:var(--md-sys-color-primary)]" : "text-[color:var(--md-sys-color-on-surface-variant)] hover:text-[color:var(--md-sys-color-on-surface)]"}`}
-              >
-                {tab}
-                {index === 0 ? (
-                  <div className="absolute -bottom-4 left-0 right-0 h-0.5 rounded-full bg-[color:var(--md-sys-color-primary)]" />
-                ) : null}
-              </button>
-            ))}
           </div>
         </div>
 
@@ -452,13 +387,6 @@ export function DigitalLibrary({ courseDetails }: DigitalLibraryProps) {
                           disabled={isPending}
                         >
                           <MaterialSymbol icon={NoteEditIcon} size={18} />
-                        </M3Button>
-                        <M3Button
-                          size="sm"
-                          className="h-8 w-8 text-[color:var(--md-sys-color-on-surface-variant)]"
-                          disabled
-                        >
-                          <MaterialSymbol icon={Download01Icon} size={18} />
                         </M3Button>
                         <M3Button
                           size="sm"
