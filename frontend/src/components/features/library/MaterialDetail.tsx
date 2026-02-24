@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ﻿"use client";
 
 import * as React from "react";
@@ -6,10 +7,21 @@ import {
   Download01Icon,
   Share01Icon,
   Bookmark01Icon,
+=======
+"use client";
+
+import * as React from "react";
+import {
+  ArrowLeft01Icon,
+  Download01Icon,
+  Share01Icon,
+  BookmarkIcon,
+>>>>>>> origin/main
   CourseIcon,
   UserIcon,
   Calendar03Icon,
   InformationCircleIcon,
+<<<<<<< HEAD
   Message01Icon,
 } from "@/lib/icons/material-icons";
 import { MaterialSymbol } from "@/components/core/MaterialSymbol";
@@ -26,6 +38,15 @@ import {
   resolveMaterialAction,
   runMaterialAction,
 } from "@/lib/material-actions";
+=======
+} from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
+import Link from "next/link";
+import { motion } from "framer-motion";
+
+import { Material } from "@/services/api";
+import dynamic from "next/dynamic";
+>>>>>>> origin/main
 
 const DocumentViewer = dynamic(
   () =>
@@ -36,15 +57,21 @@ const DocumentViewer = dynamic(
     ssr: false,
     loading: () => (
       <div className="flex flex-col items-center gap-4 p-12">
+<<<<<<< HEAD
         <div className="h-10 w-10 animate-spin rounded-full border-4 border-[color:var(--md-sys-color-primary)] border-t-transparent" />
         <p className="text-[14px] font-medium text-[color:var(--md-sys-color-on-surface-variant)]">
           Loading Document Viewer...
         </p>
+=======
+        <div className="h-10 w-10 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+        <p className="text-sm font-medium">Loading Document Viewer...</p>
+>>>>>>> origin/main
       </div>
     ),
   },
 );
 
+<<<<<<< HEAD
 import {
   M3Button,
   Badge,
@@ -55,11 +82,15 @@ import {
 import { useNotesStore } from "@/store/useNotesStore";
 import { useUserStore } from "@/store/useUserStore";
 import { useToast } from "@/components/core/toast";
+=======
+import { Button, Badge, Card, CardContent, Separator } from "@/components/core";
+>>>>>>> origin/main
 
 interface MaterialDetailProps {
   material: Material;
 }
 
+<<<<<<< HEAD
 interface VideoComment {
   id: string;
   materialId: string;
@@ -343,11 +374,17 @@ export function MaterialDetail({ material }: MaterialDetailProps) {
       addToast("Unable to open this resource right now.", "error");
     }
   }, [addToast, primaryMaterialAction]);
+=======
+export function MaterialDetail({ material }: MaterialDetailProps) {
+  const isVideo = material.type === "video";
+  const isPdf = material.type === "pdf" || material.type === "past-question";
+>>>>>>> origin/main
 
   return (
     <div className="space-y-8 pb-20">
       {/* Navigation Header */}
       <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+<<<<<<< HEAD
         <Link
           href="/library"
           className="inline-block text-[15px] font-medium text-[color:var(--md-sys-color-on-surface-variant)] focus-visible:rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--md-sys-color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--md-sys-color-surface)]"
@@ -397,10 +434,37 @@ export function MaterialDetail({ material }: MaterialDetailProps) {
           {primaryMaterialAction.reason}
         </p>
       ) : null}
+=======
+        <Link href="/library">
+          <Button
+            variant="ghost"
+            className="gap-2 -ml-2 text-muted-foreground hover:text-foreground"
+          >
+            <HugeiconsIcon icon={ArrowLeft01Icon} size={18} />
+            Back to Library
+          </Button>
+        </Link>
+        <div className="flex items-center gap-3">
+          <Button variant="outline" size="sm" className="gap-2 rounded-xl h-10">
+            <HugeiconsIcon icon={BookmarkIcon} size={18} />
+            Save to Notes
+          </Button>
+          <Button variant="outline" size="sm" className="gap-2 rounded-xl h-10">
+            <HugeiconsIcon icon={Share01Icon} size={18} />
+            Share
+          </Button>
+          <Button className="gap-2 rounded-xl h-10 shadow-lg shadow-primary/20">
+            <HugeiconsIcon icon={Download01Icon} size={18} />
+            Download {material.size && `(${material.size})`}
+          </Button>
+        </div>
+      </div>
+>>>>>>> origin/main
 
       <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
         {/* Main Content Area (Resource Viewer) */}
         <div className="xl:col-span-3 space-y-6">
+<<<<<<< HEAD
           <div className="overflow-hidden rounded-3xl border border-[color:var(--md-sys-color-outline-variant)] bg-[color:var(--md-sys-color-surface)]">
             {isVideo ? (
               youtubeUrl ? (
@@ -462,10 +526,46 @@ export function MaterialDetail({ material }: MaterialDetailProps) {
                     ? "Open Source"
                     : "Download Resource"}
                 </M3Button>
+=======
+          <div className="rounded-3xl overflow-hidden border border-border/40 bg-card shadow-sm">
+            {isVideo ? (
+              <div className="aspect-video bg-black flex items-center justify-center group relative">
+                {/* Mock Video Player */}
+                <video
+                  src={material.url}
+                  controls
+                  className="w-full h-full object-contain"
+                  poster="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=1200"
+                />
+              </div>
+            ) : isPdf ? (
+              <div className="bg-accent/5 p-4 md:p-8">
+                <DocumentViewer url={material.url} title={material.title} />
+              </div>
+            ) : (
+              <div className="p-20 flex flex-col items-center justify-center text-center">
+                <div className="size-20 rounded-full bg-primary/10 flex items-center justify-center mb-6">
+                  <HugeiconsIcon
+                    icon={InformationCircleIcon}
+                    size={40}
+                    className="text-primary"
+                  />
+                </div>
+                <h3 className="text-xl font-bold">Preview not available</h3>
+                <p className="text-muted-foreground mt-2 max-w-md">
+                  This file type ({material.type}) cannot be previewed directly.
+                  Please download it to view the content.
+                </p>
+                <Button className="mt-8 gap-2">
+                  <HugeiconsIcon icon={Download01Icon} size={18} />
+                  Download Resource
+                </Button>
+>>>>>>> origin/main
               </div>
             )}
           </div>
 
+<<<<<<< HEAD
           {isVideo ? (
             <Card className="border-[color:var(--md-sys-color-outline-variant)]">
               <CardContent className="space-y-5 p-5 sm:p-6">
@@ -557,6 +657,10 @@ export function MaterialDetail({ material }: MaterialDetailProps) {
 
           {/* Info Card for mobile/smaller screens */}
           <Card className="border-[color:var(--md-sys-color-outline-variant)] xl:hidden">
+=======
+          {/* Info Card for mobile/smaller screens */}
+          <Card className="xl:hidden">
+>>>>>>> origin/main
             <CardContent className="p-6 space-y-6">
               <MaterialInfo material={material} />
             </CardContent>
@@ -565,19 +669,26 @@ export function MaterialDetail({ material }: MaterialDetailProps) {
 
         {/* Sidebar Info (Desktop) */}
         <div className="hidden xl:block space-y-6">
+<<<<<<< HEAD
           <Card className="sticky top-8 border-[color:var(--md-sys-color-outline-variant)]">
+=======
+          <Card className="sticky top-8 border-border/40">
+>>>>>>> origin/main
             <CardContent className="p-6 space-y-8">
               <MaterialInfo material={material} />
             </CardContent>
           </Card>
         </div>
       </div>
+<<<<<<< HEAD
       <ShareMaterialModal
         open={isShareOpen}
         onOpenChange={setIsShareOpen}
         material={material}
         shareUrl={shareUrl}
       />
+=======
+>>>>>>> origin/main
     </div>
   );
 }
@@ -588,6 +699,7 @@ function MaterialInfo({ material }: { material: Material }) {
       <div className="space-y-3">
         <Badge
           variant="secondary"
+<<<<<<< HEAD
           className="border-none bg-[color:var(--md-sys-color-primary-container)] text-[13px] font-bold uppercase tracking-widest text-[color:var(--md-sys-color-on-primary-container)]"
         >
           {material.courseCode}
@@ -609,10 +721,32 @@ function MaterialInfo({ material }: { material: Material }) {
               Uploader
             </p>
             <p className="text-[14px] font-bold">{material.uploader}</p>
+=======
+          className="bg-primary/5 text-primary border-none font-bold uppercase tracking-widest text-xs"
+        >
+          {material.courseCode}
+        </Badge>
+        <h1 className="text-2xl font-bold leading-tight">{material.title}</h1>
+      </div>
+
+      <Separator className="bg-border/50" />
+
+      <div className="space-y-4">
+        <div className="flex items-center gap-3">
+          <div className="size-10 rounded-xl bg-accent/10 flex items-center justify-center text-accent">
+            <HugeiconsIcon icon={UserIcon} size={20} />
+          </div>
+          <div>
+            <p className="text-xs uppercase tracking-widest font-bold text-muted-foreground">
+              Uploader
+            </p>
+            <p className="text-sm font-bold">{material.uploader}</p>
+>>>>>>> origin/main
           </div>
         </div>
 
         <div className="flex items-center gap-3">
+<<<<<<< HEAD
           <div className="flex size-10 items-center justify-center rounded-xl bg-[color:var(--md-sys-color-secondary-container)] text-[color:var(--md-sys-color-on-secondary-container)]">
             <MaterialSymbol icon={Calendar03Icon} size={20} />
           </div>
@@ -621,12 +755,23 @@ function MaterialInfo({ material }: { material: Material }) {
               Upload Date
             </p>
             <p className="text-[14px] font-bold">
+=======
+          <div className="size-10 rounded-xl bg-accent/10 flex items-center justify-center text-accent">
+            <HugeiconsIcon icon={Calendar03Icon} size={20} />
+          </div>
+          <div>
+            <p className="text-xs uppercase tracking-widest font-bold text-muted-foreground">
+              Upload Date
+            </p>
+            <p className="text-sm font-bold">
+>>>>>>> origin/main
               {new Date(material.uploadDate).toLocaleDateString()}
             </p>
           </div>
         </div>
 
         <div className="flex items-center gap-3">
+<<<<<<< HEAD
           <div className="flex size-10 items-center justify-center rounded-xl bg-[color:var(--md-sys-color-secondary-container)] text-[color:var(--md-sys-color-on-secondary-container)]">
             <MaterialSymbol icon={CourseIcon} size={20} />
           </div>
@@ -635,10 +780,21 @@ function MaterialInfo({ material }: { material: Material }) {
               Semester
             </p>
             <p className="text-[14px] font-bold">{material.semester}</p>
+=======
+          <div className="size-10 rounded-xl bg-accent/10 flex items-center justify-center text-accent">
+            <HugeiconsIcon icon={CourseIcon} size={20} />
+          </div>
+          <div>
+            <p className="text-xs uppercase tracking-widest font-bold text-muted-foreground">
+              Semester
+            </p>
+            <p className="text-sm font-bold">{material.semester}</p>
+>>>>>>> origin/main
           </div>
         </div>
       </div>
 
+<<<<<<< HEAD
       <Separator className="bg-[color:var(--md-sys-color-outline-variant)]" />
 
       <div className="space-y-2">
@@ -646,6 +802,15 @@ function MaterialInfo({ material }: { material: Material }) {
           Description
         </p>
         <p className="text-[14px] leading-relaxed text-[color:var(--md-sys-color-on-surface-variant)]">
+=======
+      <Separator className="bg-border/50" />
+
+      <div className="space-y-2">
+        <p className="text-xs uppercase tracking-widest font-bold text-muted-foreground px-1">
+          Description
+        </p>
+        <p className="text-sm text-muted-foreground leading-relaxed">
+>>>>>>> origin/main
           This resource was curated to help students in {material.courseCode}{" "}
           better understand the core concepts. Make sure to review the
           accompanying notes and participate in the course Q&A if you have

@@ -1,0 +1,5 @@
+UU Backend/.gitignore
+UU frontend/package-lock.json
+UU frontend/package.json
+UU frontend/src/components/features/library/DocumentViewer.tsx
+UU frontend/tsconfig.json

@@ -1,0 +1,5 @@
+Backend/.gitignore
+frontend/package-lock.json
+frontend/package.json
+frontend/src/components/features/library/DocumentViewer.tsx
+frontend/tsconfig.json

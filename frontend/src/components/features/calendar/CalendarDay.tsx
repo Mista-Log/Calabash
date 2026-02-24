@@ -1,12 +1,19 @@
 "use client";
 
 import * as React from "react";
+<<<<<<< HEAD
 import { useCalendarStore, CalendarEvent } from "@/store/useCalendarStore";
 import { isBefore, startOfDay } from "date-fns";
 
 interface CalendarDayProps {
   day: number | null;
   dayDate: Date;
+=======
+import { CalendarEvent } from "@/store/useCalendarStore";
+
+interface CalendarDayProps {
+  day: number | null;
+>>>>>>> origin/main
   isToday: boolean;
   isSelected: boolean;
   isCurrentMonth: boolean;
@@ -14,6 +21,7 @@ interface CalendarDayProps {
   onClick: () => void;
 }
 
+<<<<<<< HEAD
 const CATEGORY_STYLES: Record<
   string,
   { chip: string; text: string; dot: string; border: string }
@@ -48,17 +56,29 @@ const CATEGORY_STYLES: Record<
     dot: "bg-[color:var(--md-sys-color-on-surface-variant)]",
     border: "border-[color:var(--md-sys-color-outline-variant)]",
   },
+=======
+const CATEGORY_COLORS: Record<string, string> = {
+  Exam: "bg-red-500",
+  Lecture: "bg-indigo-500",
+  Deadline: "bg-orange-500",
+  Holiday: "bg-green-500",
+  Other: "bg-slate-500",
+>>>>>>> origin/main
 };
 
 export function CalendarDay({
   day,
+<<<<<<< HEAD
   dayDate,
+=======
+>>>>>>> origin/main
   isToday,
   isSelected,
   isCurrentMonth,
   events,
   onClick,
 }: CalendarDayProps) {
+<<<<<<< HEAD
   const { setEditingEventId } = useCalendarStore();
   const todayStart = startOfDay(new Date());
   const dayStart = startOfDay(dayDate);
@@ -99,10 +119,30 @@ export function CalendarDay({
               : isPastDay
                 ? "text-[color:var(--md-sys-color-on-surface-variant)]"
               : "text-[color:var(--md-sys-color-on-surface-variant)] group-hover:text-[color:var(--md-sys-color-on-surface)]"
+=======
+  return (
+    <div
+      onClick={day ? onClick : undefined}
+      className={`group p-3 border-r border-b border-border/10 last:border-r-0 transition-all hover:bg-primary/5 cursor-pointer relative min-h-[120px] ${
+        !isCurrentMonth
+          ? "bg-muted/5 opacity-30 select-none cursor-default"
+          : ""
+      } ${isSelected ? "bg-primary/10" : ""}`}
+    >
+      <div className="flex items-center justify-between mb-2">
+        <span
+          className={`text-xs font-bold transition-all ${
+            isToday
+              ? "size-7 flex items-center justify-center bg-primary text-primary-foreground rounded-lg -mt-1 -ml-1 shadow-lg shadow-primary/20"
+              : isSelected
+                ? "text-primary scale-110"
+                : "text-muted-foreground group-hover:text-foreground"
+>>>>>>> origin/main
           }`}
         >
           {day}
         </span>
+<<<<<<< HEAD
         {events.length > 0 && isCurrentMonth && (
           <span
             className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${
@@ -114,12 +154,15 @@ export function CalendarDay({
             {events.length}
           </span>
         )}
+=======
+>>>>>>> origin/main
       </div>
 
       <div className="space-y-1">
         {events.slice(0, 3).map((event) => (
           <div
             key={event.id}
+<<<<<<< HEAD
             onClick={(e) => {
               e.stopPropagation();
               setEditingEventId(event.id);
@@ -138,6 +181,17 @@ export function CalendarDay({
         ))}
         {events.length > 3 && (
           <div className="pl-1 text-[11px] font-semibold text-[color:var(--md-sys-color-on-surface-variant)]">
+=======
+            className={`p-1.5 rounded-lg ${CATEGORY_COLORS[event.category] || "bg-slate-500"}/10 border-l-2 ${CATEGORY_COLORS[event.category] || "bg-slate-500"} text-xs font-bold ${(
+              CATEGORY_COLORS[event.category] || "bg-slate-500"
+            ).replace("bg-", "text-")} truncate`}
+          >
+            {event.title}
+          </div>
+        ))}
+        {events.length > 3 && (
+          <div className="text-[9px] font-black text-muted-foreground/60 pl-1 uppercase tracking-tighter">
+>>>>>>> origin/main
             + {events.length - 3} more
           </div>
         )}

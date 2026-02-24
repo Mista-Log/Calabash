@@ -1,10 +1,17 @@
+<<<<<<< HEAD
 ﻿"use client";
+=======
+"use client";
+>>>>>>> origin/main
 
 import React from "react";
 import { useSettingsStore } from "@/store/useSettingsStore";
 
+<<<<<<< HEAD
 type ResolvedTheme = "light" | "dark";
 
+=======
+>>>>>>> origin/main
 export function ThemeWrapper({
   children,
 }: Readonly<{
@@ -14,6 +21,7 @@ export function ThemeWrapper({
 
   React.useEffect(() => {
     const root = document.documentElement;
+<<<<<<< HEAD
     const media = window.matchMedia("(prefers-color-scheme: dark)");
 
     const syncThemeColorMeta = (nextTheme: ResolvedTheme) => {
@@ -76,3 +84,19 @@ export function ThemeWrapper({
 
   return <>{children}</>;
 }
+=======
+    root.classList.remove("light", "dark"); // Clean up existing classes
+
+    if (theme === "system") {
+      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches
+        ? "dark"
+        : "light";
+      root.classList.add(systemTheme);
+    } else {
+      root.classList.add(theme);
+    }
+  }, [theme]);
+
+  return <>{children}</>;
+}
+>>>>>>> origin/main

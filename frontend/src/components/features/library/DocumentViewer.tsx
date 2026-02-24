@@ -14,6 +14,7 @@ import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
 
 import { MaterialSymbol } from "@/components/core/MaterialSymbol";
+import { HugeiconsIcon } from "@hugeicons/react";
 import {
   M3Button,
   Card,

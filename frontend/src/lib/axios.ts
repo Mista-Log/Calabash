@@ -63,7 +63,7 @@ apiClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     const state = useUserStore.getState();
     const token = state.token;
-    
+
     // Attach JWT token only for non-auth requests, or for /auth/me/.
     // This avoids sending stale/invalid tokens to login/signup endpoints.
     const shouldAttachAuth =
