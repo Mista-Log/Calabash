@@ -2,6 +2,11 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
 interface SettingsState {
+<<<<<<< HEAD
+  reducedMotion: boolean;
+  setReducedMotion: (value: boolean) => void;
+  toggleReducedMotion: () => void;
+=======
   // Display preferences
   reducedMotion: boolean;
   theme: 'light' | 'dark' | 'system';
@@ -20,11 +25,18 @@ interface SettingsState {
   setEmailNotifications: (enabled: boolean) => void;
   setPushNotifications: (enabled: boolean) => void;
   setProfileVisibility: (visibility: 'public' | 'private') => void;
+>>>>>>> 4e84afb555dea8266411ce233f4e83fd5a07858e
 }
 
 export const useSettingsStore = create<SettingsState>()(
   persist(
     (set) => ({
+<<<<<<< HEAD
+      reducedMotion: false,
+      setReducedMotion: (value) => set({ reducedMotion: value }),
+      toggleReducedMotion: () =>
+        set((state) => ({ reducedMotion: !state.reducedMotion })),
+=======
       // Default values
       reducedMotion: false,
       theme: 'light',
@@ -40,6 +52,7 @@ export const useSettingsStore = create<SettingsState>()(
       setEmailNotifications: (enabled) => set({ emailNotifications: enabled }),
       setPushNotifications: (enabled) => set({ pushNotifications: enabled }),
       setProfileVisibility: (visibility) => set({ profileVisibility: visibility }),
+>>>>>>> 4e84afb555dea8266411ce233f4e83fd5a07858e
     }),
     {
       name: "calabash-settings",
