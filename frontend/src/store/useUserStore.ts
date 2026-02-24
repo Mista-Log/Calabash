@@ -23,10 +23,6 @@ export const useUserStore = create<UserState>()(
         set({ user, token, refreshToken, isAuthenticated: true }),
       logout: () => {
         set({ user: null, token: null, refreshToken: null, isAuthenticated: false });
-        // Clear old mock role as well
-        if (typeof window !== 'undefined') {
-          localStorage.removeItem('calabash_user_role');
-        }
       },
       updateUser: (updates) =>
         set((state) => ({

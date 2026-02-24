@@ -44,6 +44,18 @@ const FieldDescription = React.forwardRef<
 ));
 FieldDescription.displayName = "FieldDescription";
 
+const FieldError = React.forwardRef<
+  HTMLParagraphElement,
+  React.HTMLAttributes<HTMLParagraphElement>
+>(({ className, ...props }, ref) => (
+  <p
+    ref={ref}
+    className={cn("text-sm font-medium text-destructive", className)}
+    {...props}
+  />
+));
+FieldError.displayName = "FieldError";
+
 const FieldSeparator = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
@@ -64,4 +76,4 @@ const FieldSeparator = React.forwardRef<
 ));
 FieldSeparator.displayName = "FieldSeparator";
 
-export { Field, FieldGroup, FieldLabel, FieldDescription, FieldSeparator };
+export { Field, FieldGroup, FieldLabel, FieldDescription, FieldError, FieldSeparator };

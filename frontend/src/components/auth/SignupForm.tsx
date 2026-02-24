@@ -30,6 +30,8 @@ import { useUserStore } from "@/store/useUserStore";
 import { UserProfile } from "@/services/api";
 import { authService } from "@/services/auth.service";
 
+import Image from "next/image"; // Import Image component
+
 export function SignupForm({
   className,
   title = "Create Account.",
@@ -97,21 +99,18 @@ export function SignupForm({
       // Given the previous mock logic logged them in immediately:
       const newUser: UserProfile = {
         id: Math.random().toString(36).substr(2, 9),
-        name: result.full_name,
+        name: name, // Use local state to ensure immediate availability
         email: result.email,
         role: result.role as "student" | "lecturer",
         department: "Computer Science",
         semester: 1,
+        isNewUser: true,
       };
 
       // Note: We'd normally need a token here to truly log in.
       // If signup doesn't return a token, we might need to call login() right after
       // or redirect to login. For consistency with previous behavior:
       login(newUser, "", "");
-
-      if (typeof window !== "undefined") {
-        localStorage.setItem("calabash_user_role", result.role);
-      }
 
       router.push("/dashboard");
     } catch (error: any) {
@@ -130,7 +129,7 @@ export function SignupForm({
       <div className="mb-8">
         <a
           href="/auth"
-          className="inline-flex items-center gap-2 text-sm font-semibold text-muted-foreground hover:text-primary transition-colors mb-6 group"
+          className="inline-flex items-center gap-2 text-base font-semibold text-muted-foreground hover:text-primary transition-colors mb-6 group"
         >
           <HugeiconsIcon
             icon={ArrowLeft01Icon}
@@ -150,7 +149,7 @@ export function SignupForm({
           <Field>
             <FieldLabel
               htmlFor="name"
-              className="text-xs font-bold uppercase tracking-wider text-muted-foreground/80 mb-2 block"
+              className="text-sm font-bold uppercase tracking-wider text-muted-foreground/80 mb-2 block"
             >
               Full Name
             </FieldLabel>
@@ -173,7 +172,7 @@ export function SignupForm({
           <Field>
             <FieldLabel
               htmlFor="email"
-              className="text-xs font-bold uppercase tracking-wider text-muted-foreground/80 mb-2 block"
+              className="text-sm font-bold uppercase tracking-wider text-muted-foreground/80 mb-2 block"
             >
               Email Address
             </FieldLabel>
@@ -199,7 +198,7 @@ export function SignupForm({
               />
             </div>
             {emailError && (
-              <p className="text-[10px] text-destructive font-bold mt-1.5 ml-4 uppercase tracking-widest">
+              <p className="text-xs text-destructive font-bold mt-1.5 ml-4 uppercase tracking-widest">
                 {emailError}
               </p>
             )}
@@ -208,7 +207,7 @@ export function SignupForm({
           <Field>
             <FieldLabel
               htmlFor="password"
-              className="text-xs font-bold uppercase tracking-wider text-muted-foreground/80 mb-2 block"
+              className="text-sm font-bold uppercase tracking-wider text-muted-foreground/80 mb-2 block"
             >
               Password
             </FieldLabel>
@@ -261,7 +260,7 @@ export function SignupForm({
                     />
                   ))}
                 </div>
-                <p className="text-[10px] font-bold uppercase tracking-widest flex items-center gap-2">
+                <p className="text-sm font-bold uppercase tracking-widest flex items-center gap-2">
                   <span className="text-muted-foreground/60">
                     Password strength:
                   </span>
@@ -291,7 +290,7 @@ export function SignupForm({
             type="submit"
             isLoading={isLoading}
             loadingText="Creating Account..."
-            className="h-11 rounded-xl text-base font-bold shadow-lg shadow-primary/10 bg-primary hover:bg-primary/90 text-primary-foreground"
+            className="h-11 rounded-xl text-lg font-bold shadow-lg shadow-primary/10 bg-primary hover:bg-primary/90 text-primary-foreground"
             icon={ArrowLeft01Icon}
             iconPlacement="right"
           >
@@ -303,11 +302,12 @@ export function SignupForm({
             type="button"
             className="h-11 rounded-xl border-border/60 font-bold bg-background hover:bg-muted/30 transition-all gap-3"
           >
-            <img
+            <Image
               src="/google.svg"
               alt="Google"
+              width={20} // Explicit width
+              height={20} // Explicit height
               className="h-5 w-5"
-              onError={(e) => (e.currentTarget.style.display = "none")}
             />
             Sign Up With Google
           </Button>

@@ -30,6 +30,8 @@ interface LoginFormProps extends React.ComponentProps<"form"> {
   role?: "student" | "lecturer";
 }
 
+import Image from "next/image"; // Import Image component
+
 export function LoginForm({
   className,
   signupUrl,
@@ -64,6 +66,7 @@ export function LoginForm({
 
     try {
       const result = await authService.login({
+        username: email,
         email,
         password,
       });
@@ -74,8 +77,8 @@ export function LoginForm({
 
       const user: UserProfile = result.user || {
         id: "u-" + Math.random().toString(36).substr(2, 5),
-        name: result.email.split("@")[0],
-        email: result.email,
+        name: result.email ? result.email.split("@")[0] : "User",
+        email: result.email || "",
         role:
           role ||
           (result.email.toLowerCase().includes("lecturer")
@@ -83,13 +86,10 @@ export function LoginForm({
             : "student"),
         department: "Computer Science",
         semester: 2,
+        isNewUser: false,
       };
 
       login(user, token, refreshToken);
-
-      if (typeof window !== "undefined") {
-        localStorage.setItem("calabash_user_role", user.role);
-      }
 
       router.push("/dashboard");
     } catch (error: any) {
@@ -108,7 +108,7 @@ export function LoginForm({
       <div className="mb-8">
         <a
           href="/auth"
-          className="inline-flex items-center gap-2 text-sm font-semibold text-muted-foreground hover:text-primary transition-colors mb-6 group"
+          className="inline-flex items-center gap-2 text-base font-semibold text-muted-foreground hover:text-primary transition-colors mb-6 group"
         >
           <HugeiconsIcon
             icon={ArrowLeft01Icon}
@@ -130,7 +130,7 @@ export function LoginForm({
           <Field>
             <FieldLabel
               htmlFor="email"
-              className="text-xs font-bold uppercase tracking-wider text-muted-foreground/80 mb-2 block"
+              className="text-sm font-bold uppercase tracking-wider text-muted-foreground/80 mb-2 block"
             >
               Email Address
             </FieldLabel>
@@ -156,7 +156,7 @@ export function LoginForm({
               />
             </div>
             {emailError && (
-              <p className="text-[10px] text-destructive font-bold mt-1.5 ml-4 uppercase tracking-widest">
+              <p className="text-xs text-destructive font-bold mt-1.5 ml-4 uppercase tracking-widest">
                 {emailError}
               </p>
             )}
@@ -166,13 +166,13 @@ export function LoginForm({
             <div className="flex items-center justify-between mb-2">
               <FieldLabel
                 htmlFor="password"
-                className="text-xs font-bold uppercase tracking-wider text-muted-foreground/80"
+                className="text-sm font-bold uppercase tracking-wider text-muted-foreground/80"
               >
                 Password
               </FieldLabel>
               <a
                 href="#"
-                className="text-xs font-bold text-primary hover:underline"
+                className="text-sm font-bold text-primary hover:underline"
               >
                 Forgot Password
               </a>
@@ -184,6 +184,8 @@ export function LoginForm({
               <Input
                 id="password"
                 type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 required
                 className="h-11 pl-12 pr-12 rounded-xl border-border/60 bg-muted/20 focus:bg-background transition-all"
               />
@@ -209,7 +211,7 @@ export function LoginForm({
             />
             <label
               htmlFor="remember"
-              className="text-sm font-semibold text-muted-foreground cursor-pointer"
+              className="text-base font-semibold text-muted-foreground cursor-pointer"
             >
               Remember For 30 Days
             </label>
@@ -221,7 +223,7 @@ export function LoginForm({
             type="submit"
             isLoading={isLoading}
             loadingText="Signing In..."
-            className="h-11 rounded-xl text-base font-bold shadow-lg shadow-primary/10 bg-primary hover:bg-primary/90 text-primary-foreground"
+            className="h-11 rounded-xl text-lg font-bold shadow-lg shadow-primary/10 bg-primary hover:bg-primary/90 text-primary-foreground"
             icon={ArrowLeft01Icon}
             iconPlacement="right"
           >
@@ -233,11 +235,12 @@ export function LoginForm({
             type="button"
             className="h-11 rounded-xl border-border/60 font-bold bg-background hover:bg-muted/30 transition-all gap-3"
           >
-            <img
+            <Image
               src="/google.svg"
               alt="Google"
+              width={20} // Explicit width
+              height={20} // Explicit height
               className="h-5 w-5"
-              onError={(e) => (e.currentTarget.style.display = "none")}
             />
             Sign In With Google
           </Button>
