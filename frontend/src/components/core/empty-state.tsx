@@ -5,7 +5,13 @@ import { Folder01Icon } from "@/lib/icons/material-icons";
 import { M3Button } from "@/components/core";
 
 interface EmptyStateProps extends React.HTMLAttributes<HTMLDivElement> {
-  icon?: React.ComponentType<{ size?: number; className?: string; strokeWidth?: number }> | string;
+  icon?:
+    | React.ComponentType<{
+        size?: number;
+        className?: string;
+        strokeWidth?: number;
+      }>
+    | string;
   title: string;
   description?: string;
   action?: React.ReactNode;

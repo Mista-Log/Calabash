@@ -76,19 +76,25 @@ export function LoginForm({
     setFormError("");
 
     try {
-      const session = await authService.loginAndResolveUser({
-        email,
-        password,
-      }, role);
+      const session = await authService.loginAndResolveUser(
+        {
+          email,
+          password,
+        },
+        role,
+      );
 
       if (!session.user) {
-        setFormError(
-          "Unable to load account profile. Please contact support.",
-        );
+        setFormError("Unable to load account profile. Please contact support.");
         return;
       }
 
-      login(session.user, session.accessToken, session.refreshToken, rememberMe);
+      login(
+        session.user,
+        session.accessToken,
+        session.refreshToken,
+        rememberMe,
+      );
       router.push("/dashboard");
     } catch (error: unknown) {
       setFormError(
@@ -109,7 +115,7 @@ export function LoginForm({
       <div className="mb-8">
         <Link
           href="/auth"
-          className="inline-flex items-center gap-2 text-[16px] font-semibold text-[color:var(--md-sys-color-on-surface-variant)] hover:text-[color:var(--md-sys-color-primary)] transition-colors mb-6 group"
+          className="inline-flex items-center gap-2 text-[16px] font-semibold text-(--md-sys-color-on-surface-variant) hover:text-(--md-sys-color-primary) transition-colors mb-6 group"
         >
           <MaterialSymbol
             icon={ArrowLeft01Icon}
@@ -132,10 +138,10 @@ export function LoginForm({
               />
             </div>
           </div>
-          <h1 className="text-[32px] font-bold tracking-tight text-[color:var(--md-sys-color-on-surface)]">
+          <h1 className="text-[32px] font-bold tracking-tight text-(--md-sys-color-on-surface)">
             Welcome Back
           </h1>
-          <p className="text-[16px] text-[color:var(--md-sys-color-on-surface-variant)] mt-2">
+          <p className="text-[16px] text-(--md-sys-color-on-surface-variant) mt-2">
             Sign in to your {role || "account"} to continue
           </p>
         </div>
@@ -147,7 +153,7 @@ export function LoginForm({
         <div className="space-y-2">
           <label
             htmlFor="email"
-            className="block text-[14px] font-semibold uppercase tracking-wider text-[color:var(--md-sys-color-on-surface-variant)]"
+            className="block text-[14px] font-semibold uppercase tracking-wider text-(--md-sys-color-on-surface-variant)"
           >
             Email Address
           </label>
@@ -182,7 +188,7 @@ export function LoginForm({
             }
           />
           {emailError && (
-            <p className="text-[13px] font-semibold text-[color:var(--md-sys-color-error)] flex items-center gap-2">
+            <p className="text-[13px] font-semibold text-(--md-sys-color-error) flex items-center gap-2">
               <MaterialSymbol icon="error" size={16} />
               {emailError}
             </p>
@@ -194,13 +200,13 @@ export function LoginForm({
           <div className="flex items-center justify-between">
             <label
               htmlFor="password"
-              className="block text-[14px] font-semibold uppercase tracking-wider text-[color:var(--md-sys-color-on-surface-variant)]"
+              className="block text-[14px] font-semibold uppercase tracking-wider text-(--md-sys-color-on-surface-variant)"
             >
               Password
             </label>
             <Link
               href={forgotPasswordUrl}
-              className="text-[14px] font-semibold text-[color:var(--md-sys-color-primary)] hover:underline"
+              className="text-[14px] font-semibold text-(--md-sys-color-primary) hover:underline"
             >
               Forgot Password?
             </Link>
@@ -241,7 +247,7 @@ export function LoginForm({
         </div>
 
         {formError && (
-          <p className="text-[13px] font-semibold text-[color:var(--md-sys-color-error)] flex items-center gap-2">
+          <p className="text-[13px] font-semibold text-(--md-sys-color-error) flex items-center gap-2">
             <MaterialSymbol icon="error" size={16} />
             {formError}
           </p>
@@ -254,11 +260,11 @@ export function LoginForm({
             id="remember"
             checked={rememberMe}
             onChange={(e) => setRememberMe(e.target.checked)}
-            className="w-5 h-5 rounded-lg border-2 border-[color:var(--md-sys-color-outline)] text-[color:var(--md-sys-color-primary)] focus:ring-[color:var(--md-sys-color-primary)] focus:ring-2 cursor-pointer"
+            className="w-5 h-5 rounded-lg border-2 border-(--md-sys-color-outline) text-(--md-sys-color-primary) focus:ring-(--md-sys-color-primary) focus:ring-2 cursor-pointer"
           />
           <label
             htmlFor="remember"
-            className="text-[16px] font-semibold text-[color:var(--md-sys-color-on-surface-variant)] cursor-pointer"
+            className="text-[16px] font-semibold text-(--md-sys-color-on-surface-variant) cursor-pointer"
           >
             Remember for 30 days
           </label>
@@ -270,8 +276,8 @@ export function LoginForm({
           disabled={isLoading}
           className={cn(
             "w-full h-14 rounded-2xl",
-            "bg-[color:var(--md-sys-color-primary)]",
-            "text-[color:var(--md-sys-color-on-primary)]",
+            "bg-(--md-sys-color-primary)",
+            "text-(--md-sys-color-on-primary)",
             "text-[18px] font-bold",
             "transition-all duration-200",
             "hover:opacity-90",
@@ -296,11 +302,11 @@ export function LoginForm({
 
       {/* Footer */}
       <div className="text-center">
-        <p className="text-[15px] text-[color:var(--md-sys-color-on-surface-variant)]">
+        <p className="text-[15px] text-(--md-sys-color-on-surface-variant)">
           Don&apos;t have an account?{" "}
           <Link
             href={finalSignupUrl}
-            className="font-bold text-[color:var(--md-sys-color-primary)] hover:underline"
+            className="font-bold text-(--md-sys-color-primary) hover:underline"
           >
             Sign Up
           </Link>
