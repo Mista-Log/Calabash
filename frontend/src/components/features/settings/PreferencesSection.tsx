@@ -68,7 +68,7 @@ export function PreferencesSection() {
                 className={cn(
                   "flex flex-col items-center gap-3 p-4 rounded-xl border-2 transition-all font-bold text-[14px] capitalize",
                   theme === themeOption
-                    ? "border-primary bg-primary/5 text-primary"
+                    ? "border-[color:var(--md-sys-color-primary)] bg-[color:var(--md-sys-color-primary-container)] text-[color:var(--md-sys-color-on-primary-container)]"
                     : "border-border hover:border-muted-foreground/30 text-muted-foreground hover:text-foreground",
                 )}
               >

@@ -13,7 +13,7 @@ interface SetMaterialsOptions {
 }
 
 // Queue for serializing async mutations to prevent race conditions
-let libraryMutationQueue: Array<() => Promise<unknown>> = [];
+const libraryMutationQueue: Array<() => Promise<unknown>> = [];
 let isProcessingLibraryMutation = false;
 
 async function processLibraryMutationQueue(): Promise<void> {
@@ -100,7 +100,10 @@ function filterMaterials(materials: Material[], query: string): Material[] {
   );
 }
 
-function mergeMaterialLists(current: Material[], incoming: Material[]): Material[] {
+function mergeMaterialLists(
+  current: Material[],
+  incoming: Material[],
+): Material[] {
   const map = new Map<string, Material>();
 
   for (const material of current) {
@@ -182,7 +185,10 @@ export const useLibraryStore = create<LibraryState>()(
         };
 
         set((state) => {
-          const merged = mergeMaterialLists([createdMaterial, ...state.materials], []);
+          const merged = mergeMaterialLists(
+            [createdMaterial, ...state.materials],
+            [],
+          );
           return {
             ...updateFiltered(merged, state.searchQuery),
             status: "loading",
@@ -229,7 +235,11 @@ export const useLibraryStore = create<LibraryState>()(
         set((state) => {
           const next = state.materials.map((material) =>
             material.id === id
-              ? { ...material, ...updates, lastEditedAt: new Date().toISOString() }
+              ? {
+                  ...material,
+                  ...updates,
+                  lastEditedAt: new Date().toISOString(),
+                }
               : material,
           );
           return {

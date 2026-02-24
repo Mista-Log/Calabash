@@ -32,8 +32,10 @@ export const Card = React.forwardRef<HTMLDivElement, CardProps>(
 );
 Card.displayName = "Card";
 
-export interface CardHeaderProps
-  extends Omit<React.HTMLAttributes<HTMLDivElement>, "title"> {
+export interface CardHeaderProps extends Omit<
+  React.HTMLAttributes<HTMLDivElement>,
+  "title"
+> {
   avatar?: React.ReactNode;
   heading?: React.ReactNode;
   subtitle?: React.ReactNode;
@@ -41,7 +43,10 @@ export interface CardHeaderProps
 }
 
 export const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>(
-  ({ className, avatar, heading, subtitle, action, children, ...props }, ref) => {
+  (
+    { className, avatar, heading, subtitle, action, children, ...props },
+    ref,
+  ) => {
     const resolvedClassName = cn("px-5 pt-5 pb-2 sm:px-6 sm:pt-6", className);
 
     if (heading || subtitle || avatar || action) {
@@ -105,7 +110,9 @@ export interface CardActionsProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 export const CardActions = React.forwardRef<HTMLDivElement, CardActionsProps>(
-  ({ className, ...props }, ref) => <div ref={ref} className={className} {...props} />,
+  ({ className, ...props }, ref) => (
+    <div ref={ref} className={className} {...props} />
+  ),
 );
 CardActions.displayName = "CardActions";
 
@@ -114,7 +121,9 @@ export interface CardFooterProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 export const CardFooter = React.forwardRef<HTMLDivElement, CardFooterProps>(
-  ({ className, ...props }, ref) => <div ref={ref} className={className} {...props} />,
+  ({ className, ...props }, ref) => (
+    <div ref={ref} className={className} {...props} />
+  ),
 );
 CardFooter.displayName = "CardFooter";
 
@@ -128,7 +137,18 @@ export const CardMedia = React.forwardRef<HTMLDivElement, CardMediaProps>(
   ({ className, src, alt = "", children, ...props }, ref) => {
     return (
       <div ref={ref} className={className} {...props}>
-        {src ? <img src={src} alt={alt} /> : null}
+        {src ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={src}
+            alt={alt}
+            style={{
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+            }}
+          />
+        ) : null}
         {children}
       </div>
     );

@@ -23,6 +23,7 @@ import {
   CardTitle,
   Separator,
 } from "@/components/core";
+import { resolveUrlDownloadAction, runMaterialAction } from "@/lib/material-actions";
 
 // Set up worker for react-pdf
 // Set up worker for react-pdf only on client side
@@ -39,6 +40,7 @@ export function DocumentViewer({ url, title }: DocumentViewerProps) {
   const [numPages, setNumPages] = React.useState<number | null>(null);
   const [pageNumber, setPageNumber] = React.useState(1);
   const [scale, setScale] = React.useState(1.0);
+  const downloadAction = React.useMemo(() => resolveUrlDownloadAction(url), [url]);
 
   function onDocumentLoadSuccess({ numPages }: { numPages: number }) {
     setNumPages(numPages);
@@ -48,7 +50,7 @@ export function DocumentViewer({ url, title }: DocumentViewerProps) {
     <Card className="w-full max-w-4xl mx-auto border-none bg-card overflow-hidden">
       <CardHeader className="flex flex-row items-center justify-between border-b bg-muted/30 px-6 py-4">
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[color:var(--md-sys-color-primary-container)] text-[color:var(--md-sys-color-on-primary-container)]">
             <MaterialSymbol icon={DocumentCodeIcon} size={24} />
           </div>
           <div>
@@ -72,13 +74,24 @@ export function DocumentViewer({ url, title }: DocumentViewerProps) {
             <MaterialSymbol icon={ArrowDown01Icon} size={18} />
           </M3Button>
           <Separator orientation="vertical" className="h-8 mx-1" />
-          <M3Button size="sm">
+          <M3Button
+            size="sm"
+            onClick={() => {
+              runMaterialAction(downloadAction);
+            }}
+            disabled={downloadAction.kind === "none"}
+            title={
+              downloadAction.kind === "none"
+                ? downloadAction.reason
+                : "Download file"
+            }
+          >
             <MaterialSymbol icon={Download01Icon} size={18} />
           </M3Button>
         </div>
       </CardHeader>
 
-      <CardContent className="flex flex-col items-center justify-center min-h-[600px] bg-accent/5 p-8 overflow-auto">
+      <CardContent className="flex flex-col items-center justify-center min-h-[600px] bg-[color:var(--md-sys-color-surface-container-low)] p-8 overflow-auto">
         <div className="border rounded-sm overflow-hidden bg-white">
           <Document
             file={url}

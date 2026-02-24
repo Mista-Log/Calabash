@@ -10,12 +10,31 @@ import type { NoteEntity, NotesDashboardSnapshot } from "@/types/notes";
 import { useNotesStore } from "@/store/useNotesStore";
 
 type DashboardDataMode = "mock-only" | "api-with-fallback";
+export const DASHBOARD_ERROR_CODES = {
+  SCHEMA_INVALID: "DASHBOARD_SCHEMA_INVALID",
+  ROLE_MISMATCH: "DASHBOARD_ROLE_MISMATCH",
+  NETWORK_ERROR: "DASHBOARD_NETWORK_ERROR",
+} as const;
+export type DashboardErrorCode =
+  (typeof DASHBOARD_ERROR_CODES)[keyof typeof DASHBOARD_ERROR_CODES];
+
+export class DashboardRepositoryError extends Error {
+  readonly code: DashboardErrorCode;
+
+  constructor(code: DashboardErrorCode, message?: string) {
+    super(message ?? code);
+    this.name = "DashboardRepositoryError";
+    this.code = code;
+  }
+}
 
 const DASHBOARD_DATA_MODE: DashboardDataMode =
   process.env.NEXT_PUBLIC_DASHBOARD_DATA_MODE === "api-with-fallback" ||
   process.env.NEXT_PUBLIC_ENABLE_REAL_DASHBOARD_API === "true"
     ? "api-with-fallback"
     : "mock-only";
+const DASHBOARD_ALLOW_MOCK_FALLBACK =
+  process.env.NEXT_PUBLIC_DASHBOARD_ALLOW_MOCK_FALLBACK === "true";
 
 function dateToTime(value?: string): number {
   if (!value) return 0;
@@ -119,15 +138,24 @@ function normalizeDashboardData(
   role: "student" | "lecturer",
   userId: string,
 ): DashboardData {
+  const normalizedUser =
+    typeof data.user.id === "number"
+      ? { ...data.user, id: String(data.user.id) }
+      : data.user;
+
   if (role === "student" && !data.courseProgress) {
     const progress = useMockDataStore.getState().courseProgress[userId] ?? {};
     return {
       ...data,
+      user: normalizedUser,
       courseProgress: progress,
     };
   }
 
-  return data;
+  return {
+    ...data,
+    user: normalizedUser,
+  };
 }
 
 function isValidDashboardData(value: unknown): value is DashboardData {
@@ -142,7 +170,9 @@ function isValidDashboardData(value: unknown): value is DashboardData {
     return false;
   }
   const user = data.user as unknown as Record<string, unknown>;
-  if (typeof user.id !== "string" || !user.id) {
+  const hasStringId = typeof user.id === "string" && user.id.length > 0;
+  const hasNumericId = typeof user.id === "number" && Number.isFinite(user.id);
+  if (!hasStringId && !hasNumericId) {
     return false;
   }
   if (user.role !== "student" && user.role !== "lecturer") {
@@ -320,6 +350,25 @@ export const dashboardRepository = {
     try {
       const response = await CalabashApiService.getDashboardData();
       if (!isValidDashboardData(response)) {
+        throw new DashboardRepositoryError(DASHBOARD_ERROR_CODES.SCHEMA_INVALID);
+      }
+
+      if (response.user.role !== role) {
+        throw new DashboardRepositoryError(DASHBOARD_ERROR_CODES.ROLE_MISMATCH);
+      }
+
+      const notesSnapshot =
+        role === "student" ? await getStudentNotesSnapshot(userId) : emptyNotesSnapshot;
+      return mapApiToViewModel(
+        normalizeDashboardData(response, role, userId),
+        undefined,
+        notesSnapshot,
+      );
+    } catch (error) {
+      if (error instanceof DashboardRepositoryError) {
+        throw error;
+      }
+      if (DASHBOARD_ALLOW_MOCK_FALLBACK) {
         const fallback = useMockDataStore.getState().getDashboardData(userId, role);
         const notesSnapshot =
           role === "student" ? await getStudentNotesSnapshot(userId) : emptyNotesSnapshot;
@@ -329,27 +378,7 @@ export const dashboardRepository = {
           notesSnapshot,
         );
       }
-
-      const data =
-        response.user.role === role
-          ? response
-          : useMockDataStore.getState().getDashboardData(userId, role);
-      const notesSnapshot =
-        role === "student" ? await getStudentNotesSnapshot(userId) : emptyNotesSnapshot;
-      return mapApiToViewModel(
-        normalizeDashboardData(data, role, userId),
-        undefined,
-        notesSnapshot,
-      );
-    } catch {
-      const fallback = useMockDataStore.getState().getDashboardData(userId, role);
-      const notesSnapshot =
-        role === "student" ? await getStudentNotesSnapshot(userId) : emptyNotesSnapshot;
-      return mapApiToViewModel(
-        normalizeDashboardData(fallback, role, userId),
-        undefined,
-        notesSnapshot,
-      );
+      throw new DashboardRepositoryError(DASHBOARD_ERROR_CODES.NETWORK_ERROR);
     }
   },
 

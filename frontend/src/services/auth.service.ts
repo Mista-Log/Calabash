@@ -87,6 +87,32 @@ export interface ResolvedAuthSession {
   me: UserMeResponse;
 }
 
+function decodeJwtTokenType(token: string): "access" | "refresh" | null {
+  try {
+    const segments = token.split(".");
+    if (segments.length !== 3) return null;
+    const payloadSegment = segments[1]
+      .replace(/-/g, "+")
+      .replace(/_/g, "/");
+    const normalized =
+      payloadSegment + "=".repeat((4 - (payloadSegment.length % 4)) % 4);
+    let payloadJson = "";
+    if (typeof atob === "function") {
+      payloadJson = atob(normalized);
+    } else {
+      const nodeBuffer = (globalThis as { Buffer?: { from: (value: string, encoding: string) => { toString: (encoding: string) => string } } }).Buffer;
+      if (!nodeBuffer) return null;
+      payloadJson = nodeBuffer.from(normalized, "base64").toString("utf-8");
+    }
+    const payload = JSON.parse(payloadJson) as { token_type?: unknown };
+    return payload.token_type === "access" || payload.token_type === "refresh"
+      ? payload.token_type
+      : null;
+  } catch {
+    return null;
+  }
+}
+
 const AUTH_ERROR_KEYS = [
   "detail",
   "message",
@@ -279,8 +305,25 @@ export const authService = {
     expectedRole?: "student" | "lecturer",
   ): Promise<ResolvedAuthSession> {
     const loginResponse = await this.login(credentials);
-    const accessToken = loginResponse.access ?? loginResponse.token ?? "";
-    const refreshToken = loginResponse.refresh ?? null;
+    let accessToken = loginResponse.access ?? "";
+    let refreshToken = loginResponse.refresh ?? null;
+
+    // Backward-compat fallback if backend returns only a generic token field.
+    if (!accessToken && loginResponse.token) {
+      const tokenType = decodeJwtTokenType(loginResponse.token);
+      if (tokenType === "access") {
+        accessToken = loginResponse.token;
+      } else if (tokenType === "refresh") {
+        refreshToken = loginResponse.token;
+      }
+    }
+
+    // If we only have refresh, exchange it for access.
+    if (!accessToken && refreshToken) {
+      const refreshed = await this.refreshToken(refreshToken);
+      accessToken = refreshed.access;
+      refreshToken = refreshed.refresh ?? refreshToken;
+    }
 
     if (!accessToken) {
       throw new Error("Unable to complete sign-in. Access token is missing.");

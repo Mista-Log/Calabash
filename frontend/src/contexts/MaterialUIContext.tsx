@@ -13,6 +13,8 @@ export interface MaterialUIState {
 
   // Navigation Drawer
   isDrawerOpen: boolean;
+  openDrawer: () => void;
+  closeDrawer: () => void;
   isDrawerCollapsed: boolean;
   toggleDrawer: () => void;
   toggleDrawerCollapsed: () => void;
@@ -104,6 +106,14 @@ export function MaterialUIProvider({ children }: { children: React.ReactNode }) 
     }
   }, [isDrawerCollapsed, isUIHydrated]);
 
+  const openDrawer = React.useCallback(() => {
+    setIsDrawerOpen(true);
+  }, []);
+
+  const closeDrawer = React.useCallback(() => {
+    setIsDrawerOpen(false);
+  }, []);
+
   const toggleDrawer = React.useCallback(() => {
     setIsDrawerOpen((prev) => !prev);
   }, []);
@@ -145,6 +155,8 @@ export function MaterialUIProvider({ children }: { children: React.ReactNode }) 
     () => ({
       isUIHydrated,
       isDrawerOpen,
+      openDrawer,
+      closeDrawer,
       isDrawerCollapsed,
       toggleDrawer,
       toggleDrawerCollapsed,
@@ -167,6 +179,8 @@ export function MaterialUIProvider({ children }: { children: React.ReactNode }) 
     }),
     [
       isDrawerOpen,
+      openDrawer,
+      closeDrawer,
       isDrawerCollapsed,
       isUIHydrated,
       isSearchOpen,

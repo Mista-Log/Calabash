@@ -61,7 +61,7 @@ export function EditMaterialModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="w-[min(96vw,32rem)] max-h-[calc(100dvh-2rem)] overflow-hidden rounded-3xl border border-[color:var(--md-sys-color-outline-variant)]">
+      <DialogContent className="w-[min(96vw,38rem)] max-h-[calc(100dvh-2rem)] overflow-hidden rounded-3xl border border-[color:var(--md-sys-color-outline-variant)]">
         <DialogHeader className="bg-[color:var(--md-sys-color-surface-container-low)]">
           <div className="flex items-center gap-3">
             <div className="flex size-10 items-center justify-center rounded-xl bg-[color:var(--md-sys-color-primary-container)] text-[color:var(--md-sys-color-on-primary-container)]">
@@ -78,7 +78,7 @@ export function EditMaterialModal({
           </div>
         </DialogHeader>
 
-        <div className="max-h-[calc(100dvh-10rem)] overflow-y-auto space-y-6 px-1 py-1">
+        <div className="max-h-[calc(100dvh-10rem)] overflow-y-auto space-y-6">
           <div className="space-y-4">
             <div className="space-y-2">
               <Label className="text-[13px] font-black uppercase tracking-widest text-muted-foreground">

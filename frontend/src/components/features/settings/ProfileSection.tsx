@@ -86,7 +86,7 @@ export function ProfileSection() {
         <div className="flex items-center gap-6">
           <Avatar className="h-24 w-24 border-2 border-border">
             <AvatarImage src={avatarUrl} />
-            <AvatarFallback className="bg-primary/10 text-primary text-[24px] font-bold">
+            <AvatarFallback className="bg-[color:var(--md-sys-color-primary-container)] text-[color:var(--md-sys-color-on-primary-container)] text-[24px] font-bold">
               {user?.name
                 ?.split(" ")
                 .map((n) => n[0])

@@ -91,7 +91,7 @@ export function FilterModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="w-[min(96vw,42rem)] max-h-[calc(100dvh-2rem)] overflow-hidden border-[color:var(--md-sys-color-outline-variant)] bg-[color:var(--md-sys-color-surface-container-low)]">
+      <DialogContent className="w-[min(96vw,48rem)] max-h-[calc(100dvh-2rem)] overflow-hidden border-[color:var(--md-sys-color-outline-variant)] bg-[color:var(--md-sys-color-surface-container-low)]">
         <DialogHeader>
           <div className="flex items-center gap-3">
             <div className="flex size-10 items-center justify-center rounded-xl bg-[color:var(--md-sys-color-primary-container)] text-[color:var(--md-sys-color-on-primary-container)]">
@@ -116,7 +116,7 @@ export function FilterModal({
           </div>
         </DialogHeader>
 
-        <div className="max-h-[calc(100dvh-18rem)] space-y-6 overflow-y-auto px-1 py-1">
+        <div className="max-h-[calc(100dvh-18rem)] space-y-6 overflow-y-auto">
           {sections.map((section) => (
             <div key={section.id} className="space-y-3">
               <h4 className="text-[14px] font-semibold text-[color:var(--md-sys-color-on-surface)]">

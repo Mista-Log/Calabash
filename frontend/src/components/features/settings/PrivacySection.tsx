@@ -79,7 +79,7 @@ export function PrivacySection() {
                 className={cn(
                   "flex flex-col items-start gap-2 p-4 rounded-xl border-2 transition-all",
                   profileVisibility === "public"
-                    ? "border-primary bg-primary/5"
+                    ? "border-[color:var(--md-sys-color-primary)] bg-[color:var(--md-sys-color-primary-container)]"
                     : "border-border hover:border-muted-foreground/30",
                 )}
               >
@@ -88,12 +88,12 @@ export function PrivacySection() {
                     className={cn(
                       "h-4 w-4 rounded-full border-2 flex items-center justify-center",
                       profileVisibility === "public"
-                        ? "border-primary"
+                        ? "border-[color:var(--md-sys-color-primary)]"
                         : "border-muted-foreground",
                     )}
                   >
                     {profileVisibility === "public" && (
-                      <div className="h-2 w-2 rounded-full bg-primary" />
+                      <div className="h-2 w-2 rounded-full bg-[color:var(--md-sys-color-primary)]" />
                     )}
                   </div>
                   <span className="font-bold text-[14px]">Public</span>

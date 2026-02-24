@@ -9,6 +9,7 @@ import { M3Button } from "@/components/core";
 import { MaterialSymbol } from "@/components/core/MaterialSymbol";
 import { LastUpdated } from "@/components/core/last-updated";
 import { AlertCircleIcon } from "@/lib/icons/material-icons";
+import { DASHBOARD_ERROR_CODES } from "@/services/dashboard.repository";
 import {
   DashboardHeaderSkeleton,
   LecturerDashboardSkeleton,
@@ -55,6 +56,12 @@ const COPY = {
   loadErrorTitle: "Unable to load dashboard records",
   loadErrorFallback:
     "Dashboard data could not be loaded. Please try again.",
+  schemaInvalidError:
+    "Dashboard data format is invalid. Please contact support if this continues.",
+  roleMismatchError:
+    "This account does not match the selected dashboard role. Sign in again with the correct profile.",
+  networkError:
+    "Dashboard service is unavailable right now. Check your connection and try again.",
   retry: "Reload Dashboard",
 };
 
@@ -88,6 +95,7 @@ export default function DashboardPage() {
   const {
     status,
     error,
+    errorCode,
     lastUpdated,
     studentView,
     lecturerView,
@@ -102,9 +110,18 @@ export default function DashboardPage() {
   }, [user?.id, user?.role, fetchDashboard]);
 
   React.useEffect(() => {
-    if (status !== "success" || materials.length === 0) return;
+    if (status !== "success") return;
     syncRecentMaterials(materials);
   }, [materials, status, syncRecentMaterials]);
+
+  const resolvedLoadErrorMessage =
+    errorCode === DASHBOARD_ERROR_CODES.SCHEMA_INVALID
+      ? COPY.schemaInvalidError
+      : errorCode === DASHBOARD_ERROR_CODES.ROLE_MISMATCH
+        ? COPY.roleMismatchError
+        : errorCode === DASHBOARD_ERROR_CODES.NETWORK_ERROR
+          ? COPY.networkError
+          : error || COPY.loadErrorFallback;
 
   if (!hasHydrated) {
     return <DashboardLoadingState role={null} />;
@@ -162,7 +179,7 @@ export default function DashboardPage() {
                       {COPY.loadErrorTitle}
                     </p>
                     <p className="mt-1 text-[14px] text-[color:var(--md-sys-color-on-surface-variant)]">
-                      {error || COPY.loadErrorFallback}
+                      {resolvedLoadErrorMessage}
                     </p>
                   </div>
                 </div>

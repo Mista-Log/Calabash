@@ -25,7 +25,7 @@ export function Toolbar({
   title = "Calabash",
   showSearch = true,
   searchPlaceholder = "Search...",
-  onSearch,
+  onSearch: _onSearch,
   showNavigation = true,
   actions,
   onOpenCommandPalette,
@@ -38,7 +38,7 @@ export function Toolbar({
     streakCount,
     isDrawerCollapsed,
     isUIHydrated,
-    toggleDrawer,
+    openDrawer,
   } = useMaterialUI();
   const showGamification = user?.role === "student";
   const [showUserMenu, setShowUserMenu] = React.useState(false);
@@ -108,7 +108,7 @@ export function Toolbar({
           icon="menu"
           className={cn("lg:hidden", !showNavigation && "hidden")}
           aria-label="Toggle navigation"
-          onClick={toggleDrawer}
+          onClick={openDrawer}
         />
 
         <Link
@@ -228,6 +228,7 @@ export function Toolbar({
           className="hidden sm:flex"
           aria-label="Help"
           title="Help"
+          onClick={() => router.push("/support")}
         />
 
         <div

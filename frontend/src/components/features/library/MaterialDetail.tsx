@@ -17,8 +17,15 @@ import Link from "next/link";
 
 import { Material } from "@/services/api";
 import dynamic from "next/dynamic";
-import { YouTubeEmbed, getYouTubeId } from "@/components/features/courses/YouTubeEmbed";
+import {
+  YouTubeEmbed,
+  getYouTubeId,
+} from "@/components/features/courses/YouTubeEmbed";
 import { ShareMaterialModal } from "@/components/features/library/ShareMaterialModal";
+import {
+  resolveMaterialAction,
+  runMaterialAction,
+} from "@/lib/material-actions";
 
 const DocumentViewer = dynamic(
   () =>
@@ -64,7 +71,7 @@ interface VideoComment {
 const VIDEO_COMMENT_STORAGE_KEY = "calabash-video-comments-v1";
 
 // Queue for serializing localStorage writes to prevent race conditions
-let videoCommentWriteQueue: Array<() => void> = [];
+const videoCommentWriteQueue: Array<() => void> = [];
 let isWritingVideoComments = false;
 
 function processVideoCommentWriteQueue(): void {
@@ -150,6 +157,10 @@ export function MaterialDetail({ material }: MaterialDetailProps) {
   const [shareUrl, setShareUrl] = React.useState(`/library/${material.id}`);
   const [commentDraft, setCommentDraft] = React.useState("");
   const [videoComments, setVideoComments] = React.useState<VideoComment[]>([]);
+  const primaryMaterialAction = React.useMemo(
+    () => resolveMaterialAction(material),
+    [material],
+  );
 
   React.useEffect(() => {
     setShareUrl(`/library/${material.id}`);
@@ -199,8 +210,14 @@ export function MaterialDetail({ material }: MaterialDetailProps) {
         const commentsForOtherMaterials = allComments.filter(
           (comment) => comment.materialId !== material.id,
         );
-        const merged = [...nextCommentsForMaterial, ...commentsForOtherMaterials];
-        window.localStorage.setItem(VIDEO_COMMENT_STORAGE_KEY, JSON.stringify(merged));
+        const merged = [
+          ...nextCommentsForMaterial,
+          ...commentsForOtherMaterials,
+        ];
+        window.localStorage.setItem(
+          VIDEO_COMMENT_STORAGE_KEY,
+          JSON.stringify(merged),
+        );
       };
 
       videoCommentWriteQueue.push(writeOperation);
@@ -220,7 +237,8 @@ export function MaterialDetail({ material }: MaterialDetailProps) {
       .filter((comment) => comment.materialId === material.id)
       .sort(
         (left, right) =>
-          new Date(right.createdAt).getTime() - new Date(left.createdAt).getTime(),
+          new Date(right.createdAt).getTime() -
+          new Date(left.createdAt).getTime(),
       );
     setVideoComments(commentsForMaterial);
   }, [isVideo, material.id]);
@@ -254,7 +272,9 @@ export function MaterialDetail({ material }: MaterialDetailProps) {
     const roleNotes = latestNotes.filter(
       (note) => note.userId === user.id && note.role === user.role,
     );
-    const existingActive = roleNotes.find((note) => note.id === latestActiveNoteId);
+    const existingActive = roleNotes.find(
+      (note) => note.id === latestActiveNoteId,
+    );
     let targetNoteId = existingActive?.id ?? null;
 
     if (!targetNoteId) {
@@ -309,6 +329,21 @@ export function MaterialDetail({ material }: MaterialDetailProps) {
     addToast("Comment posted.", "success");
   };
 
+  const handlePrimaryMaterialAction = React.useCallback(() => {
+    if (primaryMaterialAction.kind === "none") {
+      addToast(
+        primaryMaterialAction.reason ?? "This action is unavailable right now.",
+        "info",
+      );
+      return;
+    }
+
+    const executed = runMaterialAction(primaryMaterialAction);
+    if (!executed) {
+      addToast("Unable to open this resource right now.", "error");
+    }
+  }, [addToast, primaryMaterialAction]);
+
   return (
     <div className="space-y-8 pb-20">
       {/* Navigation Header */}
@@ -344,12 +379,24 @@ export function MaterialDetail({ material }: MaterialDetailProps) {
             <MaterialSymbol icon={Share01Icon} size={18} />
             Share
           </M3Button>
-          <M3Button size="lg" className="h-11 gap-2 px-4 text-[15px] font-medium">
+          <M3Button
+            size="lg"
+            className="h-11 gap-2 px-4 text-[15px] font-medium"
+            onClick={handlePrimaryMaterialAction}
+            disabled={primaryMaterialAction.kind === "none"}
+          >
             <MaterialSymbol icon={Download01Icon} size={18} />
-            Download {material.size && `(${material.size})`}
+            {primaryMaterialAction.kind === "open-source"
+              ? "Open Source"
+              : `Download${material.size ? ` (${material.size})` : ""}`}
           </M3Button>
         </div>
       </div>
+      {primaryMaterialAction.kind === "none" && primaryMaterialAction.reason ? (
+        <p className="mt-1 text-[12px] text-[color:var(--md-sys-color-on-surface-variant)] md:text-right">
+          {primaryMaterialAction.reason}
+        </p>
+      ) : null}
 
       <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
         {/* Main Content Area (Resource Viewer) */}
@@ -380,7 +427,8 @@ export function MaterialDetail({ material }: MaterialDetailProps) {
                     Video source unavailable
                   </h3>
                   <p className="max-w-lg text-[14px] text-[color:var(--md-sys-color-on-surface-variant)]">
-                    This video does not have a playable source yet. Ask the lecturer to upload a video file or provide a YouTube URL.
+                    This video does not have a playable source yet. Ask the
+                    lecturer to upload a video file or provide a YouTube URL.
                   </p>
                 </div>
               )
@@ -404,9 +452,15 @@ export function MaterialDetail({ material }: MaterialDetailProps) {
                   This file type ({material.type}) cannot be previewed directly.
                   Please download it to view the content.
                 </p>
-                <M3Button className="mt-8 gap-2">
+                <M3Button
+                  className="mt-8 gap-2"
+                  onClick={handlePrimaryMaterialAction}
+                  disabled={primaryMaterialAction.kind === "none"}
+                >
                   <MaterialSymbol icon={Download01Icon} size={18} />
-                  Download Resource
+                  {primaryMaterialAction.kind === "open-source"
+                    ? "Open Source"
+                    : "Download Resource"}
                 </M3Button>
               </div>
             )}
@@ -425,7 +479,8 @@ export function MaterialDetail({ material }: MaterialDetailProps) {
                     </h2>
                   </div>
                   <span className="text-[12px] font-semibold uppercase tracking-[0.12em] text-[color:var(--md-sys-color-on-surface-variant)]">
-                    {videoComments.length} comment{videoComments.length === 1 ? "" : "s"}
+                    {videoComments.length} comment
+                    {videoComments.length === 1 ? "" : "s"}
                   </span>
                 </div>
 
@@ -451,7 +506,11 @@ export function MaterialDetail({ material }: MaterialDetailProps) {
                   />
                   <div className="m3-action-row m3-action-row--end">
                     <M3Button
-                      variant={!user || commentDraft.trim().length === 0 ? "outlined" : "filled"}
+                      variant={
+                        !user || commentDraft.trim().length === 0
+                          ? "outlined"
+                          : "filled"
+                      }
                       size="md"
                       className="h-10 gap-2 px-4 text-[14px] font-medium"
                       onClick={handlePostVideoComment}
@@ -467,7 +526,8 @@ export function MaterialDetail({ material }: MaterialDetailProps) {
 
                 {videoComments.length === 0 ? (
                   <p className="text-[14px] text-[color:var(--md-sys-color-on-surface-variant)]">
-                    No comments yet. Start the discussion with a question or key takeaway.
+                    No comments yet. Start the discussion with a question or key
+                    takeaway.
                   </p>
                 ) : (
                   <div className="space-y-3">

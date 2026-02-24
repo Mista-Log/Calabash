@@ -5,7 +5,6 @@ import Link from "next/link";
 import { motion } from "@/lib/motion-foundations";
 import { cn } from "@/lib/utils";
 import { useSettingsStore } from "@/store/useSettingsStore";
-import { useMockDataStore } from "@/store/useMockDataStore";
 import { useToast } from "@/components/core/toast";
 import { MaterialSymbol } from "@/components/core/MaterialSymbol";
 import {
@@ -36,6 +35,7 @@ import type {
 } from "@/types/dashboard";
 import type { Achievement, Material } from "@/services/api";
 import { useCourseStore } from "@/store/useCourseStore";
+import { useDashboardStore } from "@/store/useDashboardStore";
 
 interface StudentDashboardProps {
   view: StudentDashboardView;
@@ -99,6 +99,8 @@ const COPY = {
   milestoneFilterAwarded: (count: number) => `Awarded (${count})`,
   milestoneFilterInProgress: (count: number) => `In Progress (${count})`,
   claimAll: (count: number) => `Record All Eligible Milestones (${count})`,
+  claimsReadOnly:
+    "Milestone claims are currently read-only in live API mode.",
   progressTitle: "Academic Progress Summary",
   coursesInProgress: "Courses In Progress",
   coursesCompleted: "Courses Completed",
@@ -151,8 +153,11 @@ const toPathCards = (
 export function StudentDashboard({ view, onRefresh }: StudentDashboardProps) {
   const { reducedMotion } = useSettingsStore();
   const { addToast } = useToast();
-  const addXP = useMockDataStore((state) => state.addXP);
-  const updateGamification = useMockDataStore((state) => state.updateGamification);
+  const claimAchievement = useDashboardStore((state) => state.claimAchievement);
+  const claimAllAchievements = useDashboardStore((state) => state.claimAllAchievements);
+  const canPersistMilestoneClaims = useDashboardStore(
+    (state) => state.canPersistMilestoneClaims,
+  );
   const sharedCourseProgress = useCourseStore((state) => state.courseProgress);
   const loadedContext = useCourseStore((state) => state.loadedContext);
 
@@ -246,28 +251,38 @@ export function StudentDashboard({ view, onRefresh }: StudentDashboardProps) {
     longestStreak: gamification?.streak.best ?? 0,
   };
 
-  const quickStats = [
-    { label: "Avg Progress", value: `${averageProgress}%`, trend: { value: 12, isPositive: true } },
-    { label: "GPA", value: data.studentStats?.gpa || "N/A", trend: { value: 3, isPositive: true } },
-    { label: "Attendance", value: data.studentStats?.attendance || "N/A", trend: { value: -2, isPositive: false } },
-    { label: "Resources", value: recentMaterials.length.toString(), trend: { value: 8, isPositive: true } },
+  const quickStats: Array<{
+    label: string;
+    value: string;
+    trend?: { value: number; isPositive?: boolean };
+  }> = [
+    { label: "Avg Progress", value: `${averageProgress}%` },
+    { label: "GPA", value: data.studentStats?.gpa || "N/A" },
+    { label: "Attendance", value: data.studentStats?.attendance || "N/A" },
+    { label: "Resources", value: recentMaterials.length.toString() },
   ];
 
   const handleClaimAchievement = async (achievementId: string) => {
     const userId = data.user.id;
-    if (!userId || !gamification) return;
+    if (!userId || !gamification || !canPersistMilestoneClaims) return;
 
     const target = gamification.achievements.find((item) => item.id === achievementId);
     if (!target || !isAchievementClaimable(target)) return;
 
     try {
-      const updatedAchievements = gamification.achievements.map((item) =>
-        item.id === achievementId
-          ? { ...item, unlocked: true, unlockedAt: new Date().toISOString() }
-          : item,
-      );
-      updateGamification(userId, { achievements: updatedAchievements });
-      addXP(userId, 15, "achievement-claim");
+      const result = await claimAchievement(userId, achievementId);
+      if (!result.ok) {
+        addToast(result.message ?? "Unable to record milestone. Try again.", "error");
+        return;
+      }
+      if (!result.persisted) {
+        addToast(
+          result.message ??
+            "Milestone update is not persisted in API mode yet.",
+          "info",
+        );
+        return;
+      }
       addToast("Academic milestone recorded successfully.", "success");
       await onRefresh?.();
     } catch {
@@ -277,17 +292,35 @@ export function StudentDashboard({ view, onRefresh }: StudentDashboardProps) {
 
   const handleClaimAllAchievements = async () => {
     const userId = data.user.id;
-    if (!userId || !gamification || claimableAchievements.length === 0) return;
+    if (
+      !userId ||
+      !gamification ||
+      claimableAchievements.length === 0 ||
+      !canPersistMilestoneClaims
+    ) {
+      return;
+    }
 
     try {
-      const claimableIds = new Set(claimableAchievements.map((item) => item.id));
-      const updatedAchievements = gamification.achievements.map((item) =>
-        claimableIds.has(item.id)
-          ? { ...item, unlocked: true, unlockedAt: new Date().toISOString() }
-          : item,
+      const result = await claimAllAchievements(
+        userId,
+        claimableAchievements.map((item) => item.id),
       );
-      updateGamification(userId, { achievements: updatedAchievements });
-      addXP(userId, claimableAchievements.length * 15, "achievement-claim-all");
+      if (!result.ok) {
+        addToast(
+          result.message ?? "Unable to record all eligible milestones right now.",
+          "error",
+        );
+        return;
+      }
+      if (!result.persisted) {
+        addToast(
+          result.message ??
+            "Milestone updates are not persisted in API mode yet.",
+          "info",
+        );
+        return;
+      }
       addToast(`${claimableAchievements.length} academic milestones recorded.`, "success");
       await onRefresh?.();
     } catch {
@@ -434,14 +467,12 @@ export function StudentDashboard({ view, onRefresh }: StudentDashboardProps) {
                                   {card.ctaLabel}
                                 </M3Button>
                               </Link>
-                              <Link href={card.href}>
-                                <button
-                                  type="button"
-                                  className="flex h-10 w-10 items-center justify-center rounded-full bg-[color:var(--md-sys-color-primary-container)] text-[color:var(--md-sys-color-on-primary-container)]"
-                                  aria-label={COPY.openActivityAria}
-                                >
-                                  <MaterialSymbol icon={ArrowRight01Icon} size={18} />
-                                </button>
+                              <Link
+                                href={card.href}
+                                className="flex h-10 w-10 items-center justify-center rounded-full bg-[color:var(--md-sys-color-primary-container)] text-[color:var(--md-sys-color-on-primary-container)] transition-colors hover:bg-[color:var(--md-sys-color-primary)] hover:text-[color:var(--md-sys-color-on-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--md-sys-color-primary)] focus-visible:ring-offset-2"
+                                aria-label={COPY.openActivityAria}
+                              >
+                                <MaterialSymbol icon={ArrowRight01Icon} size={18} />
                               </Link>
                             </div>
                           </CardContent>
@@ -626,8 +657,18 @@ export function StudentDashboard({ view, onRefresh }: StudentDashboardProps) {
                   />
                 )}
 
-                {claimableAchievements.length > 0 ? (
-                  <M3Button className="w-full gap-2" onClick={() => void handleClaimAllAchievements()}>
+                {!canPersistMilestoneClaims ? (
+                  <p className="text-[12px] text-[color:var(--md-sys-color-on-surface-variant)]">
+                    {COPY.claimsReadOnly}
+                  </p>
+                ) : null}
+
+                {(claimableAchievements.length > 0 || !canPersistMilestoneClaims) ? (
+                  <M3Button
+                    className="w-full gap-2"
+                    disabled={!canPersistMilestoneClaims || claimableAchievements.length === 0}
+                    onClick={() => void handleClaimAllAchievements()}
+                  >
                     <MaterialSymbol icon={Tick01Icon} size={14} />
                     {COPY.claimAll(claimableAchievements.length)}
                   </M3Button>
@@ -684,6 +725,8 @@ export function StudentDashboard({ view, onRefresh }: StudentDashboardProps) {
         achievements={totalAchievements}
         onClaimAchievement={handleClaimAchievement}
         onClaimAll={handleClaimAllAchievements}
+        claimsEnabled={canPersistMilestoneClaims}
+        claimsDisabledReason={COPY.claimsReadOnly}
       />
     </>
   );

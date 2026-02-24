@@ -147,17 +147,15 @@ export function CommandPalette({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-start justify-center pt-[12vh] p-4 sm:p-6"
+      className="app-overlay-root"
       role="dialog"
       aria-modal="true"
       onClick={() => onOpenChange(false)}
     >
-      {/* Backdrop */}
-      <div className="absolute inset-0 bg-[color:var(--md-sys-color-scrim)]/40" />
-
-      {/* Palette */}
+      <div aria-hidden="true" className="app-overlay-scrim" />
+      <div className="app-overlay-center">
       <div
-        className="relative z-10 w-full max-w-[560px] overflow-hidden rounded-[24px] border border-[color:var(--md-sys-color-outline-variant)] bg-[color:var(--md-sys-color-surface-container)] shadow-2xl"
+        className="app-overlay-panel w-full max-w-[44rem] overflow-hidden rounded-[24px] border border-[color:var(--md-sys-color-outline-variant)] bg-[color:var(--md-sys-color-surface-container)] shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Search Input */}
@@ -351,6 +349,7 @@ export function CommandPalette({
             </span>
           </div>
         </div>
+      </div>
       </div>
     </div>
   );

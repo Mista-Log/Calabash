@@ -169,7 +169,6 @@ interface NavigationRailProps {
   isCollapsed: boolean;
   onToggle: () => void;
   mobileOpen: boolean;
-  onMobileToggle: () => void;
   onMobileClose: () => void;
 }
 
@@ -177,13 +176,13 @@ export function NavigationRail({
   isCollapsed,
   onToggle,
   mobileOpen,
-  onMobileToggle,
   onMobileClose,
 }: NavigationRailProps) {
   const pathname = usePathname();
   const router = useRouter();
   const { user, hasHydrated } = useUserStore();
   const [isNavReady, setIsNavReady] = React.useState(false);
+  const [canDismissMobileDrawer, setCanDismissMobileDrawer] = React.useState(false);
   const mobileOpenRef = React.useRef(mobileOpen);
   const isLecturer = user?.role === "lecturer";
   const navGroups = isLecturer ? lecturerNavGroups : studentNavGroups;
@@ -244,6 +243,17 @@ export function NavigationRail({
     return () => {
       document.body.style.overflow = previousOverflow;
     };
+  }, [mobileOpen]);
+
+  React.useEffect(() => {
+    if (!mobileOpen) {
+      setCanDismissMobileDrawer(false);
+      return;
+    }
+    const timeoutId = window.setTimeout(() => {
+      setCanDismissMobileDrawer(true);
+    }, 140);
+    return () => window.clearTimeout(timeoutId);
   }, [mobileOpen]);
 
   if (!isNavReady || !hasHydrated) {
@@ -336,24 +346,25 @@ export function NavigationRail({
     ),
     mobileOpen
       ? React.createElement(
-          "div",
-          {
-            className: "fixed inset-0 z-50 lg:hidden",
-            role: "dialog",
-            "aria-modal": "true",
-            "aria-label": "Mobile navigation drawer",
-          },
+          React.Fragment,
+          null,
           React.createElement("button", {
             type: "button",
-            className: "app-overlay-scrim",
-            onClick: onMobileClose,
+            className: "fixed inset-0 z-50 app-overlay-scrim lg:hidden",
+            onClick: () => {
+              if (!canDismissMobileDrawer) return;
+              onMobileClose();
+            },
             "aria-label": "Close navigation",
           }),
           React.createElement(
-            "div",
+            "aside",
             {
               className:
-                "relative z-10 h-full w-[min(86vw,340px)] border-r border-[color:var(--md-sys-color-outline-variant)] bg-[color:var(--md-sys-color-surface)]",
+                "fixed inset-y-0 left-0 z-[51] w-[min(88vw,360px)] border-r border-[color:var(--md-sys-color-outline-variant)] bg-[color:var(--md-sys-color-surface)] shadow-none lg:hidden",
+              role: "dialog",
+              "aria-modal": "true",
+              "aria-label": "Mobile navigation drawer",
             },
             React.createElement(
               "md-nav-rail",
@@ -369,7 +380,7 @@ export function NavigationRail({
                 "md-icon-button",
                 {
                   slot: "menu",
-                  onClick: onMobileToggle,
+                  onClick: onMobileClose,
                   "aria-label": "Close navigation drawer",
                   title: "Close navigation drawer",
                   className: "navigation-rail__menu-toggle",
@@ -413,19 +424,13 @@ export function NavigationDrawer() {
     isDrawerCollapsed,
     toggleDrawerCollapsed,
     isDrawerOpen,
-    toggleDrawer,
+    closeDrawer,
   } = useMaterialUI();
-  const closeMobileDrawer = React.useCallback(() => {
-    if (isDrawerOpen) {
-      toggleDrawer();
-    }
-  }, [isDrawerOpen, toggleDrawer]);
 
   return React.createElement(NavigationRail, {
     isCollapsed: isDrawerCollapsed,
     onToggle: toggleDrawerCollapsed,
     mobileOpen: isDrawerOpen,
-    onMobileToggle: toggleDrawer,
-    onMobileClose: closeMobileDrawer,
+    onMobileClose: closeDrawer,
   });
 }

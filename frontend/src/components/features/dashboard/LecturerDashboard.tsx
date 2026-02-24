@@ -101,7 +101,9 @@ const COPY = {
   selectAll: "Select All",
   setSelectedPublic: "Set Selected Public",
   setSelectedPrivate: "Set Selected Private",
-  selectedCount: (count: number) => `${count} selected`,
+  selectedCount: (selected: number, visible: number) =>
+    `${selected} selected of ${visible} visible`,
+  visibleScopeHint: "Bulk actions apply to visible items on this panel.",
   visibilityPublic: "Public",
   visibilityPrivate: "Private",
   select: "Select",
@@ -609,7 +611,7 @@ export function LecturerDashboard({ view, onRefresh }: LecturerDashboardProps) {
                     variant="outlined"
                     size="sm"
                     onClick={toggleSelectAllUploads}
-                    disabled={isBatchUpdating}
+                    disabled={isBatchUpdating || selectableUploads.length === 0}
                   >
                     {selectedUploadIds.length === selectableUploads.length
                       ? COPY.clearSelection
@@ -619,7 +621,11 @@ export function LecturerDashboard({ view, onRefresh }: LecturerDashboardProps) {
                     variant="text"
                     size="sm"
                     onClick={() => void applyBatchVisibility("public")}
-                    disabled={isBatchUpdating || selectedUploadIds.length === 0}
+                    disabled={
+                      isBatchUpdating ||
+                      selectableUploads.length === 0 ||
+                      selectedUploadIds.length === 0
+                    }
                   >
                     {COPY.setSelectedPublic}
                   </M3Button>
@@ -627,17 +633,24 @@ export function LecturerDashboard({ view, onRefresh }: LecturerDashboardProps) {
                     variant="text"
                     size="sm"
                     onClick={() => void applyBatchVisibility("private")}
-                    disabled={isBatchUpdating || selectedUploadIds.length === 0}
+                    disabled={
+                      isBatchUpdating ||
+                      selectableUploads.length === 0 ||
+                      selectedUploadIds.length === 0
+                    }
                   >
                     {COPY.setSelectedPrivate}
                   </M3Button>
                   <span className="ml-auto text-[12px] font-medium text-[color:var(--md-sys-color-on-surface-variant)]">
-                    {COPY.selectedCount(selectedUploadIds.length)}
+                    {COPY.selectedCount(selectedUploadIds.length, selectableUploads.length)}
                   </span>
+                  <p className="w-full text-[11px] text-[color:var(--md-sys-color-on-surface-variant)]">
+                    {COPY.visibleScopeHint}
+                  </p>
                 </div>
               )}
               {recentUploads.length > 0 ? (
-                recentUploads.slice(0, 6).map((material) => {
+                selectableUploads.map((material) => {
                   const Icon = materialIcons[material.type] || Pdf01Icon;
                   const isPending = isBatchUpdating || pendingMaterialId === material.id;
                   const isPublic = material.visibility !== "private";

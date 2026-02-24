@@ -54,14 +54,21 @@ function isAuthRequest(url?: string): boolean {
   return typeof url === "string" && url.includes("/api/auth/");
 }
 
+function isMeRequest(url?: string): boolean {
+  return typeof url === "string" && url.includes("/api/auth/me/");
+}
+
 // Request Interceptor: attach JWT token and CSRF token when needed
 apiClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     const state = useUserStore.getState();
     const token = state.token;
     
-    // Attach JWT token
-    if (token && !hasAuthorizationHeader(config)) {
+    // Attach JWT token only for non-auth requests, or for /auth/me/.
+    // This avoids sending stale/invalid tokens to login/signup endpoints.
+    const shouldAttachAuth =
+      !isAuthRequest(config.url) || isMeRequest(config.url);
+    if (token && shouldAttachAuth && !hasAuthorizationHeader(config)) {
       const nextHeaders = AxiosHeaders.from(config.headers);
       nextHeaders.set("Authorization", `Bearer ${token}`);
       config.headers = nextHeaders;

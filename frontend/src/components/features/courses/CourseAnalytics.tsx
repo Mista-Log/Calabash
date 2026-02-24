@@ -144,7 +144,7 @@ export function CourseAnalytics({ courseDetails }: CourseAnalyticsProps) {
             <div className="space-y-2">
               <div className="flex justify-between items-center text-[13px] font-bold uppercase tracking-widest text-muted-foreground/50">
                 <span>Top Material</span>
-                <span className="text-primary">824 Views</span>
+                <span className="text-[color:var(--md-sys-color-primary)]">824 Views</span>
               </div>
               <p className="text-[14px] font-bold">
                 Lecture 1: Intro to Silicon.pdf
@@ -153,7 +153,7 @@ export function CourseAnalytics({ courseDetails }: CourseAnalyticsProps) {
             <div className="space-y-2">
               <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50">
                 <span>Highest Activity</span>
-                <span className="text-primary">Wednesday</span>
+                <span className="text-[color:var(--md-sys-color-primary)]">Wednesday</span>
               </div>
               <p className="text-[14px] font-bold">280 Student Accesses</p>
             </div>
@@ -230,8 +230,8 @@ export function CourseAnalytics({ courseDetails }: CourseAnalyticsProps) {
                     activity.type === "upload"
                       ? "bg-[color:var(--md-sys-color-secondary-container)] text-[color:var(--md-sys-color-on-secondary-container)]"
                       : activity.type === "view"
-                        ? "bg-primary/10 text-primary"
-                        : "bg-primary/10 text-primary"
+                        ? "bg-[color:var(--md-sys-color-primary-container)] text-[color:var(--md-sys-color-on-primary-container)]"
+                        : "bg-[color:var(--md-sys-color-primary-container)] text-[color:var(--md-sys-color-on-primary-container)]"
                   }`}
                 >
                   <div className="h-5 w-5 bg-current opacity-20 rounded-full" />

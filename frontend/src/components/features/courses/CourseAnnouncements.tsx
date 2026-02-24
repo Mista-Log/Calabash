@@ -112,11 +112,11 @@ export function CourseAnnouncements() {
                     </div>
 
                     <div className="flex items-center gap-3 pt-2">
-                      <div className="h-8 w-8 rounded-full bg-accent/20 flex items-center justify-center border border-accent/20">
+                      <div className="h-8 w-8 rounded-full bg-[color:var(--md-sys-color-primary-container)] flex items-center justify-center border border-[color:var(--md-sys-color-primary-container)]">
                         <MaterialSymbol
                           icon={UserAccountIcon}
                           size={14}
-                          className="text-accent-foreground"
+                          className="text-[color:var(--md-sys-color-on-primary-container)]"
                         />
                       </div>
                       <div className="space-y-0.5">

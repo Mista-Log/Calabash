@@ -27,6 +27,8 @@ interface AchievementsModalProps {
   achievements: Achievement[];
   onClaimAchievement: (achievementId: string) => Promise<void> | void;
   onClaimAll: () => Promise<void> | void;
+  claimsEnabled?: boolean;
+  claimsDisabledReason?: string;
 }
 
 const COPY = {
@@ -57,6 +59,8 @@ export function AchievementsModal({
   achievements,
   onClaimAchievement,
   onClaimAll,
+  claimsEnabled = true,
+  claimsDisabledReason,
 }: AchievementsModalProps) {
   const [filter, setFilter] = React.useState<AchievementFilter>("all");
 
@@ -81,7 +85,7 @@ export function AchievementsModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-[min(96vw,64rem)] max-h-[calc(100dvh-2rem)] overflow-hidden rounded-3xl border border-[color:var(--md-sys-color-outline-variant)] bg-[color:var(--md-sys-color-surface-container-low)]">
+      <DialogContent className="w-[min(96vw,68rem)] max-h-[calc(100dvh-2rem)] overflow-hidden rounded-3xl border border-[color:var(--md-sys-color-outline-variant)] bg-[color:var(--md-sys-color-surface-container-low)]">
         <DialogHeader>
           <div className="flex items-start justify-between gap-4">
             <div className="space-y-2">
@@ -101,7 +105,7 @@ export function AchievementsModal({
             <M3Button
               size="sm"
               className="gap-2"
-              disabled={claimableCount === 0}
+              disabled={!claimsEnabled || claimableCount === 0}
               onClick={() => void onClaimAll()}
             >
               <MaterialSymbol icon={Tick01Icon} size={14} />
@@ -129,9 +133,14 @@ export function AchievementsModal({
               {COPY.filterInProgress(inProgress.length)}
             </M3Button>
           </div>
+          {!claimsEnabled && claimsDisabledReason ? (
+            <p className="mt-3 text-[12px] text-[color:var(--md-sys-color-on-surface-variant)]">
+              {claimsDisabledReason}
+            </p>
+          ) : null}
         </DialogHeader>
 
-        <div className="max-h-[calc(100dvh-16rem)] overflow-y-auto px-1 py-1">
+        <div className="max-h-[calc(100dvh-16rem)] overflow-y-auto">
           {visible.length > 0 ? (
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {visible.map((achievement) => {
@@ -183,7 +192,7 @@ export function AchievementsModal({
                       {!achievement.unlocked ? (
                         <M3Button
                           size="sm"
-                          disabled={!claimable}
+                          disabled={!claimsEnabled || !claimable}
                           onClick={() => void onClaimAchievement(achievement.id)}
                         >
                           {COPY.actionRecordMilestone}

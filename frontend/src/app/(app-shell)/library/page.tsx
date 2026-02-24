@@ -113,6 +113,7 @@ export default function StudentCatalogPage() {
   const [query, setQuery] = React.useState("");
   const [debouncedQuery, setDebouncedQuery] = React.useState("");
   const [page, setPage] = React.useState(1);
+  const [isUploadOpen, setIsUploadOpen] = React.useState(false);
 
   const [badgeFilter, setBadgeFilter] = React.useState<
     "all" | "certificate-track" | "none"
@@ -517,7 +518,10 @@ export default function StudentCatalogPage() {
           </>
         )}
       </div>
+      <UploadModal
+        isOpen={isUploadOpen}
+        onClose={() => setIsUploadOpen(false)}
+      />
     </div>
   );
 }
-

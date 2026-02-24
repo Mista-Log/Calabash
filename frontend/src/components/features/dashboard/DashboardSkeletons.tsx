@@ -285,6 +285,7 @@ export function StudentDashboardSkeleton() {
                 />
               ))}
             </div>
+            <MdSkeleton variant="text" width="72%" height={12} />
             <MdSkeleton variant="rounded" className="h-10 w-full rounded-full" />
           </CardContent>
         </Card>

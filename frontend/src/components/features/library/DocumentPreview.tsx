@@ -66,12 +66,20 @@ export function DocumentPreview({ material, className }: DocumentPreviewProps) {
         );
       case "image": // added for completeness
         return (
-          <img
-            src={material.url}
-            alt={material.title}
-            className="w-full h-full object-contain rounded-lg"
-            onError={() => setError(true)}
-          />
+          <div className="relative w-full h-full">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={material.url}
+              alt={material.title}
+              style={{
+                width: "100%",
+                height: "100%",
+                objectFit: "contain",
+              }}
+              className="rounded-lg"
+              onError={() => setError(true)}
+            />
+          </div>
         );
       default:
         return (
@@ -99,4 +107,3 @@ export function DocumentPreview({ material, className }: DocumentPreviewProps) {
     </div>
   );
 }
-

@@ -28,7 +28,12 @@ const AvatarImage = React.forwardRef<
   const normalizedSrc =
     typeof src === "string" && src.trim().length > 0 ? src : undefined;
 
+  if (!normalizedSrc) {
+    return null;
+  }
+
   return (
+    // eslint-disable-next-line @next/next/no-img-element
     <img
       ref={ref}
       alt={alt}

@@ -121,10 +121,10 @@ export function UploadModal({ isOpen, onClose, onUploaded, preselectedCourseCode
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="w-[min(96vw,500px)] max-h-[calc(100dvh-2rem)] overflow-hidden">
+      <DialogContent className="w-[min(96vw,40rem)] max-h-[calc(100dvh-2rem)] overflow-hidden">
         <div className="max-h-[calc(100dvh-2rem)] overflow-y-auto">
           <div className="h-1.5 bg-[color:var(--md-sys-color-primary)]" />
-          <div className="px-1 py-1">
+          <div>
             <DialogHeader>
               <DialogTitle className="text-[24px] font-bold">
                 Upload Knowledge

@@ -69,13 +69,20 @@ export function GamificationCard({
             </p>
           </div>
         </div>
-        <button
-          onClick={onExpand}
-          className="flex items-center gap-1 rounded-full bg-[color:var(--md-sys-color-surface-container-high)] px-3 py-1.5 text-[13px] font-semibold text-[color:var(--md-sys-color-primary)] transition-colors hover:bg-[color:var(--md-sys-color-surface-container-highest)]"
-        >
-          View All
-          <MaterialSymbol icon="arrow_forward" size={16} />
-        </button>
+        {onExpand ? (
+          <button
+            type="button"
+            onClick={onExpand}
+            className="flex items-center gap-1 rounded-full bg-[color:var(--md-sys-color-surface-container-high)] px-3 py-1.5 text-[13px] font-semibold text-[color:var(--md-sys-color-primary)] transition-colors hover:bg-[color:var(--md-sys-color-surface-container-highest)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--md-sys-color-primary)] focus-visible:ring-offset-2"
+          >
+            View All
+            <MaterialSymbol icon="arrow_forward" size={16} />
+          </button>
+        ) : (
+          <span className="rounded-full bg-[color:var(--md-sys-color-surface-container-high)] px-3 py-1.5 text-[13px] font-semibold text-[color:var(--md-sys-color-on-surface-variant)]">
+            Milestones
+          </span>
+        )}
       </div>
 
       {/* XP Progress */}

@@ -67,18 +67,16 @@ export function KeyboardShortcutsModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6"
+      className="app-overlay-root"
       role="dialog"
       aria-modal="true"
       aria-labelledby="shortcuts-modal-title"
       onClick={() => onOpenChange(false)}
     >
-      {/* Backdrop */}
-      <div className="absolute inset-0 bg-[color:var(--md-sys-color-scrim)]/40" />
-
-      {/* Modal */}
+      <div aria-hidden="true" className="app-overlay-scrim" />
+      <div className="app-overlay-center">
       <div
-        className="relative z-10 w-full max-w-2xl overflow-hidden rounded-[28px] border border-[color:var(--md-sys-color-outline-variant)] bg-[color:var(--md-sys-color-surface-container)] shadow-2xl"
+        className="app-overlay-panel w-full max-w-3xl overflow-hidden rounded-[28px] border border-[color:var(--md-sys-color-outline-variant)] bg-[color:var(--md-sys-color-surface-container)] shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -167,6 +165,7 @@ export function KeyboardShortcutsModal({
             anytime to view this help
           </p>
         </div>
+      </div>
       </div>
     </div>
   );
