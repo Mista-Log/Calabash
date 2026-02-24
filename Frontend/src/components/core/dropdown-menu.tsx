@@ -1,10 +1,7 @@
+import { Tick01Icon, ArrowRight01Icon, CircleIcon } from '@hugeicons/core-free-icons';
 import * as React from "react";
 import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
-import {
-  Tick01Icon,
-  ArrowRight01Icon,
-  CircleIcon,
-} from "@hugeicons/core-free-icons";
+
 import { HugeiconsIcon } from "@hugeicons/react";
 
 import { cn } from "@/lib/utils";

@@ -1,10 +1,10 @@
 import { AuthLayout } from "@/components/layout/AuthLayout";
-import { LoginForm } from "@/components/login-form";
+import { LoginForm } from "@/components/auth/LoginForm";
 
 export default function AuthLoginPage() {
   return (
     <AuthLayout
-      image="https://images.unsplash.com/photo-1543269865-cbf427effbad?q=80&w=2070&auto=format&fit=crop"
+      video="https://ouq07ad0ckrnn7nu.public.blob.vercel-storage.com/student-login.mp4"
       testimonial={{
         quote:
           "The seamless login and access to resources have made my research workflow much more efficient. Calabash is a game-changer.",
