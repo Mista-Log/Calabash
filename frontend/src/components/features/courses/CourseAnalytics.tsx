@@ -63,7 +63,8 @@ export function CourseAnalytics({ courseDetails }: CourseAnalyticsProps) {
                   Material views vs Unique student interactions
                 </p>
               </div>
-              <Badge variant="outline"
+              <Badge
+                variant="outline"
                 className="border-[color:var(--md-sys-color-tertiary)]/30 bg-[color:var(--md-sys-color-tertiary-container)] text-[color:var(--md-sys-color-on-tertiary-container)] font-bold"
               >
                 +24%
@@ -76,7 +77,11 @@ export function CourseAnalytics({ courseDetails }: CourseAnalyticsProps) {
                 <AreaChart data={weeklyData}>
                   <defs>
                     <linearGradient id="areaViews" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor={tertiary} stopOpacity={0.3} />
+                      <stop
+                        offset="5%"
+                        stopColor={tertiary}
+                        stopOpacity={0.3}
+                      />
                       <stop offset="95%" stopColor={tertiary} stopOpacity={0} />
                     </linearGradient>
                   </defs>
@@ -144,7 +149,9 @@ export function CourseAnalytics({ courseDetails }: CourseAnalyticsProps) {
             <div className="space-y-2">
               <div className="flex justify-between items-center text-[13px] font-bold uppercase tracking-widest text-muted-foreground/50">
                 <span>Top Material</span>
-                <span className="text-[color:var(--md-sys-color-primary)]">824 Views</span>
+                <span className="text-[color:var(--md-sys-color-primary)]">
+                  824 Views
+                </span>
               </div>
               <p className="text-[14px] font-bold">
                 Lecture 1: Intro to Silicon.pdf
@@ -153,7 +160,9 @@ export function CourseAnalytics({ courseDetails }: CourseAnalyticsProps) {
             <div className="space-y-2">
               <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50">
                 <span>Highest Activity</span>
-                <span className="text-[color:var(--md-sys-color-primary)]">Wednesday</span>
+                <span className="text-[color:var(--md-sys-color-primary)]">
+                  Wednesday
+                </span>
               </div>
               <p className="text-[14px] font-bold">280 Student Accesses</p>
             </div>

@@ -212,7 +212,10 @@ export function EventModal({ isOpen, onClose }: EventModalProps) {
             >
               Cancel
             </M3Button>
-            <M3Button type="submit" className="h-11 rounded-2xl font-bold gap-2">
+            <M3Button
+              type="submit"
+              className="h-11 rounded-2xl font-bold gap-2"
+            >
               <MaterialSymbol icon={CheckmarkCircle02Icon} size={18} />
               Create Event
             </M3Button>
@@ -230,7 +233,11 @@ export function EventModal({ isOpen, onClose }: EventModalProps) {
             <DialogTitle className="text-xl font-black">
               {editingEvent ? "Edit Event" : "Add New Event"}
             </DialogTitle>
-            <M3Button size="sm" onClick={handleClose} className="rounded-xl size-8">
+            <M3Button
+              size="sm"
+              onClick={handleClose}
+              className="rounded-xl size-8"
+            >
               <MaterialSymbol icon={Cancel01Icon} size={18} />
             </M3Button>
           </div>

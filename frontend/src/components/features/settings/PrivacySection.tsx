@@ -28,10 +28,7 @@ export function PrivacySection() {
     setIsDownloading(true);
     try {
       const result = await mockActionsService.requestDataExport();
-      addToast(
-        `Data export prepared (${result.referenceId}).`,
-        "success",
-      );
+      addToast(`Data export prepared (${result.referenceId}).`, "success");
     } catch {
       addToast("Data export request failed.", "error");
     } finally {
@@ -43,10 +40,7 @@ export function PrivacySection() {
     setIsDeleting(true);
     try {
       const result = await mockActionsService.requestAccountDeletion();
-      addToast(
-        `Deletion request submitted (${result.referenceId}).`,
-        "info",
-      );
+      addToast(`Deletion request submitted (${result.referenceId}).`, "info");
       setShowDeleteConfirm(false);
     } catch {
       addToast("Unable to submit deletion request.", "error");

@@ -103,7 +103,8 @@ export function MaterialCard({
               : undefined
           }
         >
-          <M3Button variant="text"
+          <M3Button
+            variant="text"
             size="sm"
             className="h-9 text-[13px] font-bold hover:bg-primary hover:text-primary-foreground rounded-full px-4 transition-all duration-300"
           >

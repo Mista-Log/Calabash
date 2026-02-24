@@ -23,7 +23,10 @@ import {
   CardTitle,
   Separator,
 } from "@/components/core";
-import { resolveUrlDownloadAction, runMaterialAction } from "@/lib/material-actions";
+import {
+  resolveUrlDownloadAction,
+  runMaterialAction,
+} from "@/lib/material-actions";
 
 // Set up worker for react-pdf
 // Set up worker for react-pdf only on client side
@@ -40,7 +43,10 @@ export function DocumentViewer({ url, title }: DocumentViewerProps) {
   const [numPages, setNumPages] = React.useState<number | null>(null);
   const [pageNumber, setPageNumber] = React.useState(1);
   const [scale, setScale] = React.useState(1.0);
-  const downloadAction = React.useMemo(() => resolveUrlDownloadAction(url), [url]);
+  const downloadAction = React.useMemo(
+    () => resolveUrlDownloadAction(url),
+    [url],
+  );
 
   function onDocumentLoadSuccess({ numPages }: { numPages: number }) {
     setNumPages(numPages);
@@ -61,13 +67,15 @@ export function DocumentViewer({ url, title }: DocumentViewerProps) {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <M3Button size="sm"
+          <M3Button
+            size="sm"
             onClick={() => setScale((s) => Math.min(2, s + 0.1))}
             title="Zoom In"
           >
             <MaterialSymbol icon={ArrowUp01Icon} size={18} />
           </M3Button>
-          <M3Button size="sm"
+          <M3Button
+            size="sm"
             onClick={() => setScale((s) => Math.max(0.5, s - 0.1))}
             title="Zoom Out"
           >
