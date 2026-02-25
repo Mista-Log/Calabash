@@ -1,6 +1,11 @@
 /**
  * Notification Service for Calabash
- * Handles real-time notifications via WebSocket and fallback polling
+ * DISABLED - WebSocket not implemented yet
+ * 
+ * To re-enable when backend is ready:
+ * 1. Set ENABLED = true
+ * 2. Implement WebSocket endpoint on backend
+ * 3. Update WS_URL
  */
 
 import type {
@@ -14,6 +19,9 @@ import { useUserStore } from "@/store/useUserStore";
 
 const NOTIFICATION_STORAGE_KEY = "calabash-notifications";
 const WS_URL = process.env.NEXT_PUBLIC_WS_URL || "wss://calabash-n9hz.onrender.com/ws";
+
+// DISABLED - Set to true when backend WebSocket is ready
+const ENABLED = false;
 
 type NotificationListener = (notifications: Notification[]) => void;
 
@@ -83,6 +91,12 @@ export class NotificationService {
   // ============================================================================
 
   connect(userId: string): void {
+    // DISABLED - Don't connect until backend is ready
+    if (!ENABLED) {
+      console.log('[NotificationService] Disabled - WebSocket not implemented yet');
+      return;
+    }
+    
     if (typeof window === "undefined") return;
     if (this.ws?.readyState === WebSocket.OPEN) return;
 

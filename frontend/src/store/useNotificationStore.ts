@@ -50,32 +50,63 @@ export const useNotificationStore = create<NotificationStoreState>((set, get) =>
   initialize: (userId: string) => {
     if (!userId) return;
 
-    set({ isLoading: true });
-
-    // Load initial notifications from storage
-    const initialNotifications = notificationService.getNotifications();
-    const initialStats = notificationService.getStats();
-
-    set({
-      notifications: initialNotifications,
-      stats: initialStats,
+    // DISABLED - Notification service not implemented yet
+    // When backend is ready:
+    // 1. Set ENABLED = true in notification.service.ts
+    // 2. Uncomment the code below
+    
+    set({ 
+      notifications: [],
+      stats: {
+        total: 0,
+        unread: 0,
+        byType: {
+          course_update: 0,
+          new_material: 0,
+          deadline_reminder: 0,
+          achievement_unlocked: 0,
+          streak_milestone: 0,
+          announcement: 0,
+          system: 0,
+          qa_reply: 0,
+          grade_published: 0,
+        },
+        byPriority: {
+          low: 0,
+          medium: 0,
+          high: 0,
+          urgent: 0,
+        },
+      },
+      isConnected: false,
+      isUsingPolling: false,
       isLoading: false,
     });
 
-    // Subscribe to real-time updates
-    notificationService.connect(userId);
+    // Load initial notifications from storage
+    // const initialNotifications = notificationService.getNotifications();
+    // const initialStats = notificationService.getStats();
 
-    const unsubscribe = notificationService.subscribe((notifications) => {
-      const stats = notificationService.getStats();
-      set({
-        notifications,
-        stats,
-        isConnected: true,
-      });
-    });
+    // set({
+    //   notifications: initialNotifications,
+    //   stats: initialStats,
+    //   isLoading: false,
+    // });
+
+    // Subscribe to real-time updates
+    // notificationService.connect(userId);
+
+    // const unsubscribe = notificationService.subscribe((notifications) => {
+    //   const stats = notificationService.getStats();
+    //   set({
+    //     notifications,
+    //     stats,
+    //     isConnected: true,
+    //   });
+    // });
 
     // Store unsubscribe function for cleanup
-    return unsubscribe;
+    // return unsubscribe;
   },
 
   disconnect: () => {
