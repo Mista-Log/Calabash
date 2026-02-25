@@ -240,6 +240,160 @@ export function Toolbar({
             title="My Account"
             onClick={() => setShowUserMenu(!showUserMenu)}
           />
+
+          {showUserMenu && (
+            <div
+              className={cn(
+                "absolute right-0 mt-2 w-80",
+                "bg-[color:var(--md-sys-color-surface-container)]",
+                "rounded-3xl",
+                "border border-[color:var(--md-sys-color-outline-variant)]",
+                "shadow-2xl",
+                "overflow-hidden",
+                "z-50",
+                "m3-motion-short",
+              )}
+              style={{
+                animation: "slideDown 0.15s ease-out",
+              }}
+            >
+              {/* Header with gradient background */}
+              <div className="relative overflow-hidden">
+                <div
+                  className="absolute inset-0 opacity-60"
+                  style={{
+                    background: "linear-gradient(135deg, var(--md-sys-color-primary-container) 0%, var(--md-sys-color-surface-container) 100%)",
+                  }}
+                />
+                <div className="relative flex items-center gap-4 p-5">
+                  <div
+                    className="flex h-14 w-14 items-center justify-center rounded-2xl shadow-md"
+                    style={{ backgroundColor: "var(--md-sys-color-primary)" }}
+                  >
+                    <MdIcon
+                      className="text-[28px]"
+                      style={{ color: "var(--md-sys-color-on-primary)" }}
+                    >
+                      person
+                    </MdIcon>
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p
+                      className="m3-title-medium truncate font-semibold text-[color:var(--md-sys-color-on-surface)]"
+                    >
+                      {user?.name || "User"}
+                    </p>
+                    <p
+                      className="m3-body-small truncate text-[color:var(--md-sys-color-on-surface-variant)]"
+                    >
+                      {user?.email || "user@calabash.edu"}
+                    </p>
+                    {user?.role && (
+                      <span className="mt-1 inline-flex items-center gap-1 rounded-full bg-[color:var(--md-sys-color-secondary-container)] px-2 py-0.5">
+                        <span className="m3-label-small font-semibold capitalize text-[color:var(--md-sys-color-on-secondary-container)]">
+                          {user.role}
+                        </span>
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Menu Items - Hidden Scrollbar */}
+              <div
+                className="max-h-[60vh] overflow-y-auto py-2"
+                style={{
+                  scrollbarWidth: "none",
+                  msOverflowStyle: "none",
+                }}
+              >
+                {/* Hide scrollbar for Chrome, Safari and Opera */}
+                <style jsx>{`
+                  div::-webkit-scrollbar {
+                    display: none;
+                    width: 0;
+                    height: 0;
+                  }
+                `}</style>
+                
+                <div className="px-2">
+                  <Link
+                    href="/settings"
+                    className={cn(
+                      "flex items-center gap-3 rounded-xl px-3 py-3",
+                      "m3-body-medium text-[color:var(--md-sys-color-on-surface-variant)]",
+                      "hover:bg-[color:var(--md-sys-color-surface-container-high)]",
+                      "transition-colors m3-motion-short",
+                    )}
+                    onClick={() => setShowUserMenu(false)}
+                  >
+                    <div
+                      className="flex h-9 w-9 items-center justify-center rounded-xl"
+                      style={{ backgroundColor: "var(--md-sys-color-secondary-container)" }}
+                    >
+                      <MdIcon className="text-[20px] text-[color:var(--md-sys-color-on-secondary-container)]">
+                        settings
+                      </MdIcon>
+                    </div>
+                    <span className="font-medium">Settings</span>
+                  </Link>
+
+                  <Link
+                    href="/support"
+                    className={cn(
+                      "flex items-center gap-3 rounded-xl px-3 py-3",
+                      "m3-body-medium text-[color:var(--md-sys-color-on-surface-variant)]",
+                      "hover:bg-[color:var(--md-sys-color-surface-container-high)]",
+                      "transition-colors m3-motion-short",
+                    )}
+                    onClick={() => setShowUserMenu(false)}
+                  >
+                    <div
+                      className="flex h-9 w-9 items-center justify-center rounded-xl"
+                      style={{ backgroundColor: "var(--md-sys-color-tertiary-container)" }}
+                    >
+                      <MdIcon className="text-[20px] text-[color:var(--md-sys-color-on-tertiary-container)]">
+                        help
+                      </MdIcon>
+                    </div>
+                    <span className="font-medium">Help & Support</span>
+                  </Link>
+                </div>
+
+                {/* Divider */}
+                <div className="my-2 px-2">
+                  <div
+                    className="h-px"
+                    style={{ backgroundColor: "var(--md-sys-color-outline-variant)" }}
+                  />
+                </div>
+
+                {/* Logout */}
+                <div className="px-2">
+                  <button
+                    onClick={handleLogout}
+                    className={cn(
+                      "flex w-full items-center gap-3 rounded-xl px-3 py-3",
+                      "m3-body-medium",
+                      "hover:bg-[color:var(--md-sys-color-error-container)]/20",
+                      "transition-colors m3-motion-short",
+                    )}
+                    style={{ color: "var(--md-sys-color-error)" }}
+                  >
+                    <div
+                      className="flex h-9 w-9 items-center justify-center rounded-xl"
+                      style={{ backgroundColor: "var(--md-sys-color-error-container)" }}
+                    >
+                      <MdIcon className="text-[20px] text-[color:var(--md-sys-color-on-error-container)]">
+                        logout
+                      </MdIcon>
+                    </div>
+                    <span className="font-semibold">Logout</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         {actions}
