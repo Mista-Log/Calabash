@@ -16,6 +16,7 @@ import { cn } from "@/lib/utils";
 
 interface MaterialCardProps {
   material: Material;
+  courseId?: string;
   onView?: (material: Material) => void;
   className?: string;
   variant?: "grid" | "list";
@@ -23,11 +24,17 @@ interface MaterialCardProps {
 
 export function MaterialCard({
   material,
+  courseId,
   onView,
   className,
   variant = "grid",
 }: MaterialCardProps) {
   const isList = variant === "list";
+  
+  // Use course-based routing if courseId is provided
+  const materialHref = courseId
+    ? `/courses/${courseId}/material/${material.id}`
+    : `/library/${material.id}`;
 
   return (
     <Card
@@ -93,7 +100,7 @@ export function MaterialCard({
         )}
       >
         <Link
-          href={`/library/${material.id}`}
+          href={materialHref}
           onClick={
             onView
               ? (e) => {

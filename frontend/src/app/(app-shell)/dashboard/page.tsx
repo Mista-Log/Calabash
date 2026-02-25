@@ -15,6 +15,7 @@ import {
   LecturerDashboardSkeleton,
   StudentDashboardSkeleton,
 } from "@/components/features/dashboard/DashboardSkeletons";
+import { PersistentLayout } from "@/components/layout/PersistentLayout";
 import {
   APP_PAGE_CONTAINER,
   APP_PAGE_SHELL,
@@ -30,6 +31,7 @@ const StudentDashboard = dynamic(
     ),
   {
     loading: () => <RoleDashboardSkeleton />,
+    ssr: false,
   },
 );
 
@@ -40,6 +42,7 @@ const LecturerDashboard = dynamic(
     ),
   {
     loading: () => <RoleDashboardSkeleton />,
+    ssr: false,
   },
 );
 
@@ -104,6 +107,8 @@ export default function DashboardPage() {
     syncRecentMaterials,
   } = useDashboardStore();
 
+  const isLoading = status === "loading" || status === "idle";
+
   React.useEffect(() => {
     if (!user?.id) return;
     void fetchDashboard(user.role, user.id);
@@ -123,10 +128,16 @@ export default function DashboardPage() {
           ? COPY.networkError
           : error || COPY.loadErrorFallback;
 
+  // Show initial loading skeleton before hydration
   if (!hasHydrated) {
-    return <DashboardLoadingState role={null} />;
+    return (
+      <PersistentLayout isLoading={true}>
+        <DashboardLoadingState role={null} />
+      </PersistentLayout>
+    );
   }
 
+  // Show sign-in prompt for unauthenticated users
   if (!user) {
     return (
       <div className="mx-auto flex min-h-[60vh] w-full max-w-[960px] items-center justify-center px-4">
@@ -146,12 +157,17 @@ export default function DashboardPage() {
   const activeView = isLecturer ? lecturerView : studentView;
   const firstName = user.name?.split(" ")[0] || "User";
 
-  if (status === "loading" || status === "idle") {
-    return <DashboardLoadingState role={user.role} />;
+  // Show loading skeleton during data fetch
+  if (isLoading) {
+    return (
+      <PersistentLayout isLoading={true}>
+        <DashboardLoadingState role={user.role} />
+      </PersistentLayout>
+    );
   }
 
   return (
-    <>
+    <PersistentLayout isLoading={false}>
       <div className={APP_PAGE_SHELL}>
         <div className={cn(APP_PAGE_CONTAINER, APP_SECTION_STACK)}>
           {/* Page Header */}
@@ -213,6 +229,6 @@ export default function DashboardPage() {
           )}
         </div>
       </div>
-    </>
+    </PersistentLayout>
   );
 }

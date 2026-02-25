@@ -409,114 +409,111 @@ export default function StudentCatalogPage() {
             </div>
           </Card>
         ) : (
-          <>
-            <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {currentItems.map((material) => (
-                <Link
-                  key={material.id}
-                  href={`/library/${material.id}`}
-                  aria-label={`Open ${material.title}`}
-                  className="group block"
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {currentItems.map((material) => (
+              <Link
+                key={material.id}
+                href={`/library/${material.id}`}
+                aria-label={`Open ${material.title}`}
+                className="group block"
+              >
+                <Card
+                  variant="outlined"
+                  className="flex h-full flex-col overflow-hidden transition-colors m3-motion-short"
                 >
-                  <Card
-                    variant="outlined"
-                    className="flex h-full flex-col overflow-hidden transition-colors m3-motion-short"
-                  >
-                    <CardContent className="flex flex-1 flex-col p-5">
-                      {/* Badges */}
-                      <div className="mb-3 flex flex-wrap gap-2">
+                  <CardContent className="flex flex-1 flex-col p-5">
+                    {/* Badges */}
+                    <div className="mb-3 flex flex-wrap gap-2">
+                      <Chip
+                        variant="assist"
+                        size="small"
+                        label={material.kind === "course" ? "Course" : "Lab"}
+                        icon={
+                          material.kind === "course"
+                            ? "deployed_code"
+                            : "change_history"
+                        }
+                      />
+                      {material.badge === "certificate-track" && (
                         <Chip
                           variant="assist"
                           size="small"
-                          label={material.kind === "course" ? "Course" : "Lab"}
-                          icon={
-                            material.kind === "course"
-                              ? "deployed_code"
-                              : "change_history"
-                          }
+                          label="Certificate track"
+                          icon="globe_book"
                         />
-                        {material.badge === "certificate-track" && (
-                          <Chip
-                            variant="assist"
-                            size="small"
-                            label="Certificate track"
-                            icon="globe_book"
-                          />
-                        )}
+                      )}
+                    </div>
+
+                    {/* Title */}
+                    <h3 className="m3-title-large text-[color:var(--md-sys-color-on-surface)]">
+                      {material.title}
+                    </h3>
+
+                    {/* Description */}
+                    <p className="mt-2 line-clamp-3 m3-body-medium text-[color:var(--md-sys-color-on-surface-variant)]">
+                      {material.description ||
+                        "Engage with course-aligned resources to reinforce lecture content and support continuous academic progress."}
+                    </p>
+
+                    {/* Footer */}
+                    <div className="mt-auto flex items-center justify-between pt-4">
+                      <div className="flex items-center gap-1.5 m3-label-medium text-[color:var(--md-sys-color-on-surface-variant)]">
+                        <MaterialSymbol icon={Clock01Icon} size={16} />
+                        {formatDuration(material.durationMinutes)}
                       </div>
-
-                      {/* Title */}
-                      <h3 className="m3-title-large text-[color:var(--md-sys-color-on-surface)]">
-                        {material.title}
-                      </h3>
-
-                      {/* Description */}
-                      <p className="mt-2 line-clamp-3 m3-body-medium text-[color:var(--md-sys-color-on-surface-variant)]">
-                        {material.description ||
-                          "Engage with course-aligned resources to reinforce lecture content and support continuous academic progress."}
-                      </p>
-
-                      {/* Footer */}
-                      <div className="mt-auto flex items-center justify-between pt-4">
-                        <div className="flex items-center gap-1.5 m3-label-medium text-[color:var(--md-sys-color-on-surface-variant)]">
-                          <MaterialSymbol icon={Clock01Icon} size={16} />
-                          {formatDuration(material.durationMinutes)}
-                        </div>
-                        <span
-                          className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-[color:var(--md-sys-color-primary-container)] text-[color:var(--md-sys-color-on-primary-container)] opacity-0 transition-all duration-200 group-hover:opacity-100 group-focus-visible:opacity-100"
-                          aria-hidden="true"
-                        >
-                          <MaterialSymbol icon={ArrowRight01Icon} size={18} />
-                        </span>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </Link>
-              ))}
-            </div>
-
-            {/* Pagination */}
-            <div className="mt-8 flex items-center justify-between border-t border-[color:var(--md-sys-color-outline-variant)] pt-6">
-              <p className="m3-body-small text-[color:var(--md-sys-color-on-surface-variant)]">
-                Showing {startIndex + 1} - {endIndex} of{" "}
-                {total.toLocaleString()}
-              </p>
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => setPage((prev) => Math.max(1, prev - 1))}
-                  disabled={safePage <= 1}
-                  className={cn(
-                    "inline-flex h-10 w-10 items-center justify-center rounded-full transition-colors",
-                    safePage <= 1
-                      ? "text-[color:var(--md-sys-color-outline)]"
-                      : "text-[color:var(--md-sys-color-on-surface)] hover:bg-[color:var(--md-sys-color-surface-container-high)]",
-                  )}
-                  aria-label="Previous page"
-                >
-                  <MaterialSymbol icon="chevron_left" size={20} />
-                </button>
-                <button
-                  type="button"
-                  onClick={() =>
-                    setPage((prev) => Math.min(pageCount, prev + 1))
-                  }
-                  disabled={safePage >= pageCount}
-                  className={cn(
-                    "inline-flex h-10 w-10 items-center justify-center rounded-full transition-colors",
-                    safePage >= pageCount
-                      ? "text-[color:var(--md-sys-color-outline)]"
-                      : "text-[color:var(--md-sys-color-on-surface)] hover:bg-[color:var(--md-sys-color-surface-container-high)]",
-                  )}
-                  aria-label="Next page"
-                >
-                  <MaterialSymbol icon="chevron_right" size={20} />
-                </button>
-              </div>
-            </div>
-
-          </>
+                      <span
+                        className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-[color:var(--md-sys-color-primary-container)] text-[color:var(--md-sys-color-on-primary-container)] opacity-0 transition-all duration-200 group-hover:opacity-100 group-focus-visible:opacity-100"
+                        aria-hidden="true"
+                      >
+                        <MaterialSymbol icon={ArrowRight01Icon} size={18} />
+                      </span>
+                    </div>
+                  </CardContent>
+                </Card>
+              </Link>
+            ))}
+          </div>
         )}
+
+        {/* Pagination */}
+        <div className="mt-8 flex items-center justify-between border-t border-[color:var(--md-sys-color-outline-variant)] pt-6">
+          <p className="m3-body-small text-[color:var(--md-sys-color-on-surface-variant)]">
+            Showing {startIndex + 1} - {endIndex} of{" "}
+            {total.toLocaleString()}
+          </p>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setPage((prev) => Math.max(1, prev - 1))}
+              disabled={safePage <= 1}
+              className={cn(
+                "inline-flex h-10 w-10 items-center justify-center rounded-full transition-colors",
+                safePage <= 1
+                  ? "text-[color:var(--md-sys-color-outline)]"
+                  : "text-[color:var(--md-sys-color-on-surface)] hover:bg-[color:var(--md-sys-color-surface-container-high)]",
+              )}
+              aria-label="Previous page"
+            >
+              <MaterialSymbol icon="chevron_left" size={20} />
+            </button>
+            <button
+              type="button"
+              onClick={() =>
+                setPage((prev) => Math.min(pageCount, prev + 1))
+              }
+              disabled={safePage >= pageCount}
+              className={cn(
+                "inline-flex h-10 w-10 items-center justify-center rounded-full transition-colors",
+                safePage >= pageCount
+                  ? "text-[color:var(--md-sys-color-outline)]"
+                  : "text-[color:var(--md-sys-color-on-surface)] hover:bg-[color:var(--md-sys-color-surface-container-high)]",
+              )}
+              aria-label="Next page"
+            >
+              <MaterialSymbol icon="chevron_right" size={20} />
+            </button>
+          </div>
+        </div>
       </div>
       <UploadModal
         isOpen={isUploadOpen}

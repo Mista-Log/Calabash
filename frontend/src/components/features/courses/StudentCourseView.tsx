@@ -36,6 +36,7 @@ import { useUserStore } from "@/store/useUserStore";
 
 interface StudentCourseViewProps {
   course: CourseDetails;
+  progress?: number;
 }
 
 function isPlayableVideo(material: Material | undefined): boolean {
@@ -478,7 +479,7 @@ export function StudentCourseView({ course }: StudentCourseViewProps) {
               </M3Button>
 
               {activeMaterial && activeMaterial.type !== "video" ? (
-                <Link href={`/library/${activeMaterial.id}`} className="inline-flex">
+                <Link href={`/courses/${course.id}/material/${activeMaterial.id}`} className="inline-flex">
                   <M3Button
                     variant="text"
                     size="sm"

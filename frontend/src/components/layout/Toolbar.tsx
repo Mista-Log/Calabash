@@ -87,23 +87,28 @@ export function Toolbar({
   return (
     <header
       className={cn(
-        "sticky top-0 z-30",
+        // Fixed positioning for consistent header
+        "fixed top-0 z-30",
         "h-16",
         "flex items-center justify-between gap-4",
         "px-4",
         "bg-[color:var(--md-sys-color-surface-container-lowest)]",
         "border-b border-[color:var(--md-sys-color-outline-variant)]",
         "m3-motion-short",
+        // Mobile: full width, starts from left edge
+        "left-0 w-full",
+        // Desktop: offset by navigation rail width
         showNavigation &&
-          "lg:ml-[var(--app-nav-rail-collapsed-width)] lg:w-[calc(100%-var(--app-nav-rail-collapsed-width))]",
+          "lg:left-[var(--app-nav-rail-collapsed-width)] lg:w-[calc(100%-var(--app-nav-rail-collapsed-width))]",
         showNavigation &&
           isUIHydrated &&
           !isDrawerCollapsed &&
-          "lg:ml-[var(--app-nav-rail-expanded-width)] lg:w-[calc(100%-var(--app-nav-rail-expanded-width))]",
+          "lg:left-[var(--app-nav-rail-expanded-width)] lg:w-[calc(100%-var(--app-nav-rail-expanded-width))]",
       )}
     >
       {/* Left Section - Menu & Logo */}
       <div className="flex items-center gap-2">
+        {/* Mobile menu button - visible only on mobile/tablet */}
         <MdIconButton
           icon="menu"
           className={cn("lg:hidden", !showNavigation && "hidden")}
@@ -127,6 +132,7 @@ export function Toolbar({
               school
             </MdIcon>
           </div>
+          {/* Logo text - hidden on small mobile */}
           <span
             className="hidden sm:block m3-title-large"
             style={{ color: "var(--md-sys-color-on-surface)" }}
@@ -179,6 +185,7 @@ export function Toolbar({
       <div className="flex items-center gap-1">
         {showGamification && (
           <>
+            {/* XP - Hidden on mobile */}
             <div
               className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full"
               style={{ backgroundColor: "var(--md-sys-color-primary-container)" }}
@@ -200,6 +207,7 @@ export function Toolbar({
               </span>
             </div>
 
+            {/* Streak - Hidden on mobile */}
             <div
               className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full"
               style={{ backgroundColor: "var(--md-sys-color-tertiary-container)" }}
@@ -223,57 +231,7 @@ export function Toolbar({
           </>
         )}
 
-        <MdIconButton
-          icon="help_outline"
-          className="hidden sm:flex"
-          aria-label="Help"
-          title="Help"
-          onClick={() => router.push("/support")}
-        />
-
-        <div
-          className={cn(
-            "flex items-center gap-1 p-1 rounded-full border",
-            "bg-[color:var(--md-sys-color-surface-container-high)]",
-            "border-[color:var(--md-sys-color-outline-variant)]",
-          )}
-          role="group"
-          aria-label="Theme switcher"
-        >
-          <button
-            type="button"
-            onClick={() => setTheme("light")}
-            className={cn(
-              "inline-flex items-center gap-1.5 px-2.5 h-8 rounded-full transition-colors",
-              resolvedTheme === "light"
-                ? "bg-[color:var(--md-sys-color-primary-container)] text-[color:var(--md-sys-color-on-primary-container)]"
-                : "text-[color:var(--md-sys-color-on-surface-variant)] hover:bg-[color:var(--md-sys-color-surface-container-highest)]",
-            )}
-            aria-label="Switch to light theme"
-            aria-pressed={resolvedTheme === "light"}
-            title="Light theme"
-          >
-            <MdIcon className="text-[18px]">light_mode</MdIcon>
-            <span className="hidden lg:inline text-[12px] font-semibold">Light</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => setTheme("dark")}
-            className={cn(
-              "inline-flex items-center gap-1.5 px-2.5 h-8 rounded-full transition-colors",
-              resolvedTheme === "dark"
-                ? "bg-[color:var(--md-sys-color-primary-container)] text-[color:var(--md-sys-color-on-primary-container)]"
-                : "text-[color:var(--md-sys-color-on-surface-variant)] hover:bg-[color:var(--md-sys-color-surface-container-highest)]",
-            )}
-            aria-label="Switch to dark theme"
-            aria-pressed={resolvedTheme === "dark"}
-            title="Dark theme"
-          >
-            <MdIcon className="text-[18px]">dark_mode</MdIcon>
-            <span className="hidden lg:inline text-[12px] font-semibold">Dark</span>
-          </button>
-        </div>
-
+        {/* User Menu */}
         <div className="relative" ref={userMenuRef}>
           <MdIconButton
             icon="person"
@@ -282,74 +240,6 @@ export function Toolbar({
             title="My Account"
             onClick={() => setShowUserMenu(!showUserMenu)}
           />
-
-          {showUserMenu && (
-            <div
-              className={cn(
-                "absolute right-0 mt-2 w-64",
-                "bg-[color:var(--md-sys-color-surface-container)]",
-                "rounded-2xl",
-                "border border-[color:var(--md-sys-color-outline-variant)]",
-                "overflow-hidden",
-                "z-50"
-              )}
-            >
-              <div
-                className="flex items-center gap-3 p-4"
-                style={{ borderBottom: "1px solid var(--md-sys-color-outline-variant)" }}
-              >
-                <div
-                  className="flex items-center justify-center w-12 h-12 rounded-full"
-                  style={{ backgroundColor: "var(--md-sys-color-primary)" }}
-                >
-                  <MdIcon
-                    className="text-[24px]"
-                    style={{ color: "var(--md-sys-color-on-primary)" }}
-                  >
-                    person
-                  </MdIcon>
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p
-                    className="m3-title-small truncate"
-                    style={{ color: "var(--md-sys-color-on-surface)" }}
-                  >
-                    {user?.name || "User"}
-                  </p>
-                  <p
-                    className="m3-body-small truncate"
-                    style={{ color: "var(--md-sys-color-on-surface-variant)" }}
-                  >
-                    {user?.email || "user@calabash.edu"}
-                  </p>
-                </div>
-              </div>
-
-              <div className="py-2">
-                <Link
-                  href="/settings"
-                  className="flex items-center gap-3 px-4 py-3 m3-body-medium"
-                  style={{ color: "var(--md-sys-color-on-surface-variant)" }}
-                  onClick={() => setShowUserMenu(false)}
-                >
-                  <MdIcon>settings</MdIcon>
-                  Settings
-                </Link>
-                <div
-                  className="my-2"
-                  style={{ borderTop: "1px solid var(--md-sys-color-outline-variant)" }}
-                />
-                <button
-                  onClick={handleLogout}
-                  className="w-full flex items-center gap-3 px-4 py-3 m3-body-medium"
-                  style={{ color: "var(--md-sys-color-error)" }}
-                >
-                  <MdIcon>logout</MdIcon>
-                  Logout
-                </button>
-              </div>
-            </div>
-          )}
         </div>
 
         {actions}

@@ -27,15 +27,13 @@ const useDialog = () => {
   return context;
 };
 
-let dialogIdCounter = 0;
-const nextDialogId = () => {
-  dialogIdCounter += 1;
-  return `dialog-${dialogIdCounter}`;
-};
-
-const Dialog = ({ open: controlledOpen, onOpenChange, children }: DialogProps) => {
+const Dialog = ({
+  open: controlledOpen,
+  onOpenChange,
+  children,
+}: DialogProps) => {
   const [uncontrolledOpen, setUncontrolledOpen] = React.useState(false);
-  const dialogId = React.useMemo(() => nextDialogId(), []);
+  const dialogId = React.useId();
 
   const isControlled = controlledOpen !== undefined;
   const open = isControlled ? controlledOpen : uncontrolledOpen;
@@ -123,7 +121,9 @@ const flattenChildren = (children: React.ReactNode): React.ReactNode[] => {
   const result: React.ReactNode[] = [];
   React.Children.forEach(children, (child) => {
     if (React.isValidElement(child) && child.type === React.Fragment) {
-      const fragment = child as React.ReactElement<{ children?: React.ReactNode }>;
+      const fragment = child as React.ReactElement<{
+        children?: React.ReactNode;
+      }>;
       result.push(...flattenChildren(fragment.props.children));
       return;
     }
@@ -199,7 +199,11 @@ const DialogContent = React.forwardRef<
     },
     ...slotted,
     content.length > 0
-      ? React.createElement("div", { slot: "content", className: "app-dialog__content" }, content)
+      ? React.createElement(
+          "div",
+          { slot: "content", className: "app-dialog__content" },
+          content,
+        )
       : null,
   );
 });

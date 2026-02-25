@@ -1,26 +1,45 @@
 "use client";
 
 import * as React from "react";
-import { KeyboardShortcutsModal } from "@/components/core/keyboard-shortcuts-modal";
-import { useShowShortcutsShortcut } from "@/hooks/use-keyboard-shortcut";
-import type { KeyboardShortcut } from "@/components/core/keyboard-shortcuts-modal";
+import { KeyboardShortcutsModal } from "./KeyboardShortcutsModal";
+import {
+  initializeGlobalShortcuts,
+  handleGlobalKeyboardEvent,
+} from "@/lib/keyboard-shortcuts";
 
 interface GlobalShortcutsProviderProps {
   children: React.ReactNode;
 }
 
-// Universal shortcuts (same for all roles)
-const UNIVERSAL_SHORTCUTS: KeyboardShortcut[] = [
-  { keys: ["⌘", "K"], description: "Quick Search", category: "general" },
-  { keys: ["Shift", "/"], description: "Show Shortcuts", category: "general" },
-  { keys: ["Esc"], description: "Close Modal", category: "general" },
-];
-
 export function GlobalShortcutsProvider({ children }: GlobalShortcutsProviderProps) {
   const [isShortcutsModalOpen, setIsShortcutsModalOpen] = React.useState(false);
 
-  // Global keyboard shortcuts - only Shift+/ for shortcuts modal
-  useShowShortcutsShortcut(() => setIsShortcutsModalOpen(true));
+  // Initialize global shortcuts on mount
+  React.useEffect(() => {
+    initializeGlobalShortcuts();
+
+    // Listen for shortcuts help event
+    const handleOpenShortcuts = () => setIsShortcutsModalOpen(true);
+    window.addEventListener("open-shortcuts-help", handleOpenShortcuts);
+
+    // Listen for close modals event
+    const handleCloseModals = () => {
+      setIsShortcutsModalOpen(false);
+    };
+    window.addEventListener("close-modals", handleCloseModals);
+
+    // Global keyboard event handler
+    const handleKeyDown = (event: KeyboardEvent) => {
+      handleGlobalKeyboardEvent(event);
+    };
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("open-shortcuts-help", handleOpenShortcuts);
+      window.removeEventListener("close-modals", handleCloseModals);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
 
   return (
     <>
@@ -28,9 +47,8 @@ export function GlobalShortcutsProvider({ children }: GlobalShortcutsProviderPro
 
       {/* Keyboard Shortcuts Modal (Shift+/) - Available globally */}
       <KeyboardShortcutsModal
-        open={isShortcutsModalOpen}
-        onOpenChange={setIsShortcutsModalOpen}
-        shortcuts={UNIVERSAL_SHORTCUTS}
+        isOpen={isShortcutsModalOpen}
+        onClose={() => setIsShortcutsModalOpen(false)}
       />
     </>
   );

@@ -25,12 +25,10 @@ export interface MainLayoutProps {
 
 /**
  * Material 3 Expressive Main Layout
- *
- * Implements Google Skills/Qwiklabs patterns:
- * - Navigation Rail (Desktop) - Collapsed/expanded widths from app tokens
- * - Mobile Drawer - Slide-in drawer for mobile/tablet
- * - Top App Bar (Toolbar) - Search, gamification, user menu
- * - Content Area - Main content with proper padding
+ * Mobile-first responsive layout:
+ * - Mobile: Full-width content, hamburger menu drawer
+ * - Tablet/Desktop: Fixed navigation rail, fixed toolbar
+ * - Content scrolls independently while header/sidebar stay fixed
  */
 export function MainLayout({
   children,
@@ -76,32 +74,44 @@ function MainLayoutFrame({
   useCommandPaletteShortcut(() => setIsCommandPaletteOpen(true));
 
   return (
-    <div className="min-h-screen bg-[color:var(--background)]">
+    <div className="flex h-screen w-screen overflow-hidden bg-[color:var(--background)]">
+      {/* Navigation Rail - Fixed on desktop, drawer on mobile */}
       {showNavigation && (
-        <>
+        <div className="fixed inset-y-0 left-0 z-40 h-screen">
           <NavigationDrawer />
-        </>
+        </div>
       )}
 
-      {showToolbar && (
-        <Toolbar
-          title={toolbarTitle}
-          showSearch={showSearch}
-          searchPlaceholder={searchPlaceholder}
-          onSearch={onSearch}
-          showNavigation={showNavigation}
-          onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
-        />
-      )}
+      {/* Main content wrapper */}
+      <div className="flex h-screen flex-1 flex-col overflow-hidden">
+        {/* Toolbar - Fixed position at top */}
+        {showToolbar && (
+          <div className="fixed top-0 left-0 right-0 z-30 h-16 border-b border-[color:var(--md-sys-color-outline-variant)]">
+            <Toolbar
+              title={toolbarTitle}
+              showSearch={showSearch}
+              searchPlaceholder={searchPlaceholder}
+              onSearch={onSearch}
+              showNavigation={showNavigation}
+              onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
+            />
+          </div>
+        )}
 
-      <MainContent
-        showNavigation={!!showNavigation}
-        showToolbar={!!showToolbar}
-      >
-        {children}
-      </MainContent>
+        {/* Scrollable content area */}
+        <MainContent
+          showNavigation={!!showNavigation}
+          showToolbar={!!showToolbar}
+        >
+          {children}
+        </MainContent>
 
-      {showFooter && <Footer />}
+        {showFooter && (
+          <div className="flex-shrink-0">
+            <Footer />
+          </div>
+        )}
+      </div>
 
       {/* Command Palette for search - Role-aware */}
       <CommandPalette
@@ -127,53 +137,56 @@ function MainContent({
   return (
     <main
       className={cn(
-        "min-h-[calc(100vh-4rem)] pb-4 transition-all duration-200",
-        showToolbar ? "pt-2 sm:pt-3" : "pt-0",
-        showNavigation && "lg:ml-[var(--app-nav-rail-collapsed-width)]",
+        "flex flex-1 flex-col overflow-hidden",
+        "transition-all duration-200",
+        // Toolbar padding for fixed header
+        showToolbar && "pt-16",
+        // Desktop: left padding for navigation rail
+        showNavigation && "lg:pl-[var(--app-nav-rail-collapsed-width)]",
         showNavigation &&
           !isDrawerCollapsed &&
-          "lg:ml-[var(--app-nav-rail-expanded-width)]",
+          "lg:pl-[var(--app-nav-rail-expanded-width)]",
       )}
     >
-      <div className="w-full">{children}</div>
+      <div className="w-full h-full overflow-y-auto">{children}</div>
     </main>
   );
 }
 
 function Footer() {
   return (
-    <footer className="border-t border-[color:var(--md-sys-color-outline-variant)] bg-[color:var(--md-sys-color-surface-container)]">
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+    <footer className="w-full border-t border-[color:var(--md-sys-color-outline-variant)] bg-[color:var(--md-sys-color-surface-container)]">
+      <div className="mx-auto w-full max-w-[1360px] px-3 py-5 sm:px-5 sm:py-7 lg:px-7 lg:py-9">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-4">
           {/* Brand */}
-          <div className="col-span-2 md:col-span-1">
-            <div className="flex items-center gap-2 mb-3">
-              <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-[color:var(--md-sys-color-primary)]">
+          <div className="col-span-full sm:col-span-1">
+            <div className="mb-3 flex items-center gap-2">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[color:var(--md-sys-color-primary)]">
                 <MaterialSymbol
                   icon="school"
                   size={18}
-                  className="text-[color:var(--md-sys-color-on-primary)]"
+                  className="text-(--md-sys-color-on-primary)"
                 />
               </div>
-              <span className="m3-title-medium text-[color:var(--md-sys-color-on-surface)]">
+              <span className="m3-title-medium text-(--md-sys-color-on-surface)">
                 Calabash
               </span>
             </div>
-            <p className="m3-body-small text-[color:var(--md-sys-color-on-surface-variant)]">
+            <p className="m3-body-small text-(--md-sys-color-on-surface-variant)">
               Digital Library & Learning Management System
             </p>
           </div>
 
           {/* Quick Links */}
           <div>
-            <h4 className="m3-label-large text-[color:var(--md-sys-color-on-surface)] mb-3">
+            <h4 className="mb-3 m3-label-large text-(--md-sys-color-on-surface)">
               Quick Links
             </h4>
             <ul className="space-y-2">
               <li>
                 <Link
                   href="/dashboard"
-                  className="m3-body-small text-[color:var(--md-sys-color-on-surface-variant)] hover:text-[color:var(--md-sys-color-primary)] transition-colors"
+                  className="m3-body-small text-(--md-sys-color-on-surface-variant) hover:text-(--md-sys-color-primary) transition-colors"
                 >
                   Dashboard
                 </Link>
@@ -181,7 +194,7 @@ function Footer() {
               <li>
                 <Link
                   href="/library"
-                  className="m3-body-small text-[color:var(--md-sys-color-on-surface-variant)] hover:text-[color:var(--md-sys-color-primary)] transition-colors"
+                  className="m3-body-small text-(--md-sys-color-on-surface-variant) hover:text-(--md-sys-color-primary) transition-colors"
                 >
                   Library
                 </Link>
@@ -189,7 +202,7 @@ function Footer() {
               <li>
                 <Link
                   href="/courses"
-                  className="m3-body-small text-[color:var(--md-sys-color-on-surface-variant)] hover:text-[color:var(--md-sys-color-primary)] transition-colors"
+                  className="m3-body-small text-(--md-sys-color-on-surface-variant) hover:text-(--md-sys-color-primary) transition-colors"
                 >
                   Courses
                 </Link>
@@ -197,7 +210,7 @@ function Footer() {
               <li>
                 <Link
                   href="/exams"
-                  className="m3-body-small text-[color:var(--md-sys-color-on-surface-variant)] hover:text-[color:var(--md-sys-color-primary)] transition-colors"
+                  className="m3-body-small text-(--md-sys-color-on-surface-variant) hover:text-(--md-sys-color-primary) transition-colors"
                 >
                   Assessment
                 </Link>
@@ -207,14 +220,14 @@ function Footer() {
 
           {/* Resources */}
           <div>
-            <h4 className="m3-label-large text-[color:var(--md-sys-color-on-surface)] mb-3">
+            <h4 className="mb-3 m3-label-large text-(--md-sys-color-on-surface)">
               Resources
             </h4>
             <ul className="space-y-2">
               <li>
                 <Link
                   href="/calendar"
-                  className="m3-body-small text-[color:var(--md-sys-color-on-surface-variant)] hover:text-[color:var(--md-sys-color-primary)] transition-colors"
+                  className="m3-body-small text-(--md-sys-color-on-surface-variant) hover:text-(--md-sys-color-primary) transition-colors"
                 >
                   Calendar
                 </Link>
@@ -222,7 +235,7 @@ function Footer() {
               <li>
                 <Link
                   href="/notes"
-                  className="m3-body-small text-[color:var(--md-sys-color-on-surface-variant)] hover:text-[color:var(--md-sys-color-primary)] transition-colors"
+                  className="m3-body-small text-(--md-sys-color-on-surface-variant) hover:text-(--md-sys-color-primary) transition-colors"
                 >
                   Notes
                 </Link>
@@ -230,7 +243,7 @@ function Footer() {
               <li>
                 <Link
                   href="/analytics"
-                  className="m3-body-small text-[color:var(--md-sys-color-on-surface-variant)] hover:text-[color:var(--md-sys-color-primary)] transition-colors"
+                  className="m3-body-small text-(--md-sys-color-on-surface-variant) hover:text-(--md-sys-color-primary) transition-colors"
                 >
                   Analytics
                 </Link>
@@ -238,7 +251,7 @@ function Footer() {
               <li>
                 <Link
                   href="/support"
-                  className="m3-body-small text-[color:var(--md-sys-color-on-surface-variant)] hover:text-[color:var(--md-sys-color-primary)] transition-colors"
+                  className="m3-body-small text-(--md-sys-color-on-surface-variant) hover:text-(--md-sys-color-primary) transition-colors"
                 >
                   Support
                 </Link>
@@ -248,14 +261,14 @@ function Footer() {
 
           {/* Legal */}
           <div>
-            <h4 className="m3-label-large text-[color:var(--md-sys-color-on-surface)] mb-3">
+            <h4 className="mb-3 m3-label-large text-(--md-sys-color-on-surface)">
               Account
             </h4>
             <ul className="space-y-2">
               <li>
                 <Link
                   href="/settings"
-                  className="m3-body-small text-[color:var(--md-sys-color-on-surface-variant)] hover:text-[color:var(--md-sys-color-primary)] transition-colors"
+                  className="m3-body-small text-(--md-sys-color-on-surface-variant) hover:text-(--md-sys-color-primary) transition-colors"
                 >
                   Settings
                 </Link>
@@ -263,7 +276,7 @@ function Footer() {
               <li>
                 <Link
                   href="/support"
-                  className="m3-body-small text-[color:var(--md-sys-color-on-surface-variant)] hover:text-[color:var(--md-sys-color-primary)] transition-colors"
+                  className="m3-body-small text-(--md-sys-color-on-surface-variant) hover:text-(--md-sys-color-primary) transition-colors"
                 >
                   Support
                 </Link>
@@ -271,7 +284,7 @@ function Footer() {
               <li>
                 <Link
                   href="/auth"
-                  className="m3-body-small text-[color:var(--md-sys-color-on-surface-variant)] hover:text-[color:var(--md-sys-color-primary)] transition-colors"
+                  className="m3-body-small text-(--md-sys-color-on-surface-variant) hover:text-(--md-sys-color-primary) transition-colors"
                 >
                   Account Portal
                 </Link>
@@ -281,29 +294,29 @@ function Footer() {
         </div>
 
         {/* Bottom Bar */}
-        <div className="mt-8 pt-6 border-t border-[color:var(--md-sys-color-outline-variant)] flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="m3-body-small text-[color:var(--md-sys-color-on-surface-variant)]">
+        <div className="mt-8 flex flex-col gap-4 border-t border-[color:var(--md-sys-color-outline-variant)] pt-6 sm:flex-row sm:items-center sm:justify-between">
+          <p className="m3-body-small text-(--md-sys-color-on-surface-variant)">
             © {new Date().getFullYear()} Calabash. Built with Material 3
             Expressive.
           </p>
-          <div className="flex items-center gap-4">
-            <button className="flex items-center gap-2 px-4 py-2 rounded-full bg-[color:var(--md-sys-color-surface-container-high)] hover:bg-[color:var(--md-sys-color-surface-container-highest)] transition-colors">
+          <div className="flex flex-wrap items-center gap-4">
+            <button className="flex items-center gap-2 rounded-full bg-[color:var(--md-sys-color-surface-container-high)] px-4 py-2 transition-colors hover:bg-[color:var(--md-sys-color-surface-container-highest)]">
               <MaterialSymbol
                 icon="light_mode"
                 size={18}
-                className="text-[color:var(--md-sys-color-on-surface-variant)]"
+                className="text-(--md-sys-color-on-surface-variant)"
               />
-              <span className="m3-label-large text-[color:var(--md-sys-color-on-surface-variant)]">
+              <span className="m3-label-large text-(--md-sys-color-on-surface-variant)">
                 Light
               </span>
             </button>
-            <button className="flex items-center gap-2 px-4 py-2 rounded-full bg-[color:var(--md-sys-color-surface-container-high)] hover:bg-[color:var(--md-sys-color-surface-container-highest)] transition-colors">
+            <button className="flex items-center gap-2 rounded-full bg-[color:var(--md-sys-color-surface-container-high)] px-4 py-2 transition-colors hover:bg-[color:var(--md-sys-color-surface-container-highest)]">
               <MaterialSymbol
                 icon="dark_mode"
                 size={18}
-                className="text-[color:var(--md-sys-color-on-surface-variant)]"
+                className="text-(--md-sys-color-on-surface-variant)"
               />
-              <span className="m3-label-large text-[color:var(--md-sys-color-on-surface-variant)]">
+              <span className="m3-label-large text-(--md-sys-color-on-surface-variant)">
                 Dark
               </span>
             </button>
