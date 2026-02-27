@@ -145,6 +145,90 @@
   --md-sys-typescale-label-small-line-height: 1rem;
   --md-sys-typescale-label-small-weight: 500;
   --md-sys-typescale-label-small-tracking: 0.025em;
+
+  /* State Layers (M3 Spec) */
+  --md-sys-state-hover-opacity: 0.08;
+  --md-sys-state-focus-opacity: 0.12;
+  --md-sys-state-pressed-opacity: 0.12;
+  --md-sys-state-dragged-opacity: 0.16;
+  --md-sys-state-selected-opacity: 0.08;
+
+  /* Layout & Spacing Tokens */
+  --md-sys-spacing-none: 0px;
+  --md-sys-spacing-1: 4px;
+  --md-sys-spacing-2: 8px;
+  --md-sys-spacing-3: 12px;
+  --md-sys-spacing-4: 16px;
+  --md-sys-spacing-5: 20px;
+  --md-sys-spacing-6: 24px;
+  --md-sys-spacing-7: 28px;
+  --md-sys-spacing-8: 32px;
+  --md-sys-spacing-9: 40px;
+  --md-sys-spacing-10: 48px;
+  --md-sys-spacing-11: 56px;
+  --md-sys-spacing-12: 64px;
+  --md-sys-spacing-13: 72px;
+  --md-sys-spacing-14: 80px;
+
+  /* Component-Specific Tokens */
+  /* Buttons */
+  --md-sys-button-height: 40px;
+  --md-sys-button-padding: 0 24px;
+  --md-sys-button-radius: 20px;
+  --md-sys-button-text-size: 0.875rem;
+  --md-sys-button-text-weight: 500;
+  --md-sys-button-text-tracking: 0.0062em;
+
+  /* Cards */
+  --md-sys-card-radius: 12px;
+  --md-sys-card-elevation: var(--md-sys-elevation-1);
+  --md-sys-card-padding: 16px;
+
+  /* Input Fields */
+  --md-sys-input-height: 56px;
+  --md-sys-input-radius: 4px;
+  --md-sys-input-padding: 0 16px;
+  --md-sys-input-text-size: 1rem;
+
+  /* Navigation Rail */
+  --md-sys-nav-rail-width-collapsed: 80px;
+  --md-sys-nav-rail-width-expanded: 360px;
+  --md-sys-nav-rail-icon-size: 24px;
+  --md-sys-nav-rail-container-color: var(--md-sys-color-surface-container-low);
+
+  /* Dialogs */
+  --md-sys-dialog-radius: 28px;
+  --md-sys-dialog-padding: 24px;
+  --md-sys-dialog-max-width: 560px;
+
+  /* Chips */
+  --md-sys-chip-height: 32px;
+  --md-sys-chip-radius: 8px;
+  --md-sys-chip-padding: 0 12px;
+  --md-sys-chip-text-size: 0.875rem;
+
+  /* FAB (Floating Action Button) */
+  --md-sys-fab-size: 56px;
+  --md-sys-fab-size-small: 40px;
+  --md-sys-fab-radius: 16px;
+  --md-sys-fab-icon-size: 24px;
+
+  /* Progress Indicators */
+  --md-sys-progress-linear-height: 4px;
+  --md-sys-progress-circular-width: 4px;
+
+  /* Badges */
+  --md-sys-badge-height: 20px;
+  --md-sys-badge-radius: 10px;
+  --md-sys-badge-padding: 0 8px;
+  --md-sys-badge-text-size: 0.75rem;
+
+  /* App Layout */
+  --app-nav-rail-collapsed-width: 96px;
+  --app-nav-rail-expanded-width: 360px;
+  --app-toolbar-height: 64px;
+  --app-content-max-width: 1400px;
+  --app-sidebar-width: 320px;
 }
 /* ============================================
    MATERIAL 3 EXPRESSIVE UTILITY CLASSES
@@ -343,6 +427,144 @@
 
 .m3-motion-decelerate {
   transition-timing-function: var(--md-ref-motion-easing-decelerate);
+}
+
+.m3-motion-accelerate {
+  transition-timing-function: var(--md-ref-motion-easing-accelerate);
+}
+
+/* State Layer Utilities */
+.m3-state-hover {
+  opacity: var(--md-sys-state-hover-opacity);
+}
+
+.m3-state-focus {
+  opacity: var(--md-sys-state-focus-opacity);
+}
+
+.m3-state-pressed {
+  opacity: var(--md-sys-state-pressed-opacity);
+}
+
+.m3-state-dragged {
+  opacity: var(--md-sys-state-dragged-opacity);
+}
+
+.m3-state-selected {
+  opacity: var(--md-sys-state-selected-opacity);
+}
+
+/* Spacing Utilities */
+.m3-spacing-none { padding: var(--md-sys-spacing-none); }
+.m3-spacing-1 { padding: var(--md-sys-spacing-1); }
+.m3-spacing-2 { padding: var(--md-sys-spacing-2); }
+.m3-spacing-3 { padding: var(--md-sys-spacing-3); }
+.m3-spacing-4 { padding: var(--md-sys-spacing-4); }
+.m3-spacing-5 { padding: var(--md-sys-spacing-5); }
+.m3-spacing-6 { padding: var(--md-sys-spacing-6); }
+.m3-spacing-8 { padding: var(--md-sys-spacing-8); }
+.m3-spacing-10 { padding: var(--md-sys-spacing-10); }
+.m3-spacing-12 { padding: var(--md-sys-spacing-12); }
+
+.m3-margin-none { margin: var(--md-sys-spacing-none); }
+.m3-margin-1 { margin: var(--md-sys-spacing-1); }
+.m3-margin-2 { margin: var(--md-sys-spacing-2); }
+.m3-margin-3 { margin: var(--md-sys-spacing-3); }
+.m3-margin-4 { margin: var(--md-sys-spacing-4); }
+.m3-margin-5 { margin: var(--md-sys-spacing-5); }
+.m3-margin-6 { margin: var(--md-sys-spacing-6); }
+.m3-margin-8 { margin: var(--md-sys-spacing-8); }
+.m3-margin-10 { margin: var(--md-sys-spacing-10); }
+.m3-margin-12 { margin: var(--md-sys-spacing-12); }
+
+/* Gap Utilities */
+.m3-gap-1 { gap: var(--md-sys-spacing-1); }
+.m3-gap-2 { gap: var(--md-sys-spacing-2); }
+.m3-gap-3 { gap: var(--md-sys-spacing-3); }
+.m3-gap-4 { gap: var(--md-sys-spacing-4); }
+.m3-gap-5 { gap: var(--md-sys-spacing-5); }
+.m3-gap-6 { gap: var(--md-sys-spacing-6); }
+.m3-gap-8 { gap: var(--md-sys-spacing-8); }
+
+/* Component Utilities */
+.m3-button {
+  height: var(--md-sys-button-height);
+  padding: var(--md-sys-button-padding);
+  border-radius: var(--md-sys-button-radius);
+  font-size: var(--md-sys-button-text-size);
+  font-weight: var(--md-sys-button-text-weight);
+  letter-spacing: var(--md-sys-button-text-tracking);
+}
+
+.m3-card {
+  border-radius: var(--md-sys-card-radius);
+  box-shadow: var(--md-sys-card-elevation);
+  padding: var(--md-sys-card-padding);
+}
+
+.m3-input {
+  height: var(--md-sys-input-height);
+  border-radius: var(--md-sys-input-radius);
+  padding: var(--md-sys-input-padding);
+  font-size: var(--md-sys-input-text-size);
+}
+
+.m3-chip {
+  height: var(--md-sys-chip-height);
+  border-radius: var(--md-sys-chip-radius);
+  padding: var(--md-sys-chip-padding);
+  font-size: var(--md-sys-chip-text-size);
+}
+
+.m3-badge {
+  height: var(--md-sys-badge-height);
+  border-radius: var(--md-sys-badge-radius);
+  padding: var(--md-sys-badge-padding);
+  font-size: var(--md-sys-badge-text-size);
+}
+
+.m3-fab {
+  width: var(--md-sys-fab-size);
+  height: var(--md-sys-fab-size);
+  border-radius: var(--md-sys-fab-radius);
+}
+
+.m3-fab--small {
+  width: var(--md-sys-fab-size-small);
+  height: var(--md-sys-fab-size-small);
+}
+
+.m3-dialog {
+  border-radius: var(--md-sys-dialog-radius);
+  padding: var(--md-sys-dialog-padding);
+  max-width: var(--md-sys-dialog-max-width);
+}
+
+/* Progress Indicators */
+.m3-progress-linear {
+  height: var(--md-sys-progress-linear-height);
+}
+
+.m3-progress-circular {
+  stroke-width: var(--md-sys-progress-circular-width);
+}
+
+/* Navigation Rail */
+.m3-nav-rail {
+  width: var(--md-sys-nav-rail-width-collapsed);
+}
+
+.m3-nav-rail--expanded {
+  width: var(--md-sys-nav-rail-width-expanded);
+}
+
+/* App Layout Utilities */
+.m3-app-content {
+  max-width: var(--app-content-max-width);
+}
+
+.m3-app-sidebar {
+  width: var(--app-sidebar-width);
 }
 
 .m3-motion-accelerate {

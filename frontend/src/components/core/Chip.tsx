@@ -27,6 +27,7 @@ const toChipKey = (value?: string): string =>
 export const Chip = ({
   className,
   variant = "assist",
+  size = "medium",
   label,
   value,
   icon,
@@ -67,7 +68,13 @@ export const Chip = ({
             onRemove();
           }
         : undefined,
-      style,
+      style: {
+        ...style,
+        // Apply M3 chip tokens
+        "--md-chip-height": size === "small" ? "24px" : "32px",
+        "--md-chip-radius": "var(--md-sys-shape-corner-small)",
+        "--md-chip-padding": "0 var(--md-sys-spacing-3)",
+      } as React.CSSProperties,
     },
     avatar
       ? React.isValidElement(avatar)

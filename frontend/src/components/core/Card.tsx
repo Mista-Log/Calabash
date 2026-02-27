@@ -9,22 +9,24 @@ export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 export const Card = React.forwardRef<HTMLDivElement, CardProps>(
-  ({ className, variant = "elevated", ...props }, ref) => {
+  ({ className, variant = "elevated", elevation = 0, ...props }, ref) => {
     const variantClassName = cn(
-      "rounded-[var(--md-sys-shape-corner-extra-large)] border",
+      "m3-card border",
       variant === "filled" &&
         "border-[color:var(--md-sys-color-outline-variant)] bg-[color:var(--md-sys-color-surface-container-low)] text-[color:var(--md-sys-color-on-surface)]",
       variant === "outlined" &&
         "border-[color:var(--md-sys-color-outline)] bg-[color:var(--md-sys-color-surface-container-lowest)] text-[color:var(--md-sys-color-on-surface)]",
       variant === "elevated" &&
         "border-[color:var(--md-sys-color-outline-variant)] bg-[color:var(--md-sys-color-surface-container-lowest)] text-[color:var(--md-sys-color-on-surface)]",
+      elevation > 0 && `m3-elevation-${elevation}`,
+      className,
     );
 
     return (
       <div
         ref={ref}
         data-card-variant={variant}
-        className={cn(variantClassName, className)}
+        className={variantClassName}
         {...props}
       />
     );
@@ -47,7 +49,7 @@ export const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>(
     { className, avatar, heading, subtitle, action, children, ...props },
     ref,
   ) => {
-    const resolvedClassName = cn("px-5 pt-5 pb-2 sm:px-6 sm:pt-6", className);
+    const resolvedClassName = cn("m3-spacing-4", className);
 
     if (heading || subtitle || avatar || action) {
       return (
@@ -95,8 +97,8 @@ export const CardContent = React.forwardRef<HTMLDivElement, CardContentProps>(
     <div
       ref={ref}
       className={cn(
-        "px-5 pb-5 sm:px-6 sm:pb-6",
-        variant === "horizontal" && "flex items-center",
+        "m3-spacing-4",
+        variant === "horizontal" && "m3-gap-4",
         className,
       )}
       {...props}
