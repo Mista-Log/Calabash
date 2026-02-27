@@ -62,7 +62,7 @@ jobs:
 
       - name: Run lint
         working-directory: frontend
-        run: npm run lint
+        run: npx next lint
 
       - name: Run build
         working-directory: frontend

@@ -7,7 +7,7 @@
     "dev:reset": "node scripts/dev-preflight.mjs --reset",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "next lint"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
