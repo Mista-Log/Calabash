@@ -1,0 +1,55 @@
+﻿"use client";
+
+import { CheckmarkCircle02Icon } from "@/lib/icons/material-icons";
+import * as React from "react";
+import { MaterialSymbol } from "@/components/core/MaterialSymbol";
+import { cn } from "@/lib/utils";
+
+export interface CheckboxProps
+  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type'> {
+  checked?: boolean;
+  onCheckedChange?: (checked: boolean) => void;
+}
+
+const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
+  ({ className, checked, onCheckedChange, disabled, ...props }, ref) => {
+    const isChecked = typeof checked === 'boolean' ? checked : false;
+
+    return (
+      <div className="relative flex items-center">
+        <input
+          type="checkbox"
+          ref={ref}
+          checked={isChecked}
+          onChange={(e) => onCheckedChange?.(e.target.checked)}
+          disabled={disabled}
+          className={cn("peer sr-only", className)}
+          {...props}
+        />
+        <div
+          className={cn(
+            "pointer-events-none flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-2 outline-none transition-all duration-200",
+            "border-outline hover:border-on-surface",
+            "peer-focus-visible:ring-2 peer-focus-visible:ring-primary peer-focus-visible:ring-offset-2",
+            "peer-disabled:cursor-not-allowed peer-disabled:border-on-surface/38",
+            isChecked && "bg-primary border-primary text-on-primary",
+            className
+          )}
+          role="checkbox"
+          aria-checked={isChecked}
+        >
+          {isChecked && (
+            <MaterialSymbol
+              icon={CheckmarkCircle02Icon}
+              size={18}
+              className="stroke-2"
+            />
+          )}
+        </div>
+      </div>
+    );
+  }
+);
+Checkbox.displayName = "Checkbox";
+
+export { Checkbox };
