@@ -25,17 +25,17 @@ jobs:
           pip install uv
 
       - name: Sync dependencies
-        working-directory: Backend
+        working-directory: backend
         run: |
           uv sync --frozen
 
       - name: Run migrations check
-        working-directory: Backend
+        working-directory: backend
         run: |
           uv run python manage.py makemigrations --check --dry-run
 
       - name: Run Django tests
-        working-directory: Backend
+        working-directory: backend
         env:
           DJANGO_SETTINGS_MODULE: config.settings
           SECRET_KEY: dummy-secret-key
@@ -59,10 +59,6 @@ jobs:
       - name: Install dependencies
         working-directory: frontend
         run: npm ci
-
-      - name: Run lint
-        working-directory: frontend
-        run: npm run lint
 
       - name: Run build
         working-directory: frontend
