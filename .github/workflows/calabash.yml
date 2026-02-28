@@ -11,6 +11,10 @@ jobs:
     name: Django CI (uv)
     runs-on: ubuntu-latest
 
+    env:
+      DJANGO_SETTINGS_MODULE: config.settings
+      SECRET_KEY: ${{ secrets.SECRET_KEY }}
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -21,26 +25,19 @@ jobs:
           python-version: "3.11"
 
       - name: Install uv
-        run: |
-          pip install uv
+        run: pip install uv
 
       - name: Sync dependencies
         working-directory: Backend
-        run: |
-          uv sync --frozen
+        run: uv sync --frozen
 
       - name: Run migrations check
         working-directory: Backend
-        run: |
-          uv run python manage.py makemigrations --check --dry-run
+        run: uv run python manage.py makemigrations --check --dry-run
 
       - name: Run Django tests
         working-directory: Backend
-        env:
-          DJANGO_SETTINGS_MODULE: config.settings
-          SECRET_KEY: dummy-secret-key
-        run: |
-          uv run python manage.py test
+        run: uv run python manage.py test
 
   frontend:
     name: Next.js CI
