@@ -1,10 +1,13 @@
 from rest_framework import serializers
-from .models import Course, Enrollment, Assignment, Submission
-from account.models import Lecturer, Student
+from .models import Course, Lecturer
 
 
-class CourseSerializer(serializers.ModelSerializer):
-    lecturer_name = serializers.CharField(source="lecturer.user.full_name", read_only=True)
+class CourseCreateSerializer(serializers.ModelSerializer):
+    lecturer_id = serializers.PrimaryKeyRelatedField(
+        queryset=Lecturer.objects.all(),
+        source="lecturer",
+        write_only=True
+    )
 
     class Meta:
         model = Course
@@ -13,45 +16,100 @@ class CourseSerializer(serializers.ModelSerializer):
             "code",
             "title",
             "description",
+            "semester",
             "department",
             "level",
-            "lecturer",
-            "lecturer_name",
-            "is_active",
-            "created_at",
+            "enrollment",
+            "color",
+            "lecturer_id",
         ]
-        read_only_fields = ["lecturer"]
+
+    def validate_code(self, value):
+        if Course.objects.filter(code=value).exists():
+            raise serializers.ValidationError("Course code already exists.")
+        return value
 
 
-class EnrollmentSerializer(serializers.ModelSerializer):
-    student_name = serializers.CharField(source="student.user.full_name", read_only=True)
-    course_title = serializers.CharField(source="course.title", read_only=True)
+class CourseListSerializer(serializers.ModelSerializer):
+    lecturer_name = serializers.CharField(source="lecturer.name", read_only=True)
+    material_count = serializers.SerializerMethodField()
 
     class Meta:
-        model = Enrollment
+        model = Course
         fields = [
             "id",
-            "student",
-            "student_name",
-            "course",
-            "course_title",
-            "enrolled_at",
-            "grade",
+            "code",
+            "title",
+            "description",
+            "semester",
+            "department",
+            "level",
+            "enrollment",
+            "color",
+            "lecturer_name",
+            "material_count",
+            "created_at",
         ]
-        read_only_fields = ["student", "enrolled_at"]
+
+    def get_material_count(self, obj):
+        return obj.materials.count()
 
 
-class AssignmentSerializer(serializers.ModelSerializer):
 
-    class Meta:
-        model = Assignment
-        fields = "__all__"
-
-
-class SubmissionSerializer(serializers.ModelSerializer):
+class CourseDetailSerializer(serializers.ModelSerializer):
+    lecturer_name = serializers.CharField(source="lecturer.name", read_only=True)
+    material_count = serializers.SerializerMethodField()
 
     class Meta:
-        model = Submission
-        fields = "__all__"
-        read_only_fields = ["student", "submitted_at"]
+        model = Course
+        fields = [
+            "id",
+            "code",
+            "title",
+            "description",
+            "semester",
+            "department",
+            "level",
+            "enrollment",
+            "color",
+            "lecturer_name",
+            "material_count",
+            "created_at",
+        ]
 
+    def get_material_count(self, obj):
+        return obj.materials.count()
+
+
+class CourseUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Course
+        fields = [
+            "code",
+            "title",
+            "description",
+            "semester",
+            "department",
+            "level",
+            "enrollment",
+            "color",
+            "lecturer",  # FK
+            "is_active"
+        ]
+        extra_kwargs = {
+            "code": {"required": False},
+            "title": {"required": False},
+            "description": {"required": False},
+            "semester": {"required": False},
+            "department": {"required": False},
+            "level": {"required": False},
+            "enrollment": {"required": False},
+            "color": {"required": False},
+            "lecturer": {"required": False},
+            "is_active": {"required": False},
+        }
+
+    def validate_code(self, value):
+        if Course.objects.filter(code=value).exclude(id=self.instance.id).exists():
+            raise serializers.ValidationError("Course code already exists.")
+        return value

@@ -50,6 +50,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
+    semester = models.PositiveSmallIntegerField(null=True, blank=True)
 
     date_joined = models.DateTimeField(auto_now_add=True)
 
@@ -73,6 +74,7 @@ class Student(models.Model):
         on_delete=models.CASCADE,
         related_name="student_profile"
     )
+    username = models.CharField(max_length=150, unique=True, null=True, blank=True)
     matric_number = models.CharField(max_length=50, unique=True, null=True, blank=True)
     department = models.CharField(max_length=100, null=True, blank=True)
     level = models.CharField(max_length=50, null=True, blank=True)
@@ -87,7 +89,8 @@ class Lecturer(models.Model):
         on_delete=models.CASCADE,
         related_name="lecturer_profile"
     )
-    staff_id = models.CharField(max_length=50, unique=True, null=True, blank=True)
+    username = models.CharField(max_length=150, unique=True, null=True, blank=True)
+    lecturer_id = models.AutoField(primary_key=True)
     department = models.CharField(max_length=100, null=True, blank=True)
     office = models.CharField(max_length=100, null=True, blank=True)
 
