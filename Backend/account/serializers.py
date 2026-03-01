@@ -67,7 +67,7 @@ class StudentProfileSerializer(serializers.ModelSerializer):
 class LecturerProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Lecturer
-        fields = ["staff_id", "department", "office"]
+        fields = ["lecturer_id", "department", "office"]
 
 
 class AdminProfileSerializer(serializers.ModelSerializer):
