@@ -37,12 +37,7 @@ class Course(models.Model):
 
 class CourseMaterial(models.Model):
 
-    MATERIAL_TYPES = (
-        ("pdf", "PDF"),
-        ("video", "Video"),
-        ("doc", "Document"),
-        ("link", "External Link"),
-    )
+    material_type = models.CharField(max_length=50)
 
     VISIBILITY_CHOICES = (
         ("public", "Public"),
@@ -57,11 +52,8 @@ class CourseMaterial(models.Model):
 
     title = models.CharField(max_length=255)
     semester = models.PositiveSmallIntegerField(null=True, blank=True)
-    material_type = models.CharField(
-        max_length=20,
-        choices=MATERIAL_TYPES
-    )
 
+    
     file = models.FileField(upload_to="course_materials/", blank=True, null=True)
     external_url = models.URLField(blank=True, null=True)
 

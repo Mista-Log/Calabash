@@ -70,7 +70,7 @@ export const API_ENDPOINTS = {
   // Library
   LIBRARY: {
     LIST: '/api/library/',
-    SEARCH: '/api/library/search/',
+    SEARCH: '/api/library/search/', 
   },
   
   // Notes
