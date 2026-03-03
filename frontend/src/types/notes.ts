@@ -22,8 +22,10 @@ import type { Material } from "@/services/api";
 
 // =============================================================================
 // CORE TYPES
+/*
  * Backend: These map directly to Django model fields
  * =============================================================================
+ */
 
 /**
  * User role for notes (notes are role-specific)
@@ -53,9 +55,11 @@ export type NoteSaveState = "idle" | "saving" | "saved" | "error";
 
 // =============================================================================
 // NOTE ENTITY (Main data structure)
+/*
  * Backend: This is what GET /api/notes/:id/ should return
  * Django Model: courses.models.Note
  * =============================================================================
+ */
 
 export interface NoteEntity {
   // Unique identifier
@@ -92,9 +96,11 @@ export interface NoteEntity {
 
 // =============================================================================
 // NOTE ATTACHMENT
+/*
  * Backend: Links a note to a material
  * Django: Many-to-Many relationship between Note and CourseMaterial
  * =============================================================================
+ */
 
 export interface NoteAttachment {
   materialId: string;
@@ -106,8 +112,10 @@ export interface NoteAttachment {
 
 // =============================================================================
 // NOTE FILTERS & SEARCH
+/*
  * Backend: Query parameters for GET /api/notes/
  * =============================================================================
+ */
 
 /**
  * Filter options for listing notes
@@ -121,9 +129,11 @@ export interface NoteFilter {
 
 // =============================================================================
 // DASHBOARD SNAPSHOT
+/*
  * Backend: GET /api/notes/dashboard-snapshot/
  * Purpose: Quick summary of notes for dashboard widget
  * =============================================================================
+ */
 
 export interface NotesDashboardSnapshot {
   recentNotes: NoteEntity[];  // Last 3 updated notes
@@ -134,9 +144,11 @@ export interface NotesDashboardSnapshot {
 
 // =============================================================================
 // REPOSITORY RESULT TYPE
+/*
  * Backend: Use similar structure for API responses
  * Example: { ok: true, data: note } or { ok: false, code: "NOT_FOUND", error: "..." }
  * =============================================================================
+ */
 
 export type NotesRepoErrorCode =
   | "NOT_FOUND"        // Note doesn't exist
@@ -149,8 +161,10 @@ export type NotesRepoResult<T> =
 
 // =============================================================================
 // NOTE CREATION
+/*
  * Backend: POST /api/notes/ request body
  * =============================================================================
+ */
 
 /**
  * Seed data for creating a new note draft

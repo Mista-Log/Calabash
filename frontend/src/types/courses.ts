@@ -13,8 +13,10 @@ import type { Course, CourseDetails, Material } from "@/services/api";
 
 // =============================================================================
 // ERROR HANDLING
+/*
  * Backend: Your API should return similar error structures
  * =============================================================================
+ */
 
 export type CourseRepoErrorCode =
   | "UNAVAILABLE"      // Service/database unavailable
@@ -32,8 +34,10 @@ export type CourseRepoResult<T> =
 
 // =============================================================================
 // SIDEBAR COMPONENT TYPES
+/*
  * Backend: These are for UI display, computed from course/material data
  * =============================================================================
+ */
 
 /**
  * Deadline color coding for UI
@@ -88,8 +92,10 @@ export interface CourseSidebarFeed {
 
 // =============================================================================
 // VIEW MODELS (Frontend UI Organization)
+/*
  * Backend: These are frontend-specific. Just return Course/CourseDetails.
  * =============================================================================
+ */
 
 /**
  * Course list with sidebar data

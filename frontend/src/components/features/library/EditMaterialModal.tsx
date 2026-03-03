@@ -72,7 +72,7 @@ export function EditMaterialModal({
                 Edit Material
               </DialogTitle>
               <p className="mt-1 text-[13px] font-medium text-[color:var(--md-sys-color-on-surface-variant)]">
-                Update details for "{material.title}"
+                Update details for &quot;{material.title}&quot;
               </p>
             </div>
           </div>

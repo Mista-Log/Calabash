@@ -21,23 +21,28 @@ interface LecturerDashboardProps {
   onQuickUpload?: () => void;
 }
 
-export function LecturerQuickDashboard({ onQuickUpload }: LecturerDashboardProps) {
+export function LecturerQuickDashboard({
+  onQuickUpload,
+}: LecturerDashboardProps) {
   const { user } = useUserStore();
   const { courses } = useCourseStore();
 
   const stats = React.useMemo(() => {
-    const totalMaterials = courses.reduce((sum, course: any) => 
-      sum + (course.materialCount || 0), 0);
-    const totalStudents = courses.reduce((sum, course: any) => 
-      sum + (course.enrollment || 0), 0);
-    
+    const totalMaterials = courses.reduce(
+      (sum, course: any) => sum + (course.materialCount || 0),
+      0,
+    );
+    const totalStudents = courses.reduce(
+      (sum, course: any) => sum + (course.enrollment || 0),
+      0,
+    );
+
     return {
       totalCourses: courses.length,
       totalMaterials,
       totalStudents,
-      avgMaterialsPerCourse: courses.length > 0 
-        ? Math.round(totalMaterials / courses.length) 
-        : 0,
+      avgMaterialsPerCourse:
+        courses.length > 0 ? Math.round(totalMaterials / courses.length) : 0,
     };
   }, [courses]);
 
@@ -49,10 +54,10 @@ export function LecturerQuickDashboard({ onQuickUpload }: LecturerDashboardProps
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
           <h1 className="text-[28px] md:text-[32px] font-semibold text-[color:var(--md-sys-color-on-surface)]">
-            Welcome back, {user?.name?.split(' ')[0] || 'Lecturer'}!
+            Welcome back, {user?.name?.split(" ")[0] || "Lecturer"}!
           </h1>
           <p className="mt-1 text-[14px] text-[color:var(--md-sys-color-on-surface-variant)]">
-            Here's what's happening with your courses today.
+            Here&apos;s what&apos;s happening with your courses today.
           </p>
         </div>
         <Link href="/upload">
@@ -172,9 +177,15 @@ export function LecturerQuickDashboard({ onQuickUpload }: LecturerDashboardProps
             </div>
           ) : (
             <div className="text-center py-8 text-[color:var(--md-sys-color-on-surface-variant)]">
-              <MaterialSymbol icon={CourseIcon} size={48} className="mx-auto mb-3 opacity-50" />
+              <MaterialSymbol
+                icon={CourseIcon}
+                size={48}
+                className="mx-auto mb-3 opacity-50"
+              />
               <p>No courses yet</p>
-              <p className="text-[13px]">Create your first course to get started</p>
+              <p className="text-[13px]">
+                Create your first course to get started
+              </p>
             </div>
           )}
         </CardContent>
@@ -195,23 +206,29 @@ function StatCard({
   label: string;
   value: number | string;
   trend: string;
-  color: 'primary' | 'secondary' | 'tertiary' | 'success';
+  color: "primary" | "secondary" | "tertiary" | "success";
 }) {
   const colorClasses = {
-    primary: 'bg-[color:var(--md-sys-color-primary-container)] text-[color:var(--md-sys-color-on-primary-container)]',
-    secondary: 'bg-[color:var(--md-sys-color-secondary-container)] text-[color:var(--md-sys-color-on-secondary-container)]',
-    tertiary: 'bg-[color:var(--md-sys-color-tertiary-container)] text-[color:var(--md-sys-color-on-tertiary-container)]',
-    success: 'bg-[color:var(--md-sys-color-primary-container)] text-[color:var(--md-sys-color-on-primary-container)]',
+    primary:
+      "bg-[color:var(--md-sys-color-primary-container)] text-[color:var(--md-sys-color-on-primary-container)]",
+    secondary:
+      "bg-[color:var(--md-sys-color-secondary-container)] text-[color:var(--md-sys-color-on-secondary-container)]",
+    tertiary:
+      "bg-[color:var(--md-sys-color-tertiary-container)] text-[color:var(--md-sys-color-on-tertiary-container)]",
+    success:
+      "bg-[color:var(--md-sys-color-primary-container)] text-[color:var(--md-sys-color-on-primary-container)]",
   };
 
   return (
     <Card>
       <CardContent className="p-5">
         <div className="flex items-start justify-between">
-          <div className={cn(
-            "flex h-12 w-12 items-center justify-center rounded-xl",
-            colorClasses[color]
-          )}>
+          <div
+            className={cn(
+              "flex h-12 w-12 items-center justify-center rounded-xl",
+              colorClasses[color],
+            )}
+          >
             <MaterialSymbol icon={icon} size={24} />
           </div>
           <Badge variant="secondary" className="text-[11px]">
@@ -247,22 +264,28 @@ function QuickActionButton({
   label: string;
   description: string;
   href: string;
-  color: 'primary' | 'secondary' | 'tertiary' | 'success';
+  color: "primary" | "secondary" | "tertiary" | "success";
 }) {
   const colorClasses = {
-    primary: 'bg-[color:var(--md-sys-color-primary-container)] text-[color:var(--md-sys-color-on-primary-container)]',
-    secondary: 'bg-[color:var(--md-sys-color-secondary-container)] text-[color:var(--md-sys-color-on-secondary-container)]',
-    tertiary: 'bg-[color:var(--md-sys-color-tertiary-container)] text-[color:var(--md-sys-color-on-tertiary-container)]',
-    success: 'bg-[color:var(--md-sys-color-primary-container)] text-[color:var(--md-sys-color-on-primary-container)]',
+    primary:
+      "bg-[color:var(--md-sys-color-primary-container)] text-[color:var(--md-sys-color-on-primary-container)]",
+    secondary:
+      "bg-[color:var(--md-sys-color-secondary-container)] text-[color:var(--md-sys-color-on-secondary-container)]",
+    tertiary:
+      "bg-[color:var(--md-sys-color-tertiary-container)] text-[color:var(--md-sys-color-on-tertiary-container)]",
+    success:
+      "bg-[color:var(--md-sys-color-primary-container)] text-[color:var(--md-sys-color-on-primary-container)]",
   };
 
   return (
     <Link href={href}>
       <div className="group flex items-center gap-4 rounded-xl border border-[color:var(--md-sys-color-outline-variant)] bg-[color:var(--md-sys-color-surface)] p-4 transition-all hover:bg-[color:var(--md-sys-color-surface-container)] hover:shadow-md">
-        <div className={cn(
-          "flex h-12 w-12 items-center justify-center rounded-xl",
-          colorClasses[color]
-        )}>
+        <div
+          className={cn(
+            "flex h-12 w-12 items-center justify-center rounded-xl",
+            colorClasses[color],
+          )}
+        >
           <MaterialSymbol icon={icon} size={24} />
         </div>
         <div className="flex-1 min-w-0">
@@ -273,9 +296,9 @@ function QuickActionButton({
             {description}
           </p>
         </div>
-        <MaterialSymbol 
-          icon="arrow_forward" 
-          size={18} 
+        <MaterialSymbol
+          icon="arrow_forward"
+          size={18}
           className="text-[color:var(--md-sys-color-on-surface-variant)] opacity-0 group-hover:opacity-100 transition-opacity"
         />
       </div>
@@ -296,7 +319,8 @@ function CourseRow({ course }: { course: any }) {
             {course.code}: {course.title}
           </h3>
           <p className="mt-0.5 text-[13px] text-[color:var(--md-sys-color-on-surface-variant)]">
-            {course.enrollment || 0} students • {course.materialCount || 0} materials
+            {course.enrollment || 0} students • {course.materialCount || 0}{" "}
+            materials
           </p>
         </div>
       </div>
@@ -317,6 +341,12 @@ function CourseRow({ course }: { course: any }) {
 }
 
 // CardHeader helper
-function CardHeader({ children, className }: { children: React.ReactNode; className?: string }) {
+function CardHeader({
+  children,
+  className,
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
   return <div className={className}>{children}</div>;
 }

@@ -107,7 +107,7 @@ export function CourseAnnouncements() {
                         {ann.title}
                       </h3>
                       <p className="text-[14px] text-muted-foreground leading-relaxed italic pr-10">
-                        "{ann.content}"
+                        &quot;{ann.content}&quot;
                       </p>
                     </div>
 

@@ -29,7 +29,10 @@ export default function ForgotPasswordPage() {
       setIsSubmitted(true);
       addToast("Reset link sent! Check your email.");
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : "Failed to send reset link. Please try again.";
+      const message =
+        err instanceof Error
+          ? err.message
+          : "Failed to send reset link. Please try again.";
       setError(message);
       addToast(message, "error");
     } finally {
@@ -57,7 +60,8 @@ export default function ForgotPasswordPage() {
                   Reset Password
                 </h1>
                 <p className="m3-body-large text-[color:var(--md-sys-color-on-surface-variant)] text-center mb-8">
-                  Enter your email address and we'll send you a link to reset your password.
+                  Enter your email address and we&apos;ll send you a link to
+                  reset your password.
                 </p>
 
                 {/* Form */}

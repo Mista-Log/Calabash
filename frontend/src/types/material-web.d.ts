@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-empty-object-type */
 import type * as React from "react";
 
 type MaterialIntrinsicElements = {
@@ -231,14 +230,14 @@ type MaterialIntrinsicElements = {
 
 declare global {
   namespace JSX {
-    interface IntrinsicElements extends MaterialIntrinsicElements {}
+    interface IntrinsicElements extends MaterialIntrinsicElements { }
   }
 }
 
 declare module "react" {
   namespace JSX {
-    interface IntrinsicElements extends MaterialIntrinsicElements {}
+    interface IntrinsicElements extends MaterialIntrinsicElements { }
   }
 }
 
-export {};
+export { };

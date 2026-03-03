@@ -97,9 +97,7 @@ export function AuthLayout({
                   className="text-white"
                 />
               </div>
-              <span className="text-[28px] font-bold text-white">
-                Calabash
-              </span>
+              <span className="text-[28px] font-bold text-white">Calabash</span>
             </div>
           </div>
 
@@ -120,10 +118,10 @@ export function AuthLayout({
             {/* Quote */}
             <blockquote className="mb-8">
               <p className="text-[26px] font-medium leading-snug">
-                "{testimonial.quote}"
+                &quot;{testimonial.quote}&quot;
               </p>
             </blockquote>
-            
+
             {/* Author */}
             <footer className="flex items-center gap-4">
               {testimonial.avatar ? (

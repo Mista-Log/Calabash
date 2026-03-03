@@ -21,6 +21,7 @@
 
 // =============================================================================
 // MATERIAL (Learning Resource)
+/*
  * Django Model: courses.CourseMaterial
  * API Endpoints:
  *   - GET    /api/materials/              - List all materials
@@ -30,6 +31,7 @@
  *   - DELETE /api/materials/:id/          - Delete material
  *   - GET    /api/courses/:id/materials/  - Get materials for course
  * =============================================================================
+ */
 
 export interface Material {
   // Unique ID (primary key from database)
@@ -91,6 +93,7 @@ export interface Material {
 
 // =============================================================================
 // COURSE
+/*
  * Django Model: courses.Course
  * API Endpoints:
  *   - GET /api/courses/              - List courses (filtered by role/semester)
@@ -99,6 +102,7 @@ export interface Material {
  *   - PUT /api/courses/:id/          - Update course
  *   - DELETE /api/courses/:id/       - Delete course
  * =============================================================================
+ */
 
 export interface Course {
   // Unique ID (primary key)
@@ -138,9 +142,11 @@ export interface Course {
 
 // =============================================================================
 // COURSE DETAILS (Extended course with nested data)
+/*
  * API Endpoint: GET /api/courses/:id/
  * This is a detailed view that includes nested modules, materials, etc.
  * =============================================================================
+ */
 
 export interface CourseDetails extends Course {
   // Extended description (same as Course.description)
@@ -195,6 +201,7 @@ export interface CourseDetails extends Course {
 
 // =============================================================================
 // USER PROFILE
+/*
  * Django Model: account.models.User (+ Student/Lecturer profiles)
  * API Endpoints:
  *   - GET    /api/users/me/          - Get current user
@@ -204,6 +211,7 @@ export interface CourseDetails extends Course {
  *   - POST   /api/auth/signup/       - Register
  *   - POST   /api/auth/logout/       - Logout
  * =============================================================================
+ */
 
 export interface UserProfile {
   // Unique user ID (primary key)
@@ -246,9 +254,11 @@ export interface UserProfile {
 
 // =============================================================================
 // LECTURER DASHBOARD STATISTICS
+/*
  * API Endpoint: GET /api/dashboard/lecturer/
  * These are computed statistics for the lecturer dashboard
  * =============================================================================
+ */
 
 export interface LecturerStats {
   // Total number of students across all courses
@@ -289,9 +299,11 @@ export interface CourseEngagementPoint {
 
 // =============================================================================
 // STUDENT DASHBOARD STATISTICS
+/*
  * API Endpoint: GET /api/dashboard/student/
  * These are computed statistics for the student dashboard
  * =============================================================================
+ */
 
 export interface StudentStats {
   // Grade Point Average
@@ -310,9 +322,11 @@ export interface StudentStats {
 
 // =============================================================================
 // GAMIFICATION (Student Progress Tracking)
+/*
  * API Endpoint: GET /api/gamification/:userId/
  * This is for student motivation/engagement features
  * =============================================================================
+ */
 
 // Individual achievement
 export interface Achievement {
@@ -363,10 +377,12 @@ export interface StudentGamificationProfile {
 
 // =============================================================================
 // DASHBOARD DATA (Main Dashboard Response)
+/*
  * API Endpoints:
  *   - GET /api/dashboard/student/   - Student dashboard
  *   - GET /api/dashboard/lecturer/  - Lecturer dashboard
  * =============================================================================
+ */
 
 export interface DashboardData {
   // Current user

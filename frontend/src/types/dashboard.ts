@@ -27,8 +27,10 @@ import type { NotesDashboardSnapshot } from "@/types/notes";
 
 // =============================================================================
 // DASHBOARD STATE & ERROR HANDLING
+/*
  * Backend: Use similar error patterns in your API responses
  * =============================================================================
+ */
 
 /**
  * Dashboard loading state
@@ -49,8 +51,10 @@ export type DashboardErrorCode =
 
 // =============================================================================
 // LECTURER DASHBOARD TYPES
+/*
  * Backend: These are computed from Course and Material data
  * =============================================================================
+ */
 
 /**
  * Course content health indicator
@@ -80,8 +84,10 @@ export interface LecturerDashboardView {
 
 // =============================================================================
 // STUDENT DASHBOARD TYPES
+/*
  * Backend: These are computed from Course, Material, and progress data
  * =============================================================================
+ */
 
 /**
  * Student dashboard view
@@ -144,8 +150,10 @@ export interface StudentProgressSummaryVM {
 
 // =============================================================================
 // COMBINED VIEW MODEL
+/*
  * Backend: Just return DashboardData, frontend handles the rest
  * =============================================================================
+ */
 
 /**
  * Complete dashboard view model (combines both student and lecturer views)

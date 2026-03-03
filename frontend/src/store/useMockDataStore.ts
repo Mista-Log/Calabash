@@ -47,8 +47,10 @@ import {
 
 // =============================================================================
 // STORE STATE INTERFACE
+/*
  * Backend: This represents all the data the frontend needs to function
  * =============================================================================
+ */
 
 interface MockDataState {
   // Core data (from API)
@@ -85,9 +87,11 @@ interface StudentStatsRecord {
 }
 
 // =============================================================================
+/*
  * STORE IMPLEMENTATION
  * Backend: Ignore the implementation details - focus on the data structures above
  * =============================================================================
+ */
 
 export const useMockDataStore = create<MockDataState>()(
   persist(
@@ -166,13 +170,13 @@ export const useMockDataStore = create<MockDataState>()(
       addXP: (userId, amount) => set((state) => {
         const profile = state.gamificationProfiles[userId];
         if (!profile) return state;
-        
+
         const newCurrentXP = profile.currentXP + amount;
         const newTotalXP = profile.totalXP + amount;
-        
+
         // Check for level up
         const leveledUp = newCurrentXP >= profile.xpToNextLevel;
-        
+
         return {
           gamificationProfiles: {
             ...state.gamificationProfiles,
@@ -196,11 +200,11 @@ export const useMockDataStore = create<MockDataState>()(
       // ───────────────────────────────────────────────────────────────────────
       getDashboardData: (userId, role) => {
         const state = get();
-        
+
         // Find user by ID, then by role, then default to first user
         const user = state.users.find(u => u.id === userId) ??
-                    state.users.find(u => u.role === role) ??
-                    state.users[0];
+          state.users.find(u => u.role === role) ??
+          state.users[0];
 
         if (!user) {
           throw new Error("No user found for dashboard");

@@ -76,8 +76,10 @@ export interface PaginatedResponse<T> {
 
 // =============================================================================
 // COURSE API RESPONSES
+/*
  * Endpoints: /api/courses/, /api/courses/:id/, etc.
  * =============================================================================
+ */
 
 /**
  * Response for GET /api/courses/
@@ -160,8 +162,10 @@ export interface CourseBulkActionResponse {
 
 // =============================================================================
 // MATERIAL/LIBRARY API RESPONSES
+/*
  * Endpoints: /api/materials/, /api/materials/:id/, etc.
  * =============================================================================
+ */
 
 /**
  * Response for GET /api/materials/
@@ -209,8 +213,10 @@ export interface MaterialSearchResponse {
 
 // =============================================================================
 // DASHBOARD API RESPONSES
+/*
  * Endpoints: /api/dashboard/student/, /api/dashboard/lecturer/
  * =============================================================================
+ */
 
 /**
  * Response for GET /api/dashboard/student/ or /api/dashboard/lecturer/
@@ -231,8 +237,10 @@ export interface QuickStatsResponse {
 
 // =============================================================================
 // AUTHENTICATION API RESPONSES
+/*
  * Endpoints: /api/auth/login/, /api/auth/signup/, etc.
  * =============================================================================
+ */
 
 /**
  * Request for POST /api/auth/login/
@@ -303,8 +311,10 @@ export interface PasswordResetConfirmRequest {
 
 // =============================================================================
 // NOTES API RESPONSES
+/*
  * Endpoints: /api/notes/, /api/notes/:id/, etc.
  * =============================================================================
+ */
 
 /**
  * Note object structure
@@ -353,8 +363,10 @@ export interface NoteUpdateRequest {
 
 // =============================================================================
 // CALENDAR API RESPONSES
+/*
  * Endpoints: /api/calendar/events/, etc.
  * =============================================================================
+ */
 
 /**
  * Calendar event object
@@ -397,8 +409,10 @@ export interface CalendarEventCreateRequest {
 
 // =============================================================================
 // ANALYTICS API RESPONSES
+/*
  * Endpoints: /api/analytics/courses/:id/, /api/analytics/students/:id/
  * =============================================================================
+ */
 
 /**
  * Response for GET /api/analytics/courses/:id/
@@ -431,8 +445,10 @@ export interface StudentPerformanceResponse {
 
 // =============================================================================
 // UPLOAD API RESPONSES
+/*
  * Endpoints: /api/uploads/, /api/uploads/:id/status/
  * =============================================================================
+ */
 
 /**
  * Upload progress information
@@ -458,8 +474,10 @@ export interface UploadStatusResponse {
 
 // =============================================================================
 // REAL-TIME/WEBSOCKET TYPES
+/*
  * For future real-time features (notifications, live updates)
  * =============================================================================
+ */
 
 /**
  * WebSocket connection configuration
