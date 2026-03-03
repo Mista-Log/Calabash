@@ -102,3 +102,68 @@ class UserMeSerializer(serializers.ModelSerializer):
             return AdminProfileSerializer(obj.admin_profile).data
 
         return None
+
+class StudentProfileUpdateSerializer(serializers.ModelSerializer):
+    # Fields from User model
+    full_name = serializers.CharField(source="user.full_name", required=False)
+    semester = serializers.IntegerField(source="user.semester", required=False)
+
+    class Meta:
+        model = Student
+        fields = [
+            "full_name",
+            "semester",
+            "username",
+            "matric_number",
+            "department",
+            "level",
+        ]
+
+    def update(self, instance, validated_data):
+        # Extract user data
+        user_data = validated_data.pop("user", {})
+
+        # Update User fields
+        user = instance.user
+        for attr, value in user_data.items():
+            setattr(user, attr, value)
+        user.save()
+
+        # Update Student fields
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+
+        return instance
+
+class LecturerProfileUpdateSerializer(serializers.ModelSerializer):
+    # Fields from User model
+    full_name = serializers.CharField(source="user.full_name", required=False)
+    bio = serializers.CharField(source="user.bio", required=False)
+
+    class Meta:
+        model = Lecturer
+        fields = [
+            "full_name",
+            "bio",
+            "username",
+            "department",
+            "office",
+        ]
+
+    def update(self, instance, validated_data):
+        # Extract nested user data
+        user_data = validated_data.pop("user", {})
+
+        # Update User fields
+        user = instance.user
+        for attr, value in user_data.items():
+            setattr(user, attr, value)
+        user.save()
+
+        # Update Lecturer fields
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+
+        return instance

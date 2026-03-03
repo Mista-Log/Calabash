@@ -47,7 +47,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         choices=Role.choices,
         default=Role.STUDENT
     )
-
+    bio = models.TextField(blank=True, null=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     semester = models.PositiveSmallIntegerField(null=True, blank=True)
