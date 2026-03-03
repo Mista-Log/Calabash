@@ -1,260 +1,396 @@
-import api from '@/lib/axios';
-import { API_ENDPOINTS } from './config';
-
 /**
- * API Service Interfaces for Calabash
+ * =============================================================================
+ * API TYPES & INTERFACES FOR CALABASH
+ * =============================================================================
+ * 
+ * FOR BACKEND ENGINEERS:
+ * These TypeScript interfaces define the data structures that the frontend
+ * expects from the backend API. Each interface maps to a Django model/serializer.
+ * 
+ * KEY MAPPINGS TO DJANGO:
+ * - UserProfile -> account.models.User (+ Student/Lecturer profiles)
+ * - Course -> courses.models.Course
+ * - Material -> courses.models.CourseMaterial
+ * - Note -> courses.models.Note
+ * 
+ * NAMING CONVENTION:
+ * - TypeScript uses camelCase (e.g., uploadDate)
+ * - Django uses snake_case (e.g., upload_date)
+ * - The API serializer should convert snake_case → camelCase
  */
 
+// =============================================================================
+// MATERIAL (Learning Resource)
+ * Django Model: courses.CourseMaterial
+ * API Endpoints:
+ *   - GET    /api/materials/              - List all materials
+ *   - GET    /api/materials/:id/          - Get single material
+ *   - POST   /api/materials/              - Upload new material
+ *   - PUT    /api/materials/:id/          - Update material
+ *   - DELETE /api/materials/:id/          - Delete material
+ *   - GET    /api/courses/:id/materials/  - Get materials for course
+ * =============================================================================
+
 export interface Material {
-    id: string;
-    title: string;
-    courseCode: string;
-    courseId?: string; // Added for linkage
-    type: 'pdf' | 'past-question' | 'video' | 'zip' | 'image';
-    semester: number;
-    uploadDate: string;
-    url: string;
-    uploader: string;
-    size?: string;
-    downloads?: number;
-    likes?: number;
-    duration?: string;
-    youtubeUrl?: string;
-    ownerAvatar?: string;
-    visibility?: "public" | "private";
-    lastEditedAt?: string;
+  // Unique ID (primary key from database)
+  id: string;
+
+  // Display title of the material
+  title: string;
+
+  // Course code (e.g., "CSC 201") - for display purposes
+  courseCode: string;
+
+  // Course ID - links to Course.id
+  courseId?: string;
+
+  // Type of material (maps to file extension or manual selection)
+  // Django: Could be extracted from file field or stored separately
+  type: 'pdf' | 'past-question' | 'video' | 'zip' | 'image';
+
+  // Academic semester (1, 2, 3, etc.)
+  semester: number;
+
+  // When the material was uploaded (ISO 8601 format)
+  // Django: upload_at field, serialize with .isoformat()
+  uploadDate: string;
+
+  // URL to access/download the material
+  // Django: For files, use request.build_absolute_uri(material.file.url)
+  // For external URLs (YouTube), use the external_url field
+  url: string;
+
+  // Name of the person who uploaded (lecturer's full_name)
+  uploader: string;
+
+  // File size in human-readable format (e.g., "2.4 MB")
+  size?: string;
+
+  // Number of times downloaded
+  downloads?: number;
+
+  // Number of likes/reactions
+  likes?: number;
+
+  // Duration for video/audio content (e.g., "15:30" for 15min 30sec)
+  duration?: string;
+
+  // YouTube URL if type is video and it's an external video
+  youtubeUrl?: string;
+
+  // URL to uploader's avatar
+  ownerAvatar?: string;
+
+  // Visibility setting
+  // Django: visibility field from CourseMaterial model
+  visibility?: "public" | "private";
+
+  // Last edit timestamp (ISO 8601)
+  lastEditedAt?: string;
 }
+
+// =============================================================================
+// COURSE
+ * Django Model: courses.Course
+ * API Endpoints:
+ *   - GET /api/courses/              - List courses (filtered by role/semester)
+ *   - GET /api/courses/:id/          - Get course with full details
+ *   - POST /api/courses/             - Create new course (lecturers/admin only)
+ *   - PUT /api/courses/:id/          - Update course
+ *   - DELETE /api/courses/:id/       - Delete course
+ * =============================================================================
 
 export interface Course {
-    id: string;
-    code: string;
-    title: string;
-    semester: number;
-    description?: string; // Added
-    lecturerName?: string; // Added
-    color?: string; // Added
-    enrollment?: number;
-    materialCount?: number;
+  // Unique ID (primary key)
+  id: string;
+
+  // Course code (e.g., "CSC 201") - should be unique
+  // Django: code field
+  code: string;
+
+  // Full course title
+  // Django: title field
+  title: string;
+
+  // Academic semester (1, 2, 3, etc.)
+  // Django: semester field
+  semester: number;
+
+  // Course description (optional)
+  // Django: description field
+  description?: string;
+
+  // Name of the lecturer teaching this course
+  // Django: lecturer.user.full_name (via ForeignKey)
+  lecturerName?: string;
+
+  // Display color for UI cards (optional, hex or tailwind class)
+  color?: string;
+
+  // Number of enrolled students
+  // Django: enrollment field
+  enrollment?: number;
+
+  // Total number of materials in this course
+  // Django: Can be computed with materials.count() or use material_count field
+  materialCount?: number;
 }
+
+// =============================================================================
+// COURSE DETAILS (Extended course with nested data)
+ * API Endpoint: GET /api/courses/:id/
+ * This is a detailed view that includes nested modules, materials, etc.
+ * =============================================================================
 
 export interface CourseDetails extends Course {
-    description?: string;
-    studentCount: number;
-    materialCount: number;
-    lecturer: {
-        name: string;
-        role: string;
-        avatar: string;
-    };
-    stats: {
-        rating: number;
-        totalRatings: number;
-        duration: string;
-    };
-    youtubeUrl?: string; // Main course intro video
-    supplements: Material[];
-    modules: {
-        id: string;
-        title: string;
-        order: number;
-        materials: Material[];
-    }[];
-    recentActivity: {
-        id: string;
-        type: 'upload' | 'view' | 'comment';
-        description: string;
-        date: string;
-    }[];
+  // Extended description (same as Course.description)
+  description?: string;
+
+  // Number of enrolled students
+  studentCount: number;
+
+  // Total materials count
+  materialCount: number;
+
+  // Lecturer information (nested object)
+  // Django: Serialize lecturer profile + user data
+  lecturer: {
+    name: string;      // lecturer.user.full_name
+    role: string;      // "Course Lecturer" or from profile
+    avatar: string;    // lecturer.user.avatar_url or generated
+  };
+
+  // Course statistics
+  stats: {
+    rating: number;        // Average rating (0-5)
+    totalRatings: number;  // Number of ratings
+    duration: string;      // Estimated completion time (e.g., "2.5h")
+  };
+
+  // Main course introduction video (YouTube embed URL)
+  youtubeUrl?: string;
+
+  // Supplementary materials (quick access)
+  supplements: Material[];
+
+  // Organized modules/sections with materials
+  // Django: This is a frontend organization concept
+  // Backend can return all materials and frontend groups them
+  // OR backend can have a Module model with order field
+  modules: {
+    id: string;
+    title: string;
+    order: number;
+    materials: Material[];
+  }[];
+
+  // Recent activity feed
+  recentActivity: {
+    id: string;
+    type: 'upload' | 'view' | 'comment';
+    description: string;
+    date: string;  // Relative (e.g., "2h ago") or ISO date
+  }[];
 }
+
+// =============================================================================
+// USER PROFILE
+ * Django Model: account.models.User (+ Student/Lecturer profiles)
+ * API Endpoints:
+ *   - GET    /api/users/me/          - Get current user
+ *   - GET    /api/users/:id/         - Get user by ID
+ *   - PUT    /api/users/me/          - Update current user
+ *   - POST   /api/auth/login/        - Login
+ *   - POST   /api/auth/signup/       - Register
+ *   - POST   /api/auth/logout/       - Logout
+ * =============================================================================
 
 export interface UserProfile {
-    id: string;
-    name: string;
-    username?: string; // Added for auth
-    email: string;
-    role: 'student' | 'lecturer';
-    department: string;
-    semester?: number;
-    isNewUser?: boolean;
-    bio?: string;
-    avatarUrl?: string;
+  // Unique user ID (primary key)
+  id: string;
+
+  // Full name
+  // Django: user.full_name
+  name: string;
+
+  // Username (optional, for display)
+  // Django: student.username or lecturer.username
+  username?: string;
+
+  // Email address (used for login)
+  // Django: user.email
+  email: string;
+
+  // User role
+  // Django: user.role field ("student" or "lecturer")
+  role: 'student' | 'lecturer';
+
+  // Department/Faculty
+  // Django: student.department or lecturer.department
+  department: string;
+
+  // Current semester (mainly for students)
+  // Django: user.semester
+  semester?: number;
+
+  // Flag for first-time users (for onboarding flow)
+  isNewUser?: boolean;
+
+  // Short bio
+  // Django: user.bio
+  bio?: string;
+
+  // Avatar/profile picture URL
+  avatarUrl?: string;
 }
+
+// =============================================================================
+// LECTURER DASHBOARD STATISTICS
+ * API Endpoint: GET /api/dashboard/lecturer/
+ * These are computed statistics for the lecturer dashboard
+ * =============================================================================
 
 export interface LecturerStats {
-    totalStudents: number;
-    totalUploads: number;
-    totalViews: number;
-    activeCourses: number;
+  // Total number of students across all courses
+  totalStudents: number;
+
+  // Total materials uploaded by this lecturer
+  // Django: lecturer.uploaded_materials.count()
+  totalUploads: number;
+
+  // Total views across all materials
+  totalViews: number;
+
+  // Number of active courses being taught
+  activeCourses: number;
 }
 
+// Trending material statistics
 export interface TrendingMaterialStat {
-    title: string;
-    views: number;
-    downloads: number;
-    trend: number;
+  title: string;
+  views: number;
+  downloads: number;
+  trend: number;  // Percentage increase
 }
 
+// Monthly upload data for charts
 export interface MonthlyUploadsPoint {
-    name: string;
-    uploads: number;
-    value: number;
+  name: string;   // Month name (e.g., "Jan")
+  uploads: number;
+  value: number;  // Same as uploads, for chart libraries
 }
 
+// Course engagement data for charts
 export interface CourseEngagementPoint {
-    name: string;
-    engagement: number;
-    value: number;
+  name: string;   // Course code
+  engagement: number;
+  value: number;  // Same as engagement, for chart libraries
 }
+
+// =============================================================================
+// STUDENT DASHBOARD STATISTICS
+ * API Endpoint: GET /api/dashboard/student/
+ * These are computed statistics for the student dashboard
+ * =============================================================================
 
 export interface StudentStats {
-    gpa: string;
-    attendance: string;
-    upcomingDeadlines: {
-        title: string;
-        due: string;
-        color: 'orange' | 'sage' | 'green';
-    }[];
+  // Grade Point Average
+  gpa: string;  // e.g., "3.92"
+
+  // Attendance percentage
+  attendance: string;  // e.g., "94%"
+
+  // Upcoming deadlines
+  upcomingDeadlines: {
+    title: string;
+    due: string;  // Relative (e.g., "Tomorrow") or ISO date
+    color: 'orange' | 'sage' | 'green';  // UI priority indicator
+  }[];
 }
 
-// Gamification Types
+// =============================================================================
+// GAMIFICATION (Student Progress Tracking)
+ * API Endpoint: GET /api/gamification/:userId/
+ * This is for student motivation/engagement features
+ * =============================================================================
+
+// Individual achievement
 export interface Achievement {
-    id: string;
-    title: string;
-    description: string;
-    icon: string;
-    category: 'course' | 'material' | 'streak' | 'milestone' | 'special';
-    rarity: 'common' | 'rare' | 'epic' | 'legendary';
-    unlocked: boolean;
-    unlockedAt?: string;
-    progress?: number;
-    target?: number;
+  id: string;
+  title: string;
+  description: string;
+  icon: string;  // Icon name/class
+  category: 'course' | 'material' | 'streak' | 'milestone' | 'special';
+  rarity: 'common' | 'rare' | 'epic' | 'legendary';
+  unlocked: boolean;
+  unlockedAt?: string;  // ISO date when unlocked
+  progress?: number;    // Current progress (0-100)
+  target?: number;      // Target to unlock
 }
 
+// Learning milestone
 export interface Milestone {
-    id: string;
-    title: string;
-    description: string;
-    type: 'course_completion' | 'material_consumption' | 'xp_threshold';
-    progress: number;
-    target: number;
-    reward: {
-        type: 'xp' | 'badge' | 'title';
-        value: number | string;
-    };
-    completed: boolean;
-    claimed: boolean;
+  id: string;
+  title: string;
+  description: string;
+  type: 'course_completion' | 'material_consumption' | 'xp_threshold';
+  progress: number;
+  target: number;
+  reward: {
+    type: 'xp' | 'badge' | 'title';
+    value: number | string;
+  };
+  completed: boolean;
+  claimed: boolean;  // Whether reward has been claimed
 }
 
+// Full gamification profile
 export interface StudentGamificationProfile {
-    level: number;
-    currentXP: number;
-    xpToNextLevel: number;
-    totalXP: number;
-    streak: {
-        current: number;
-        best: number;
-        lastActivity: string;
-    };
-    achievements: Achievement[];
-    milestones: Milestone[];
-    title?: string;
-    badges?: string[];
+  level: number;
+  currentXP: number;
+  xpToNextLevel: number;
+  totalXP: number;
+  streak: {
+    current: number;
+    best: number;
+    lastActivity: string;  // ISO date
+  };
+  achievements: Achievement[];
+  milestones: Milestone[];
+  title?: string;      // Current title (e.g., "Academic Explorer")
+  badges?: string[];   // Badge IDs earned
 }
+
+// =============================================================================
+// DASHBOARD DATA (Main Dashboard Response)
+ * API Endpoints:
+ *   - GET /api/dashboard/student/   - Student dashboard
+ *   - GET /api/dashboard/lecturer/  - Lecturer dashboard
+ * =============================================================================
 
 export interface DashboardData {
-    user: UserProfile;
-    courses: Course[];
-    recentMaterials: Material[];
-    stats?: LecturerStats;
-    studentStats?: StudentStats;
-    lecturerStats?: LecturerStats & {
-        trendingMaterial: TrendingMaterialStat | null;
-        monthlyUploads?: MonthlyUploadsPoint[];
-        courseEngagement?: CourseEngagementPoint[];
-    };
-    courseProgress?: Record<string, number>;
-    gamification?: StudentGamificationProfile;
-}
+  // Current user
+  user: UserProfile;
 
-export class CalabashApiService {
-    /**
-     * Fetch dashboard data from the backend only.
-     * Fallback policy is handled by the dashboard repository layer.
-     */
-    static async getDashboardData(): Promise<DashboardData> {
-        if (!API_ENDPOINTS.DASHBOARD) {
-            throw new Error('Dashboard endpoint is not configured.');
-        }
-        const response = await api.get(API_ENDPOINTS.DASHBOARD);
-        return response.data;
-    }
+  // User's courses (filtered by semester for students, all taught for lecturers)
+  courses: Course[];
 
-    static async uploadMaterial(file: File, metadata: Partial<Material>): Promise<Material> {
-        await new Promise((resolve) => setTimeout(resolve, 2000));
-        return {
-            id: Math.random().toString(36).substr(2, 9),
-            title: metadata.title || file.name,
-            courseCode: metadata.courseCode || 'UNKNOWN',
-            type: 'pdf',
-            semester: metadata.semester || 1,
-            uploadDate: new Date().toISOString(),
-            url: '#',
-            uploader: 'Current User',
-        };
-    }
+  // Recent materials (across all courses)
+  recentMaterials: Material[];
 
-    static async getCourseDetails(courseId: string): Promise<CourseDetails> {
-        await new Promise((resolve) => setTimeout(resolve, 800));
-        return {
-            id: courseId,
-            code: 'CSC 101',
-            title: 'Introduction to Computing',
-            semester: 2,
-            description: 'Fundamental concepts of computer science, algorithms, and logic. This course covers everything from basic binary operations to complex data structures and modern architectural patterns.',
-            studentCount: 1877888,
-            materialCount: 15,
-            lecturer: {
-                name: 'X_AE_A-13',
-                role: 'Product Designer, slothUI',
-                avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Michael'
-            },
-            stats: {
-                rating: 4.5,
-                totalRatings: 1200,
-                duration: '1.2 h'
-            },
-            youtubeUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ', // Mock video URL
-            supplements: [
-                { id: 'sup-1', title: 'Study Notes 2028', courseCode: 'CSC 101', type: 'pdf', semester: 2, uploadDate: '2025-02-10', url: '#', uploader: 'X_AE_A-13', size: '25MB' },
-                { id: 'sup-2', title: 'Study Hackz', courseCode: 'CSC 101', type: 'zip', semester: 2, uploadDate: '2025-02-08', url: '#', uploader: 'X_AE_A-13', size: '25MB' },
-                { id: 'sup-3', title: 'Full Lecture', courseCode: 'CSC 101', type: 'video', semester: 2, uploadDate: '2025-02-05', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', youtubeUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', uploader: 'X_AE_A-13', size: 'Streaming', duration: '12min' },
-            ],
-            modules: [
-                {
-                    id: 's-1',
-                    title: '1. Introduction to Callback Functions',
-                    order: 1,
-                    materials: [
-                        { id: 'm-1', title: '1. Introduction to Callback Functions', courseCode: 'CSC 101', type: 'video', semester: 2, uploadDate: '2025-02-10', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', youtubeUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', uploader: 'Prof. Chen', duration: '12min' },
-                        { id: 'm-2', title: '2. Database Concurrency Model', courseCode: 'CSC 101', type: 'video', semester: 2, uploadDate: '2025-02-08', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', youtubeUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', uploader: 'Prof. Chen', duration: '60min' },
-                        { id: 'm-3', title: '4. setTimeout() functions And MOre', courseCode: 'CSC 101', type: 'video', semester: 2, uploadDate: '2025-02-05', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', youtubeUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', uploader: 'Prof. Chen', duration: '78min' },
-                        { id: 'm-4', title: '5. Managing states with Redux', courseCode: 'CSC 101', type: 'video', semester: 2, uploadDate: '2025-02-04', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', youtubeUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', uploader: 'Prof. Chen', duration: '112min' },
-                        { id: 'm-5', title: '6. Build your own API with nodejs', courseCode: 'CSC 101', type: 'video', semester: 2, uploadDate: '2025-02-03', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', youtubeUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', uploader: 'Prof. Chen', duration: '68min' },
-                    ]
-                }
-            ],
-            recentActivity: [
-                { id: 'a-1', type: 'upload', description: 'Uploaded 2 new slides', date: '2h ago' },
-                { id: 'a-2', type: 'view', description: '45 students viewed Lecture 1', date: '5h ago' },
-            ]
-        };
-    }
+  // Role-specific stats (only one will be present based on user.role)
+  stats?: LecturerStats;
+  studentStats?: StudentStats;
+  lecturerStats?: LecturerStats & {
+    trendingMaterial: TrendingMaterialStat | null;
+    monthlyUploads?: MonthlyUploadsPoint[];
+    courseEngagement?: CourseEngagementPoint[];
+  };
 
-    static async bulkActionMaterials(_materialIds: string[], _action: 'delete' | 'move' | 'hide'): Promise<void> {
-        await new Promise((resolve) => setTimeout(resolve, 1500));
-    }
+  // Course progress tracking (student only)
+  // Key: courseId, Value: progress percentage (0-100)
+  courseProgress?: Record<string, number>;
 
-    static async toggleMaterialVisibility(_materialId: string, _visible: boolean): Promise<void> {
-        await new Promise((resolve) => setTimeout(resolve, 500));
-    }
+  // Gamification data (student only)
+  gamification?: StudentGamificationProfile;
 }
